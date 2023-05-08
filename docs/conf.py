@@ -6,9 +6,9 @@
 
 # -- Project information -----------------------------------------------------
 
-project = u"resomapper"
-copyright = u"2023, Biomedical-MR"
-author = u"Biomedical-MR"
+project = "resomapper"
+copyright = "2023, Biomedical-MR"
+author = "Biomedical-MR"
 
 # -- General configuration ---------------------------------------------------
 
@@ -21,7 +21,7 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.viewcode",
 ]
-autoapi_dirs = ["../src"]
+autoapi_dirs = ["../resomapper"]
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
