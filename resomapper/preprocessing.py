@@ -125,11 +125,9 @@ class Preprocessing:
         return study
 
     def denoise(self, image, patch_size=3, patch_distance=7, h=4.5):
-        d_ima = denoise_nl_means(
+        return denoise_nl_means(
             image, patch_size=patch_size, patch_distance=patch_distance, h=h
         )
-
-        return d_ima
 
     def save_nii(self, study, array):
         nii_ima = nib.Nifti1Image(array, study.affine, study.header)
@@ -185,7 +183,7 @@ class Preprocessing:
                         r_imas = np.moveaxis(np.array(p_imas), 0, -1)
                     else:
                         print(
-                            f"{hmg.error}Dimensiones del archivo de imagen no esperadas."
+                            f"{hmg.error}Dimensiones de archivo de imagen no esperadas."
                         )
                         exit()
 
@@ -222,6 +220,4 @@ class Preprocessing:
                     if not preprocess_again:
                         self.save_nii(study_nii, r_imas)
 
-        print(
-            f"\n{hmg.info}Preprocesado completado. Se va a comenzar con el procesamiento."
-        )
+        print(f"\n{hmg.info}Preprocesado completado. Va a comenzar el procesamiento.")

@@ -123,7 +123,7 @@ class FileSystemBuilder:
         list of str with the selected modalities."""
 
         print(
-            f"\n{hmg.ask}Indica qué modalidades deseas procesar en la ventana emergente."
+            f"\n{hmg.ask}Marca qué modalidades deseas procesar en la ventana emergente."
         )
 
         # init tkinter
@@ -165,7 +165,7 @@ class FileSystemBuilder:
         *DwGradVec.txt files."""
 
         # ask user for which modalities are desired to be processed
-        if known_modals == False:
+        if known_modals is False:
             self.modals_to_process = self.ask_preprocessing()
 
             # add an uderscore to distingish T2 from T2E and change DTI per DT
@@ -500,7 +500,7 @@ class Bru2NiiConverter:
                         \n {df_not_conv} \n"
                 )
 
-                perform_conv = ut.ask_user(f"¿Desea convertirlos?")
+                perform_conv = ut.ask_user("¿Desea convertirlos?")
                 if perform_conv:
                     for nc_study in not_conv:
                         self.convert_bru_2_nii(nc_study)
