@@ -18,6 +18,8 @@ author = "Biomedical-MR"
 extensions = [
     "myst_nb",
     "autoapi.extension",
+    "sphinx.ext.intersphinx",
+    "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",
     "sphinx.ext.viewcode",
 ]
