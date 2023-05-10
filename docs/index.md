@@ -4,6 +4,7 @@
 ```{toctree}
 :maxdepth: 1
 :hidden:
+:caption: RESOMAPPER
 
 example.ipynb
 changelog.md
