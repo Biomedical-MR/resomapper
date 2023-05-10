@@ -11,7 +11,6 @@ This is still not a stable version. Please wait for the next release!
 :hidden:
 :caption: Overview
 
-index.md
 first_steps.md
 ```
 
