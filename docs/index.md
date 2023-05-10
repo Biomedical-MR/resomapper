@@ -1,3 +1,4 @@
+# Resomapper
 ```{warning}
 This is still not a stable version. Please wait for the next release!
 ```
@@ -8,25 +9,19 @@ This is still not a stable version. Please wait for the next release!
 ```{toctree}
 :maxdepth: 1
 :hidden:
-:caption: First steps
+:caption: Overview
 
-example.ipynb
+index.md
+first_steps.md
 ```
 
 ```{toctree}
 :maxdepth: 1
 :hidden:
-:caption: Usage guide
+:caption: User's guide
 
+first_steps.md
 handbook.md
-```
-
-```{toctree}
-:maxdepth: 1
-:hidden:
-:caption: API references
-
-autoapi/index
 ```
 
 ```{toctree}
@@ -34,7 +29,9 @@ autoapi/index
 :hidden:
 :caption: More info
 
+autoapi/index
 changelog.md
 contributing.md
 conduct.md
+example.ipynb
 ```
