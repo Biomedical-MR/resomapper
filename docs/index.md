@@ -11,7 +11,7 @@ This is still not a stable version. Please wait for the next release!
 :hidden:
 :caption: Overview
 
-first_steps.md
+resomapper_intro.md
 ```
 
 ```{toctree}
