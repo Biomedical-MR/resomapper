@@ -1,6 +1,6 @@
-:::{warning}
+```{warning}
 This is still not a stable version. Please wait for the next release!
-:::
+```
 
 ```{include} ../README.md
 ```
