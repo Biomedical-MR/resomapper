@@ -16,7 +16,6 @@ author = "Biomedical-MR"
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    "myst_parser",
     "myst_nb",
     "autoapi.extension",
     "sphinx.ext.napoleon",
