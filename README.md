@@ -8,6 +8,8 @@ Note that `resomapper` is a tool under active development, with new features and
 
 ## Installation
 
+Soon, resomapper will be available for installation via pip. Please stay tuned.
+
 ```bash
 pip install resomapper
 ```
