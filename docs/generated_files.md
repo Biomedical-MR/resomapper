@@ -4,7 +4,7 @@ In this section we provide an overview of the different files generated after ru
 
 ## Converted studies
 
-```c++
+```{code-block} c++
 └── work_folder
     │
     ...
@@ -26,8 +26,8 @@ This files will also be copied to the processed studies folder. However, in the 
 
 ## Processed studies
 
-```c++
-└── work_folder
+```{code-block} r
+└── work_folder 
     │
     ...
     │
