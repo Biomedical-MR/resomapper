@@ -27,6 +27,7 @@ self
 
 first_steps.md
 handbook.md
+Generated files <generated_files.md>
 ```
 
 ```{toctree}
