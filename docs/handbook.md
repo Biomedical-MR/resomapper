@@ -26,7 +26,7 @@ The program will follow several steps:
 
 (start_cli)=
 ## Choosing a working folder
-After displaying a welcome message in the terminal, a pop-up window will appear in which you'll have to choose your working folder and press {kbd}`Select folder`. This directory must contain all the studies we want to process, and it will also hold all the resulting files at the end (see previous section for more details).
+After displaying a welcome message in the terminal, a pop-up window will appear in which you'll have to choose your working folder and press {kbd}`Select folder`. This directory must contain all the studies we want to process, and it will also hold all the resulting files at the end (see {ref}`prepare_studies` for more details).
 
 ```{attention}
 Make sure that you have selected the correct working folder.

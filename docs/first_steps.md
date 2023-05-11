@@ -18,7 +18,7 @@ To install resomapper, you can simply install it via `pip`. To do so, just open 
 > pip install resomapper
 ```
 
-Then wait for the installation of all the required packages and you will be ready to go! You can check if everything is correct by running the command of the resomapper CLI (see {ref}`cli_run`)
+Then wait for the installation of all the required packages and you will be ready to go! You can check if everything is correct by running the command of the resomapper CLI (see {ref}`cli_run`).
 
 ### Updates
 
@@ -52,9 +52,15 @@ You can check if both Python and pip are correctly installed by running the foll
 Any other packages required by resomapper should be installed automatically when you run the pip installation. 
 
 ```{warning}
-Python versions installed from the Windows store can have some problems with **resommaper**. We recommend to install Python from [Python's official site](https://www.python.org/downloads/).
+Python versions installed from the Windows store can have some problems with resommaper. We recommend to install Python from [Python's official site](https://www.python.org/downloads/).
 ```
+
 (venv)=
 ### Using a virtual environment
 
+...
+
+(prepare_studies)=
 ## Preparing the studies
+
+Once you have resomapper correctly installed, it is time to prepare the working directory and the studies you want to process.

@@ -39,5 +39,6 @@ autoapi/index
 changelog.md
 contributing.md
 conduct.md
+acknowledgments.md
 example.ipynb
 ```
