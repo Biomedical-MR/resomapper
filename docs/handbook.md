@@ -16,15 +16,15 @@ The program will follow several steps:
 4. {ref}`mask_creation`
 5. {ref}`preprocessing`
 6. {ref}`processing`
-    * {ref}`MT`
     * {ref}`T1`
     * {ref}`T2`
     * {ref}`T2E`
+    * {ref}`MT`
     * {ref}`DTI`
 
 
 (start_cli)=
-## Choosing root folder
+## Choosing a working folder
 After displaying a welcome message in the terminal, a pop-up window will appear in which you'll have to choose your working folder and press {kbd}`Select folder`. This directory must contain all the studies we want to process, and it will also hold all the resulting files at the end (see previous section for more details).
 
 ```{attention}
@@ -66,9 +66,6 @@ Take into account that processing it again means deleting any previous results f
 (processing)=
 ## Processing
 
-(MT)=
-### MT - Magnetisation Transfer
-
 (T1)=
 ### T1 map
 
@@ -77,6 +74,9 @@ Take into account that processing it again means deleting any previous results f
 
 (T2E)=
 ### T2* map
+
+(MT)=
+### MT - Magnetisation Transfer
 
 (DTI)=
 ### DTI - Diffusion Tensor Imaging
