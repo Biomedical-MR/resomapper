@@ -166,7 +166,7 @@ In the case of MT images, no parameters need to be specified before the processi
 These maps do not require any additional specification before processing begins. Once done, you will be asked if you want to use an {ref}`R2_filter` and the maps can be saved.
 
 (R2_filter)=
-#### R{sup}`2` filter
+### R{sup}`2` filter
 In the modalities that imply fitting the data to a model (DTI and T maps), you will be asked if you want to apply a R{sup}`2` filter. This filter will remove any pixels that have a R{sup}`2` value under a specified threshold, meaning that they adjust worse to the model. This filter is optional and usually is not needed.
 
 ## Saving the maps
