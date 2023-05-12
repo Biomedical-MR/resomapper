@@ -1,9 +1,10 @@
-# Files generated after processing
+# Output files
 
 In this section we provide an overview of the different files generated after running the **resomapper CLI**, for easier identification and retrieval of information. All the resulting files can be found in the working directory selected initially, under the folders `convertidos` and `procesados`, next to the original studies folders. See the section {ref}`file_overview` for an schematic representation of file locations.
 
 The most important files are the map files stored in the processed studies folder, however, here we describe some more that can be useful for further analyisis.
 
+(converted_studies)=
 ## Converted studies
 
 The first step of the program is to convert the raw Bruker files to NIfTI and text files for easier interpretation and handling. The results are stored in the converted studies folder, however, they also are copied to the processed studies folder. 

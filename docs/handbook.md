@@ -34,13 +34,19 @@ Make sure that you have selected the correct working folder.
 
 (convert_studies)=
 ## Converting raw studies to NIfTI
-After choosing the working folder the conversion of studies from raw Bruker format to NIfTI will automatically start. In case that the studies have already been converted and stored before on the same folder they will be reused instead of converted again.
+After choosing the working folder the conversion of studies from raw Bruker format to NIfTI will automatically start. In case that the studies have already been converted and stored before on the same folder the user will be asked if they can be reused or they need to be converted again.
 
-During this process the terminal will display some information messages that can be dismissed by the user. When completed, a message will be shown. Also, the folders containing the converted studies will be labeled for an easier identification afterwards. They will be under the working directory, inside a folder named `convertidos`.
+During this process the terminal will display some information prompts that can be ignored, and when completed, a message will be shown. Also, the folders containing the converted studies will be labeled with the modal they contain for an easier identification afterwards. They will be stored under the working directory, inside a folder named `convertidos` (see {ref}`converted_studies`).
 
 (modal_select)=
 ## Selection of modalities to process
 The next step will be to select the modalities we want to process. Currently, in **resomapper**, we have implemented the posibility to generate T1, T2, T2*, MT and DTI parametric maps. A pop-up window will appear showing all these possibilities. We can check all we want and press {kbd}`OK` to start. For each study in the working directory, the selected modalities will be processed in case their adquisitions are present.
+
+```{image} static/2_select_modal.png
+:alt: Modality selection window.
+:width: 300px
+:align: center
+```
 
 When a modality of an study has already been processed and stored before, a message will be displayed in the terminal giving the option to process it again or not. 
 
@@ -48,8 +54,11 @@ When a modality of an study has already been processed and stored before, a mess
 Take into account that processing it again means deleting any previous results for that modality (for the correspondig study). For that reason, make sure of copying them to another folder before continuing (you'll recieve a warning message to remind you anyway).
 ```
 
+At this point, the processing of the several studies will start. A message will be shown in the terminal at the start of each study and for each modality inside of it.
+
 (mask_creation)=
 ## Creating a mask
+The first step for each instance will be to create the masks or ROIs (Region Of Interest) where we want the processing to take place (in the case of neuroimaging, we need to extract the brain). Pop-up windows will be shown for each slice where the mask can be manually created following the steps shown in the terminal (left-clicking to create lines and right-clicking to close the outline). 
 
 
 ```{attention}

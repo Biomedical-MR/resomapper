@@ -27,7 +27,7 @@ self
 
 first_steps.md
 handbook.md
-Generated files <generated_files.md>
+output_files.md
 ```
 
 ```{toctree}
@@ -39,6 +39,6 @@ autoapi/index
 changelog.md
 contributing.md
 conduct.md
-acknowledgments.md
+credits.md
 example.ipynb
 ```
