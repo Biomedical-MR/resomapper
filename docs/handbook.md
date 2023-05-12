@@ -42,11 +42,12 @@ During this process the terminal will display some information prompts that can 
 ## Selection of modalities to process
 The next step will be to select the modalities we want to process. Currently, in **resomapper**, we have implemented the posibility to generate T1, T2, T2*, MT and DTI parametric maps. A pop-up window will appear showing all these possibilities. We can check all we want and press {kbd}`OK` to start. For each study in the working directory, the selected modalities will be processed in case their adquisitions are present.
 
-```{image} static/2_select_modal.png
-:alt: Modality selection window.
-:width: 250px
-:align: center
-
+```{figure} static/2_select_modal.png
+---
+width: 250px
+name: select_modal
+align: center
+---
 Modality selection window.
 ```
 
@@ -66,25 +67,21 @@ If the study has already been processed and stored in the working directory, wit
 
 you will be asked if you want to reuse it, so that you do not have to create it again.
 
-```{image} static/3_mask_creation.png
-:alt: Mask creation.
-:width: 500px
-:align: center
-
-
-```
-
-:::{admonition}
-Hola???
-:::
 
 ```{figure} static/3_mask_creation.png
 ---
-height: 150px
-name: directive-fig
+width: 500px
+name: mask_creation
+align: center
 ---
-Here is my figure caption!
+Manual mask creation.
 ```
+
+Testing...
+
+:::{warning}
+This is a test
+:::
 
 ```{atention} 
 Make sure you click enter!
