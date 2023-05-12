@@ -63,10 +63,7 @@ At this point, the processing of the several studies will start. A message will 
 ## Creating a mask
 The first step for each instance will be to create the masks or ROIs (Region Of Interest) where we want the processing to take place (in the case of neuroimaging, we need to extract the brain). Pop-up windows will be shown for each slice where the mask can be manually created following the steps shown in the terminal (left-clicking to create lines and right-clicking to close the outline). 
 
-If the study has already been processed and stored in the working directory, with an available previous mask, 
-
-you will be asked if you want to reuse it, so that you do not have to create it again.
-
+If the study has already been processed and stored in the working directory so there is an available previous mask, you will be asked if you want to reuse it, so that you do not have to create it again.
 
 ```{figure} static/3_mask_creation.png
 ---
@@ -75,15 +72,22 @@ name: mask_creation
 align: center
 ---
 Manual mask creation.
-:::{attention}
-This is a test
-:::
 ```
 
-:::{attention}
-This is a test
-:::
+After creating the masks for all slices, a pop-up window will appear with a preview of all of them. Once viewed, press {kbd}`enter` (do it while the window is on focus, you can click on it first to make sure), and the terminal will ask if it is correct. If you are not satisfied with the masks created, you can repeat the process as many times as necessary.
 
+```{figure} static/4_mask_visualization.png
+---
+width: 500px
+name: mask_visualization
+align: center
+---
+Mask pre-visualization.
+```
+
+```{warning}
+Make sure to **press {kbd}`enter`** when the mask pre-visualization window is open to continue the process, and not close it on the {kbd}`X` tab. It can be easy to lose it between other windows we may have opened too.
+```
 
 (preprocessing)=
 ## Preprocessing the images
