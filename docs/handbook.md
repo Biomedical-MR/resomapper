@@ -104,10 +104,10 @@ Parameter selection window.
 
 Next, a window will appear showing the original image and the preprocessed image, while asking if everything is correct via the terminal. If you are not satisfied with the result, you can repeat the preprocessing as many times as you wish.
 
-```{figure} static/6_filtered_results.png
+```{figure} static/6_filtered_result.png
 ---
 width: 500px
-name: filtered_results
+name: filtered_result
 align: center
 ---
 Filtered image pre-visualization.
@@ -157,10 +157,6 @@ Finally, the DTI model will be adjusted to the data, the ADC map will be compute
 * **MD -** Mean Diffusivity
 * **FA -** Fractional Anisotropy
 
-(R2_filter)=
-#### R{sup}`2` filter
-In the modalities that imply fitting the data to a model (DTI and T maps), you will be asked if you want to apply a R{sup}`2` filter. This filter will remove any pixels that have a R{sup}`2` value under a specified threshold, meaning that they adjust worse to the model. This filter is optional and usually is not needed.
-
 (MT)=
 ### MT - Magnetisation Transfer
 In the case of MT images, no parameters need to be specified before the processing starts, but there might be several different images in the original study if we have modified the slope.  If so, the program will ask which folder or folders we want to process (normally, folder 1 will be the original adquisition and the following ones will be the images with the modified slope). If there is only one folder, it will be processed directly. The processing of these images is very fast, because it does not require fitting the data to a model.
@@ -168,6 +164,10 @@ In the case of MT images, no parameters need to be specified before the processi
 (Tmaps)=
 ### T1, T2 and T2* maps
 These maps do not require any additional specification before processing begins. Once done, you will be asked if you want to use an {ref}`R2_filter` and the maps can be saved.
+
+(R2_filter)=
+#### R{sup}`2` filter
+In the modalities that imply fitting the data to a model (DTI and T maps), you will be asked if you want to apply a R{sup}`2` filter. This filter will remove any pixels that have a R{sup}`2` value under a specified threshold, meaning that they adjust worse to the model. This filter is optional and usually is not needed.
 
 ## Saving the maps
 
