@@ -47,9 +47,9 @@ The next step will be to select the modalities we want to process. Currently, in
 :width: 250px
 :align: center
 
+```
 :::{warning} Testing
 :::
-```
 
 When a modality of an study has already been processed and stored before, a message will be displayed in the terminal giving the option to process it again or not. 
 
