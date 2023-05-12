@@ -62,21 +62,32 @@ At this point, the processing of the several studies will start. A message will 
 ## Creating a mask
 The first step for each instance will be to create the masks or ROIs (Region Of Interest) where we want the processing to take place (in the case of neuroimaging, we need to extract the brain). Pop-up windows will be shown for each slice where the mask can be manually created following the steps shown in the terminal (left-clicking to create lines and right-clicking to close the outline). 
 
-If the study has already been processed and it's stored in the working directory, 
+If the study has already been processed and stored in the working directory, with an available previous mask, 
 
 you will be asked if you want to reuse it, so that you do not have to create it again.
 
 ```{image} static/3_mask_creation.png
-:alt: Modality selection window.
-:width: 300px
+:alt: Mask creation.
+:width: 500px
 :align: center
 
 
 ```
 
+:::{admonition}
+Hola???
+:::
 
+```{figure} static/3_mask_creation.png
+---
+height: 150px
+name: directive-fig
+---
+Here is my figure caption!
+```
 
-```{atention} Make sure you click enter!
+```{atention} 
+Make sure you click enter!
 ```
 
 (preprocessing)=
