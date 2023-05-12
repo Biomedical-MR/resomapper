@@ -75,17 +75,15 @@ name: mask_creation
 align: center
 ---
 Manual mask creation.
+:::{attention}
+This is a test
+:::
 ```
 
-Testing...
-
-:::{warning}
+:::{attention}
 This is a test
 :::
 
-```{atention} 
-Make sure you click enter!
-```
 
 (preprocessing)=
 ## Preprocessing the images
