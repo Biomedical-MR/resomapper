@@ -1,3 +1,4 @@
+(output_files)=
 # Output files
 
 In this section we provide an overview of the different files generated after running the **resomapper CLI**, for easier identification and retrieval of information. All the resulting files can be found in the working directory selected initially, under the folders `convertidos` and `procesados`, next to the original studies folders. See the section {ref}`file_overview` for an schematic representation of file locations.

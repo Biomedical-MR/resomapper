@@ -58,9 +58,47 @@ Python versions installed from the Windows store can have some problems with res
 (venv)=
 ### Using a virtual environment
 
-...
+```{note}
+To-do section.
+```
 
 (prepare_studies)=
 ## Preparing the studies
 
-Once you have resomapper correctly installed, it is time to prepare the working directory and the studies you want to process.
+Once you have resomapper correctly installed, it is time to prepare the working directory and the studies you want to process. 
+
+The working directory is a folder where all the studies you want to process must be stored. This folder can be located anywhere, but it is preferable that it is easily accessible for you. 
+
+The studies must be in **Bruker raw format** (not DICOM or others). This means that they will have a similar structure to the one shown in the figure below.
+
+```{figure} static/bruker_folder.png
+---
+width: 400px
+name: bruker_folder
+align: center
+---
+Example of Bruker study folder.
+```
+
+Make sure that the studies are stored directly at the working directory, in separate folders, as shown below. Each study corresponds to a patient (mouse, human...) and contains the folders of the different sequences adquired.
+
+```
+└── work_folder 
+    │
+    ├── study_1
+    │   └── Adquisition folders (1, 2, 3, 4...) and other files
+    │
+    ├── study_2
+    │   └── Adquisition folders (1, 2, 3, 4...) and other files
+    ...
+```
+
+In addition, the following folders will be automatically generated during the CLI program execution (see {ref}`output_files` section for more info on this):
+
+* **"Convertidos" folder:** will contain the original studies converted to NIfTI format. The subfolders of a study with possible interest for processing will have a prefix to better identify them (DT, MT, T1, T2 or T2E).
+* **"Procesados" folder:** will contain the results of processing. Within each study there will be a subfolder with the results for each processed modality. What each file consists of in these folders according to the modality will be specified later.
+* **"supplfiles" folder:** it is generated to save temporary files during the execution. It is not necessary to do anything with it and can be deleted.
+
+```{note}
+It is advisable to empty the working directory and save the files of interest before processing new studies. This will help to avoid confusing files and making mistakes. You can also have several work folders.
+```

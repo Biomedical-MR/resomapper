@@ -91,7 +91,7 @@ Make sure to **press {kbd}`enter`** when the mask pre-visualization window is op
 ## Preprocessing the images
 Before starting the processing, we will have the option to preprocess the images before generating the parametric map. Currently, this preprocessing consist on a noise reduction filtering step (see {ref}`noise-filter` for more details). 
 
-In case you want to perform preprocessing, a pop-up window will be shown asking for the filtering parameters. The first and second ones must be integrers, while the last one can be either an integrer or a decimal number. In the {ref}`noise-filter` you can see what these parameters mean.
+In case you want to perform preprocessing, a pop-up window will be shown asking for the filtering parameters. The first and second ones must be integrers, while the last one can be either an integrer or a decimal number. In the {ref}`noise-filter` section you can see what these parameters mean.
 
 ```{figure} static/5_preprocessing_params.png
 ---
