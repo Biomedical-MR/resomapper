@@ -66,7 +66,7 @@ If the study has already been processed and stored in the working directory so t
 ```{figure} static/3_mask_creation.png
 ---
 width: 500px
-name: mask_creation
+name: img_mask_creation
 align: center
 ---
 Manual mask creation.
@@ -131,7 +131,7 @@ However, in the case of the number of gradient directions, it may be the case th
 
 ```{figure} static/7_DWI_parameters.png
 ---
-width: 500px
+width: 600px
 name: DWI_parmeters
 align: center
 ---
@@ -168,6 +168,9 @@ These maps do not require any additional specification before processing begins.
 (R2_filter)=
 ### R{sup}`2` filter
 In the modalities that imply fitting the data to a model (DTI and T maps), you will be asked if you want to apply a R{sup}`2` filter. This filter will remove any pixels that have a R{sup}`2` value under a specified threshold, meaning that they adjust worse to the model. This filter is optional and usually is not needed.
+
+{ref}`R{sup}`2` filter <R2_filter>`
+[R{sup}`2` filter](R2_filter)
 
 ## Saving the maps
 
