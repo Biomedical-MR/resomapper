@@ -203,10 +203,10 @@ Different color palettes that can be used for map coloring.
 
 When all the maps of the selected modalities from all the studies included in the working directory have been processed and, the processing will be complete and the resomapper CLI will stop running.
 
-# Method details
+## Method details
 
 (noise-filter)=
-## Noise filtering with non-local means
+### Noise filtering with non-local means
 The preprocessing performed includes only a noise reduction in the image using the non-local means algorithm. This algorithm is based on replacing the intensity value of a pixel with the average value of the intensities of similar pixels. As these similar pixels do not necessarily have to be close to the target pixel, this algorithm searches the whole image (hence it is non-local).
 
 As searching the whole image is computationally expensive, we generally work by neighborhoods of pixels. For each target pixel (pixel whose intensity value is to be replaced) is taken:

@@ -8,10 +8,6 @@ First of all, please make sure to have **Python 3.8 or higher** installed as wel
 
 Although optional, it is good practice to use virtual environments to avoid conflicts with other package versions that you have installed for other uses. If you want to know more about this, check out the section {ref}`venv`.
 
-```{warning}
-We are still under construction and this is not an stable release. Please wait for the next release, coming soon! Resomapper is still not available for install on PyPi
-```
-
 To install resomapper, you can simply install it via `pip`. To do so, just open a terminal window (if you are using Windows, you can search for the word "cmd" on the explorer) and run the following command:
 
 ```

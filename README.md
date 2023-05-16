@@ -46,6 +46,8 @@ After running this command, you'll only need to follow the instructions that wil
 * Automatically created after processing, storing the results. 
 ```
 
+For more info, visit the [resomapper docs](https://resomapper.readthedocs.io/en/latest).
+
 ## Contributing
 
 Interested in contributing? Check out the contributing guidelines. Please note that this project is released with a Code of Conduct. By contributing to this project, you agree to abide by its terms.
