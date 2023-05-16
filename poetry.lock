@@ -133,30 +133,31 @@ files = [
 
 [[package]]
 name = "dipy"
-version = "1.7.0"
+version = "1.5.0"
 description = "Diffusion MRI utilities in python"
 category = "main"
 optional = false
 python-versions = ">= 3.6"
 files = [
-    {file = "dipy-1.7.0-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:34f1c6323f4e884dcd0e3f1dd51666d9059f1abb146fd78105aaf4c33f45184c"},
-    {file = "dipy-1.7.0-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:a8ea49b11abf423fb8abcd28dc8549467e4ea32a297db1c89301cfb49c57eb99"},
-    {file = "dipy-1.7.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:77cf294ac16fe548cbbca4aaea2a9c993e1d2e4230416926973d50aebae91b43"},
-    {file = "dipy-1.7.0-cp310-none-win_amd64.whl", hash = "sha256:c5df095b3bf41d8bb8568efe3b6a83ec87fe4bbc6bdc5895d0160a1688961e21"},
-    {file = "dipy-1.7.0-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:cce5db9595e4910fe5818f50d1ef45f29239a47ddb06e46c3c43559abe30aadb"},
-    {file = "dipy-1.7.0-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:83fd19a0347d52590ed45d5fa4ca0e6723a6c96a455c46f3696dc4feba131f53"},
-    {file = "dipy-1.7.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:4ff4cc129fed6f30d11f925350dc79edda6eda7815b04a59b486415746faa6a9"},
-    {file = "dipy-1.7.0-cp311-none-win_amd64.whl", hash = "sha256:53cac93c25e0ee5c3ecbbc17a1fcef6607564098ae1eedfbd5f548dbdde74bdd"},
-    {file = "dipy-1.7.0-cp38-cp38-macosx_10_9_x86_64.whl", hash = "sha256:c4b7f8acc389065ee62c16d5087a625de0545fc1fcdbd28866749b7195e3f761"},
-    {file = "dipy-1.7.0-cp38-cp38-manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:d21c069950ea7319e9580c5513c84232f5d06c68b4c047ab4bd8a11b2bcf51b5"},
-    {file = "dipy-1.7.0-cp38-cp38-manylinux_2_5_x86_64.manylinux1_x86_64.whl", hash = "sha256:ffe4638780d2224871c139a74b83ab4dfb443705e405f8dbf1ee5956a5d413aa"},
-    {file = "dipy-1.7.0-cp38-none-win_amd64.whl", hash = "sha256:d70498b8950a75f250059362244a63e4c597f9ab70b5d8ad1537d311b92b7303"},
-    {file = "dipy-1.7.0-cp39-cp39-macosx_10_9_x86_64.whl", hash = "sha256:e333506d3eb29c8474fa2431928684cc04a79531d23647e7e9906c0753817ea9"},
-    {file = "dipy-1.7.0-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:d2dff5b1b19d3df497ff2252cb25a2610390068d1e6cd1e822719732d8701d7f"},
-    {file = "dipy-1.7.0-cp39-cp39-manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:67b55e6f379396c55fbe9dde9e888b9e60543285839110e0f096030bdb5d0968"},
-    {file = "dipy-1.7.0-cp39-cp39-manylinux_2_5_x86_64.manylinux1_x86_64.whl", hash = "sha256:21bd7b14048f80ef7b74cd52a6ffeaf2b8b7337f5cf4e88e95af9827cfea7f96"},
-    {file = "dipy-1.7.0-cp39-none-win_amd64.whl", hash = "sha256:a6e0b216b91e3f98dbb2140a8668daff9d0b469630eeaab3482975034d791aed"},
-    {file = "dipy-1.7.0.tar.gz", hash = "sha256:59bb647128aae7793215c813bb8ea35dae260ac9f0d938c724064f0af5a05cc3"},
+    {file = "dipy-1.5.0-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:bef34e68fb8e3620fd8c21b27f36f1c8d1933da478ec5910a49069dcd465f3f8"},
+    {file = "dipy-1.5.0-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:c966a661531790806ce909efea1a58c98ee0269a6ea0d95f72d344daeed77dd0"},
+    {file = "dipy-1.5.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:c79f3e07d558e931d1ee9bfa48cdafd4cda83dc7da8c984f4b0f274e6fa4546c"},
+    {file = "dipy-1.5.0-cp310-none-win_amd64.whl", hash = "sha256:339607f6260b735164c18b0b4b9d52a081f99c27d5e9780386b63e53cf17dc3d"},
+    {file = "dipy-1.5.0-cp37-cp37m-macosx_10_9_x86_64.whl", hash = "sha256:651968d5367decabc4323b3efcd03ea977380921d226931d942bb46a579662b7"},
+    {file = "dipy-1.5.0-cp37-cp37m-manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:86c9bff99291a92bf03511df179b90d5beca2d9df518c6ce021a6cc74ebcd7a6"},
+    {file = "dipy-1.5.0-cp37-cp37m-manylinux_2_5_x86_64.manylinux1_x86_64.whl", hash = "sha256:1b79b2d89d948916eefbbcac241e94a0fdbfd4dc9237f97934970da9053b86ab"},
+    {file = "dipy-1.5.0-cp37-none-win_amd64.whl", hash = "sha256:b2ef8610450a9752f2c68e1c4fcce40e722a4e39870d98efd57398a898da706c"},
+    {file = "dipy-1.5.0-cp38-cp38-macosx_10_9_x86_64.whl", hash = "sha256:3f759512e0c4a7690751e63f2693cd0f334c6fce5c4a86fda29ffe7b19bff4d5"},
+    {file = "dipy-1.5.0-cp38-cp38-manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:1cb32bd66a85799d81c3fbdf80208f8689616acff01cd39390860ed445167bb3"},
+    {file = "dipy-1.5.0-cp38-cp38-manylinux_2_5_x86_64.manylinux1_x86_64.whl", hash = "sha256:041f794da34e4ebf3766c1839cbff72abde80e4b43eb4e9ddb8d576a79ec159c"},
+    {file = "dipy-1.5.0-cp38-none-win_amd64.whl", hash = "sha256:6dc00c70ad08faae6176bdc4e29a70767d1134d476f41705b5de03fee01fe86e"},
+    {file = "dipy-1.5.0-cp39-cp39-macosx_10_9_universal2.whl", hash = "sha256:b1db2e79c0f9e2213687b0428cfbd575a04f1fd8f5af24ad23991f8637f7dddb"},
+    {file = "dipy-1.5.0-cp39-cp39-macosx_10_9_x86_64.whl", hash = "sha256:83b66e68eb9bddfb2ed2987e5d1a548fad44e6eef6465749faa163e9ce08dde3"},
+    {file = "dipy-1.5.0-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:5242a2d3f1f6b76b99cd0a81adf465a27908f635c28a2bf0fbb830030de722fc"},
+    {file = "dipy-1.5.0-cp39-cp39-manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:09da88d8955d120e33cb1137e57fd5b2db6901c1c68480dd39f1554651b8f151"},
+    {file = "dipy-1.5.0-cp39-cp39-manylinux_2_5_x86_64.manylinux1_x86_64.whl", hash = "sha256:7c0f35b7c92b9b8aa75ea7d94b8c7a9f803c0d235a3364729f09f5a49b3d4b2c"},
+    {file = "dipy-1.5.0-cp39-none-win_amd64.whl", hash = "sha256:4cad332eaaede72647f98df3e4f069900c6a85d97c4943270fd7bdcef306af5d"},
+    {file = "dipy-1.5.0.tar.gz", hash = "sha256:a19cf40166be09c5b7c31ab00b12fed136ae9531483a9cd7019cc3f3b95f6271"},
 ]
 
 [package.dependencies]
@@ -166,10 +167,10 @@ scipy = ">=1.1"
 tqdm = ">=4.30.0"
 
 [package.extras]
-all = ["boto3", "coverage", "coveralls", "cvxpy", "cython", "fury (>=0.8.0)", "h5py", "h5py (<3.0.0)", "matplotlib", "nibabel (>=3.0.0)", "numpy", "pandas", "pytest", "scikit-image", "scikit-learn", "scipy", "statsmodels", "tables", "tensorflowtensorflow-addons"]
-doc = ["boto3", "cvxpy", "cython", "fury (>=0.8.0)", "h5py", "h5py (<3.0.0)", "matplotlib", "nibabel (>=3.0.0)", "numpy", "pandas", "scikit-image", "scikit-learn", "scipy", "statsmodels", "tables"]
-ml = ["pandas", "scikit-learn", "statsmodels", "tables", "tensorflowtensorflow-addons"]
-test = ["coverage", "coveralls", "pytest"]
+all = ["codecov", "coverage", "coveralls", "cvxpy", "cython", "fury (>=0.8.0)", "h5py", "h5py (<3.0.0)", "matplotlib", "nibabel (>=3.0.0)", "numpy", "pandas", "pytest", "scikit-image", "scikit-learn", "scipy", "statsmodels", "statsmodelstables", "tables", "tensorflow"]
+doc = ["cvxpy", "cython", "h5py", "h5py (<3.0.0)", "matplotlib", "nibabel (>=3.0.0)", "numpy", "pandas", "scikit-image", "scipy", "statsmodels", "tables"]
+ml = ["pandas", "scikit-learn", "statsmodelstables", "tensorflow"]
+test = ["codecov", "coverage", "coveralls", "pytest"]
 viz = ["fury (>=0.8.0)", "matplotlib"]
 
 [[package]]
@@ -1108,4 +1109,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "bebc42038e7e8a3e424fe49bbc684fd194d0bbd92ee62cd7d71cb113afa076cb"
+content-hash = "5801d84c042e1c634d25f5642c8747ae39c0b07b9d151bdc544a1aea62634e31"
