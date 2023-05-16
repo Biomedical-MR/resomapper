@@ -157,24 +157,81 @@ Finally, the DTI model will be adjusted to the data, the ADC map will be compute
 * **MD -** Mean Diffusivity
 * **FA -** Fractional Anisotropy
 
+Before saving the maps, you will be asked if you want to use an [R{sup}`2` filter](R2_filter) and you will be able to adjust the color scale of each map (see {ref}`save_maps`).
+
+Proccesing of DTI maps is made thanks to the [DIPY](https://dipy.org/) library.
+
 (MT)=
 ### MT - Magnetisation Transfer
 In the case of MT images, no parameters need to be specified before the processing starts, but there might be several different images in the original study if we have modified the slope.  If so, the program will ask which folder or folders we want to process (normally, folder 1 will be the original adquisition and the following ones will be the images with the modified slope). If there is only one folder, it will be processed directly. The processing of these images is very fast, because it does not require fitting the data to a model.
 
 (Tmaps)=
 ### T1, T2 and T2* maps
-These maps do not require any additional specification before processing begins. Once done, you will be asked if you want to use an {ref}`R2_filter` and the maps can be saved.
+These maps do not require any additional specification before processing begins. Once done, you will be asked if you want to use an [R{sup}`2` filter](R2_filter) and the maps can be saved.
+
+Processing of T maps is made thanks to the [MyRelax](https://github.com/fragrussu/MyRelax) library.
 
 (R2_filter)=
 ### R{sup}`2` filter
 In the modalities that imply fitting the data to a model (DTI and T maps), you will be asked if you want to apply a R{sup}`2` filter. This filter will remove any pixels that have a R{sup}`2` value under a specified threshold, meaning that they adjust worse to the model. This filter is optional and usually is not needed.
 
-{ref}`R{sup}`2` filter <R2_filter>`
-[R{sup}`2` filter](R2_filter)
+Regardless of your choice, a R{sup}`2` map will be saved for these modalities. This map consist on an image where each pixel value corresponds with the R{sup}`2` for that position. 
 
+(save_maps)=
 ## Saving the maps
+Each time a map or a result is generated, in any of the modalities, a pop-up window will open showing the result. In addition, it will be possible to modify the color scale in which it is displayed, specifying the minimum and maximum value, as well as the name of the color palette.
+
+```{figure} static/9_map_scale.png
+---
+width: 500px
+name: map_scale
+align: center
+---
+Map scaling windows.
+```
+
+The different color palettes and their names can be found in the figure below (see ). The recommended ones are "turbo" (selected by default), and "jet". You can try different combinations and visualize them by pressing the {kbd}`Refresh` button. Once you are satisfied, click on {kbd}`Accept` to save the map.
+
+```{figure} static/colorbars.png
+---
+width: 500px
+name: colorbars
+align: center
+---
+Different color palettes that can be used for map coloring.
+```
+
+When all the maps of the selected modalities from all the studies included in the working directory have been processed and, the processing will be complete and the resomapper CLI will stop running.
 
 # Method details
 
 (noise-filter)=
-## Noise filtering with non-local menas
+## Noise filtering with non-local means
+The preprocessing performed includes only a noise reduction in the image using the non-local means algorithm. This algorithm is based on replacing the intensity value of a pixel with the average value of the intensities of similar pixels. As these similar pixels do not necessarily have to be close to the target pixel, this algorithm searches the whole image (hence it is non-local).
+
+As searching the whole image is computationally expensive, we generally work by neighborhoods of pixels. For each target pixel (pixel whose intensity value is to be replaced) is taken:
+
+* A region size T around the target pixel.
+* A search area at a distance D in pixels defining a neighborhood around the target pixel.  In this neighborhood we will search for regions of size T with which to average. 
+* An intensity distance H that will allow averaging those pixels that have an intensity value similar to the target pixel. It serves as a tolerance value.
+
+The image below shows, in blue, the neighborhood defined by a distance D; in orange, the target pixel P; and in green, a region with a size T of 3x3 around P. The algorithm places a region of size T around each pixel Q that is within the neighborhood and that is in the range of values allowed by H. In the image, it is observed that Q1 and Q2 will serve to obtain the new value of P, but Q3 will not because it is outside the neighborhood. In the case of Q4, as the intensity values of its region are different from those of P, it will be a region that will also be discarded. To obtain the new value of P, a weighted sum of the average values of the pixels contained in each of the Q regions will be made, where each Q region will have a weight associated with a distance value (color distance, i.e. how similar the gray values are) between itself and the P region.
+
+```{figure} static/filter_non_local_means.png
+---
+width: 500px
+name: filter_non_local_means
+align: center
+---
+Regions used by the non-local means filtering algorithm.
+```
+
+In the program, 3 parameters must be entered:
+
+* Size of the region, which refers to T. It must be an integer, because with this parameter regions of size TxT pixels are formed. For example, 3x3. 
+* Search distance, which refers to D. It must be an integer, because with this parameter regions of size DxD pixels are formed. For example, 7x7. 
+* Value of H. It can be integer or decimal. The higher it is, the more permissive it is to include regions with different intensities, so the image will be more blurred/blurred.
+
+It is advisable to test at the beginning to see which values are most suitable for each study and even for each modality. For example, if you are working with larger images, it will be convenient to increase the search distance or the region size.
+
+The article describing the method can be found [here](https://www.ipol.im/pub/art/2011/bcm_nlm/article.pdf). The code implementation of this algorithm has been implemented using the SciPy library. For more information see [here](https://scikit-image.org/docs/stable/auto_examples/filters/plot_nonlocal_means.html) and [here](https://scikit-image.org/docs/stable/api/skimage.restoration.html#skimage.restoration.denoise_nl_means).
