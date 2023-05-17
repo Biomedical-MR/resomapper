@@ -6,47 +6,44 @@ This tool is designed and developed by the *Biomedical Magnetic Resonance Lab* a
 
 Note that `resomapper` is a tool under active development, with new features and improvements still on the way. It is used in-house for preclinical MRI data, mainly for mouse brain imaging, but can be used for different types of MRI data. Any suggestions are welcome!
 
+For more info, visit the [whole documentation](https://resomapper.readthedocs.io/en/latest).
+
 ## Installation
 
-Soon, resomapper will be available for installation via pip. Please stay tuned.
+To install **resomapper**, follow these steps:
 
-```bash
-pip install resomapper
-```
+1. Make sure that you have Python installed on your system. Versions supported are **3.8** and above. 
 
-It is recommended to use this tool from a virtual environment, that can be created with conda or venv.
+    * *Optional: create a virtual environment with conda or venv.*
+
+2. Install **resommaper** and all its dependencies running the following command from your terminal:
+
+    ```
+    pip install resomapper
+    ```
+
+3. If you have already been using **resomapper** and there is any new version available, you can use the following command to update it:
+
+    ```
+    pip install resomapper --upgrade
+    ```
 
 ## Usage
 
-The main feature of `resomapper` is its Command Line Interface, that can be started directly from the terminal with a single command:
+Then, to start using **resomapper**, you'll need to follow these steps:
 
-```bash
-resomapper_cli
-```
+1. Prepare a working directory (an empty folder located wherever you want) and store inside the studies you want to process as folders in *Bruker* raw format.
 
-After running this command, you'll only need to follow the instructions that will be shown in the terminal. Initially, you will need to provide a folder containing the studies to be processed in Bruker format. This is also where the result files will be stored. The structure of this root folder is the following:
+2. Enter the command shown below to run the program's Command Line Interface. 
 
-```
-└── root_folder
-    ├── study_folder_1
-    │   ├── 1
-    │   ├── 2
-    │   ...
-    │   └── ...
-    ├── study_folder_2
-    │   ├── 1
-    │   ├── 2
-    │   ...
-    │   └── ...
-    ...
-    ├── * convertidos 
-    ├── * procesados
-    └── * supplfiles 
+    ```
+    resomapper_cli
+    ```
 
-* Automatically created after processing, storing the results. 
-```
+3. Follow the instructions shown in the terminal.
 
-For more info, visit the [resomapper docs](https://resomapper.readthedocs.io/en/latest).
+4. Finally, retrieve all the resulting maps and files obtained after processing from the same working folder you selected at the start of the program.
+
 
 ## Contributing
 
