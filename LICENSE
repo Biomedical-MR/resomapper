@@ -23,7 +23,7 @@ SOFTWARE.
 
 
 ## 3rd party code 
-Some code distributed within the nibabel sources was developed by other projects. This code is distributed under its respective licenses that are listed below.
+Some code distributed within the resomapper sources was developed by other projects. This code is distributed under its respective licenses that are listed below.
 
 ### myrelax
 The files `resomapper/myrelax/getT1TR.py` and `resomapper/myrelax/getT2T2star.py` have been taken from myrelax: [](https://github.com/fragrussu/MyRelax)
