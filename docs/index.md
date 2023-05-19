@@ -14,18 +14,18 @@ To install **resomapper**, follow these steps:
 
 1. Make sure that you have Python installed on your system. Versions supported are **3.8** and above (more info [here](requirements)). 
 
-    * *Optional: create a virtual environment (more info [here](venv)).*
+* *Optional: create a virtual environment (more info [here](venv)).*
 
 2. Install **resommaper** and all its dependencies running the following command from your terminal:
 
     ```
-    pip install resomapper
+    > pip install resomapper
     ```
 
 3. If you have already been using **resomapper** and there is any new version available, you can use the following command to update it:
 
     ```
-    pip install resomapper --upgrade
+    > pip install resomapper --upgrade
     ```
 
 Then, to start using **resomapper**, you'll need to follow these steps:
@@ -35,7 +35,7 @@ Then, to start using **resomapper**, you'll need to follow these steps:
 2. Enter the command shown below to run the program. 
 
     ```
-    resomapper_cli
+    > resomapper_cli
     ```
 
 3. Follow the instructions shown in the terminal (read the whole manual [here](cli_run) for info on the whole workflow).

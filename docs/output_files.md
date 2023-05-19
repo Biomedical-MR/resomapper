@@ -5,6 +5,8 @@ In this section we provide an overview of the different files generated after ru
 
 The most important files are the map files stored in the processed studies folder, however, here we describe some more that can be useful for further analyisis.
 
+---
+
 (converted_studies)=
 ## Converted studies
 
@@ -24,6 +26,8 @@ In addition, for diffusion imaging adquisitions, we can also find these two file
 ```{note}
 This files will also be copied to the processed studies folder, with the same name as before, but changing **"convertido"** for **"procesado"** in the file name. However, in the case of the NIfTI image files, if we chose to preprocess them with a filter, the file stored in the processed studies folder will be preprocessed, and the one in the converted studies folders will be the original.
 ```
+
+---
 
 ## Processed studies
 
@@ -50,6 +54,8 @@ Also in the processed studies folder, we can find the masks created to select th
 * **shape_slice_(_x_).png**
 
 These files will be under the modality folder where they where originally created (**_modal_\_procesado\__name of the study\_adquisition number_**), as well as in the general folder of the processed study for studies where we reuse the mask in different modalities (**procesado\__name of the study_**).
+
+---
 
 (file_overview)=
 ## File system overview
