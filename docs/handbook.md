@@ -11,19 +11,19 @@ This will start the processing workflow, and if you need to stop it at any point
 
 The program will follow several steps:
 
-1. {ref}`start_cli`
-2. {ref}`convert_studies`
-3. {ref}`modal_select`
-4. {ref}`mask_creation`
-5. {ref}`preprocessing`
-6. {ref}`processing`
+1. [Choosing a working folder](start_cli)
+2. [Converting raw studies to NIfTI](convert_studies)
+3. [Selection of modalities to process](modal_select)
+4. [Creating a mask](mask_creation)
+5. [Preprocessing the images](preprocessing)
+6. [Processing](processing)
     * {ref}`DTI`
     * {ref}`MT`
     * {ref}`Tmaps`
-
+7. [Saving the maps](save_maps)
 
 (start_cli)=
-## Choosing a working folder
+## 1. Choosing a working folder
 After displaying a welcome message in the terminal, a pop-up window will appear in which you'll have to choose your working folder and press {kbd}`Select folder`. This directory must contain all the studies we want to process, and it will also hold all the resulting files at the end (see {ref}`prepare_studies` for more details).
 
 ```{attention}
@@ -31,13 +31,13 @@ Make sure that you have selected the correct working folder.
 ```
 
 (convert_studies)=
-## Converting raw studies to NIfTI
+## 2. Converting raw studies to NIfTI
 After choosing the working folder the conversion of studies from raw Bruker format to NIfTI will automatically start. In case that the studies have already been converted and stored before on the same folder the user will be asked if they can be reused or they need to be converted again.
 
 During this process the terminal will display some information prompts that can be ignored, and when completed, a message will be shown. Also, the folders containing the converted studies will be labeled with the modal they contain for an easier identification afterwards. They will be stored under the working directory, inside a folder named `convertidos` (see {ref}`converted_studies`).
 
 (modal_select)=
-## Selection of modalities to process
+## 3. Selection of modalities to process
 The next step will be to select the modalities we want to process. Currently, in **resomapper**, we have implemented the posibility to generate T1, T2, T2*, MT and DTI parametric maps. A pop-up window will appear showing all these possibilities. We can check all we want and press {kbd}`OK` to start. For each study in the working directory, the selected modalities will be processed in case their adquisitions are present.
 
 ```{figure} static/2_select_modal.png
@@ -58,7 +58,7 @@ Take into account that processing it again means deleting any previous results f
 At this point, the processing of the several studies will start. A message will be shown in the terminal at the start of each study and for each modality inside of it.
 
 (mask_creation)=
-## Creating a mask
+## 4. Creating a mask
 The first step for each instance will be to create the masks or ROIs (Region Of Interest) where we want the processing to take place (in the case of neuroimaging, we need to extract the brain). Pop-up windows will be shown for each slice where the mask can be manually created following the steps shown in the terminal (left-clicking to create lines and right-clicking to close the outline). 
 
 If the study has already been processed and stored in the working directory so there is an available previous mask, you will be asked if you want to reuse it, so that you do not have to create it again.
@@ -88,7 +88,7 @@ Make sure to **press {kbd}`enter`** when the mask pre-visualization window is op
 ```
 
 (preprocessing)=
-## Preprocessing the images
+## 5. Preprocessing the images
 Before starting the processing, we will have the option to preprocess the images before generating the parametric map. Currently, this preprocessing consist on a noise reduction filtering step (see {ref}`noise-filter` for more details). 
 
 In case you want to perform preprocessing, a pop-up window will be shown asking for the filtering parameters. The first and second ones must be integrers, while the last one can be either an integrer or a decimal number. In the {ref}`noise-filter` section you can see what these parameters mean.
@@ -118,7 +118,7 @@ Take into account that the filtering algorithm currently implemented in resomapp
 ```
 
 (processing)=
-## Processing
+## 6. Processing
 Once the previous steps have been completed, the processing of the corresponding modality will start. The workflow might vary a bit depending on the modality, as described in the following sections.
 
 (DTI)=
@@ -178,7 +178,7 @@ In the modalities that imply fitting the data to a model (DTI and T maps), you w
 Regardless of your choice, a R{sup}`2` map will be saved for these modalities. This map consist on an image where each pixel value corresponds with the R{sup}`2` for that position. 
 
 (save_maps)=
-## Saving the maps
+## 7. Saving the maps
 Each time a map or a result is generated, in any of the modalities, a pop-up window will open showing the result. In addition, it will be possible to modify the color scale in which it is displayed, specifying the minimum and maximum value, as well as the name of the color palette.
 
 ```{figure} static/9_map_scale.png
@@ -202,6 +202,8 @@ Different color palettes that can be used for map coloring.
 ```
 
 When all the maps of the selected modalities from all the studies included in the working directory have been processed and, the processing will be complete and the resomapper CLI will stop running.
+
+---
 
 ## Method details
 
