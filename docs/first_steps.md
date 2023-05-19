@@ -130,7 +130,7 @@ Once you have resomapper correctly installed, it is time to prepare the working 
 
 The working directory is a folder where all the studies you want to process must be stored. This folder can be located anywhere, but it is preferable that it is easily accessible for you. 
 
-The studies must be in **Bruker raw format** (not DICOM or others). This means that they will have a similar structure to the one shown in the figure below.
+The studies must be in [**Bruker raw ParaVision format**](https://imaging.mrc-cbu.cam.ac.uk/imaging/FormatBruker) (not DICOM or others). This means that they will have a similar structure to the one shown in the figure below.
 
 ```{figure} static/bruker_folder.png
 ---
