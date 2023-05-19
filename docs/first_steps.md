@@ -60,17 +60,30 @@ You can install **resomapper** and all its dependencies directly on your base Py
 In this section two ways of setting up and using a virtual environment are described: Python's `venv` module and through a `conda` installation. 
 
 ```{note}
-Remember that if you install **resomapper** in a virtual environment, you will have to activate it before or resomapper will not be available for use.
+Remember that if you install **resomapper** in a virtual environment, you'll have to activate it before or resomapper will not be available for use.
 ```
 
 #### Using **venv**
+
+With your Python installation, by default, you'll have access to the venv module, which supports the creation of lightweight virtual environments. The files of these virtual environments need to be stored in a directory of your choice. The command to create a new virtual environment is the following:
 
 ```
 python -m venv /path/to/new/virtual/environment
 ```
 
+Then, to activate the virtual environment, you'll need to run the following comand from the terminal, being on the directory you created the virtual environment in:
 
-[](https://docs.python.org/3/library/venv.html)
+**Unix/macOS:**
+```bash
+/path/to/new/virtual/environment $ source env/bin/activate
+```
+**Windows:**
+```
+C:\path\to\new\virtual\environment > .\env\Scripts\activate
+```
+
+See the [full guide](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/#creating-a-virtual-environment) and [Python's venv docs](https://docs.python.org/3/library/venv.html) for more information.
+
 
 #### Using **conda**
 
