@@ -111,7 +111,7 @@ class MTProcessor:
             )
 
             input_ready = False
-            while input_ready == False:
+            while not input_ready:
                 mt_folders_input = input(
                     f"\n{hmg.ask}Indica el número de la carpeta de adquisición que desas procesar (entre 1 y {n_mt}). "
                     f'Si deseas procesar más de una carpeta, introduce los diferentes números separados por ",".\n{hmg.pointer}'
@@ -198,7 +198,7 @@ class MTProcessor:
                         pass
 
                     # save as .nii file and save heatmaps
-                    mt_map_filename = "MT_map_" + str(i) + ".nii"
+                    mt_map_filename = f"MT_map_{str(i)}.nii"
                     saving_path = os.path.join(
                         str(self.mt_study_path), str(i), mt_map_filename
                     )
@@ -1196,6 +1196,7 @@ class Heatmap:
             cols = int(np.divide(n_slices, 2) + 0.5)
         fig, ax = plt.subplots(2, cols, figsize=(10, 7))
         ax = ax.flatten()
+        plt.axis("off")
         cbar_ax = fig.add_axes([0.91, 0.3, 0.03, 0.4])
 
         for slc_idx, new_map in enumerate(maps):
@@ -1210,9 +1211,9 @@ class Heatmap:
                 cbar_ax=cbar_ax,
                 ax=ax[slc_idx],
             ).invert_xaxis()
-            ax[slc_idx].set_title(f"{map_type} slice {str(slc_idx)}")
+            ax[slc_idx].set_title(f"{map_type} slice {str(slc_idx + 1)}")
 
-            if ind == True:
+            if ind is True:
                 ind_fig = plt.figure(frameon=False, num=slc_idx + fig.number + 1)
                 sns.heatmap(
                     r_map,
@@ -1225,7 +1226,7 @@ class Heatmap:
                 if save == save:
                     ind_fig.savefig(
                         os.path.join(
-                            out_path, map_type + "_slice_" + str(slc_idx + 1) + ".png"
+                            out_path, f"{map_type}_slice_{str(slc_idx + 1)}.png"
                         )
                     )
                     plt.close(ind_fig)
@@ -1233,8 +1234,8 @@ class Heatmap:
         plt.suptitle(f"{map_type} slices")
         fig.tight_layout(rect=[0, 0, 0.9, 1])
 
-        if save == True:
-            fig.savefig(os.path.join(out_path, map_type + "_all_slices.png"))
+        if save is True:
+            fig.savefig(os.path.join(out_path, f"{map_type}_all_slices.png"))
             plt.close()
         else:
             fig.show()
@@ -1252,16 +1253,20 @@ class Heatmap:
         f_ADC_maps[f_ADC_maps == 0.0] = np.nan
 
         cmap = plt.cm.turbo  # select default cmap
-        cmap.set_bad("black", 1)  # paints NaN values in black
+        # cmap.set_bad("black", 1)  # paints NaN values in black
         vmin = 0.1 * np.nanmax(f_ADC_maps) + np.nanmin(f_ADC_maps)
         vmax = 0.9 * np.nanmax(f_ADC_maps)
+
+        self.chosen_cmap = cmap
+        self.chosen_vmin = vmin
+        self.chosen_vmax = vmax
 
         for num_dir, ADC_map_dir in enumerate(f_ADC_maps):
             ADC_map_dir = np.rollaxis(ADC_map_dir, axis=2)
             # offer the possibility to change vmin, vmax and cmap in the adc map
             # of the first direction
             if num_dir == 0:
-                out_path = os.path.join(study_path, "Dir_" + str(num_dir + 1))
+                out_path = os.path.join(study_path, f"Dir_{str(num_dir + 1)}")
 
                 self.compute_heatmaps(
                     ADC_map_dir,
@@ -1353,8 +1358,14 @@ class Heatmap:
                         save=True,
                     )
 
+                    self.chosen_cmap = colormap_val
+                    self.chosen_vmin = color_min_val
+                    self.chosen_vmax = color_max_val
+
                     print(
-                        f"\n{hmg.info}Guardadas las direcciones: {num_dir+1} ", end=""
+                        f"\n{hmg.info}Guardadas las direcciones: {num_dir+1} ",
+                        end="",
+                        flush=True,
                     )
 
                     root.destroy()
@@ -1368,13 +1379,20 @@ class Heatmap:
                 root.mainloop()
 
             else:
-                out_path = study_path / ("Dir_" + str(num_dir + 1))
+                out_path = study_path / f"Dir_{str(num_dir + 1)}"
+
                 self.compute_heatmaps(
-                    ADC_map_dir, "ADC", cmap, vmin, vmax, out_path, ind=True, save=True
+                    ADC_map_dir,
+                    "ADC",
+                    self.chosen_cmap,
+                    self.chosen_vmin,
+                    self.chosen_vmax,
+                    out_path,
+                    ind=True,
+                    save=True,
                 )
-                print(f"{num_dir+1} ", end="")
-                plt.close("all")
-                plt.clf()
+
+                print(num_dir + 1, end=" ", flush=True)
         print()
         return vmin, vmax, cmap
 
