@@ -164,21 +164,21 @@ class FileSystemBuilder:
         Returns  a list including *method.txt, *.nii, *DwEffBval.txt and
         *DwGradVec.txt files."""
 
+        # add an uderscore to distingish T2 from T2E and change DTI per DT
+        modals = []
+        method_files = []
+        nii_files = []
+        dti_files = []
         # ask user for which modalities are desired to be processed
         if known_modals is False:
             self.modals_to_process = self.ask_preprocessing()
 
-            # add an uderscore to distingish T2 from T2E and change DTI per DT
-            modals = []
             for modal in self.modals_to_process:
                 if modal == "DTI":
                     modals.append("DT_")
                 else:
                     modals.append(modal + "_")
 
-            method_files = []
-            nii_files = []
-            dti_files = []
             for modal in modals:
                 method_files += list(
                     self.path_converted.glob(f"*/{modal}*/*method.txt")
@@ -188,21 +188,13 @@ class FileSystemBuilder:
                     self.path_converted.glob(f"*/{modal}*/*DwEffBval.txt")
                 ) + list(self.path_converted.glob(f"*/{modal}*/*DwGradVec.txt"))
 
-            return method_files + nii_files + dti_files
-
         else:
-            # known_modals only has one modality
-            # add an uderscore to distingish T2 from T2E and change DTI per DT
-            modals = []
             for modal in known_modals:
                 if modal == "DTI":
                     modals.append("DT_")
                 else:
                     modals.append(modal + "_")
 
-            method_files = []
-            nii_files = []
-            dti_files = []
             for modal in known_modals:
                 method_files += list(
                     self.path_converted.glob(f"*/{modal}*/*method.txt")
@@ -212,7 +204,7 @@ class FileSystemBuilder:
                     self.path_converted.glob(f"*/{modal}*/*DwEffBval.txt")
                 ) + list(self.path_converted.glob(f"*/{modal}*/*DwGradVec.txt"))
 
-            return method_files + nii_files + dti_files
+        return method_files + nii_files + dti_files
 
     def transfer_files(self, src_paths=None, dst_paths=None):
         """Transfer files from 'convertidos' to 'procesados' folder.
@@ -273,19 +265,19 @@ class FileSystemBuilder:
 
         # rename study subfolder
         if adq_lines[0] == "RAREVTR":  # T1
-            r_study_subfolder = Path("/".join(study_subfolder.parts[0:-1])) / (
+            r_study_subfolder = Path("/".join(study_subfolder.parts[:-1])) / (
                 "T1_" + study_subfolder.parts[-1]
             )
             os.rename(study_subfolder, r_study_subfolder)
 
         elif adq_lines[0] == "MGE":  # T2STAR
-            r_study_subfolder = Path("/".join(study_subfolder.parts[0:-1])) / (
+            r_study_subfolder = Path("/".join(study_subfolder.parts[:-1])) / (
                 "T2E_" + study_subfolder.parts[-1]
             )
             os.rename(study_subfolder, r_study_subfolder)
 
         elif adq_lines[0] == "DtiEpi":  # DIFFUSION
-            r_study_subfolder = Path("/".join(study_subfolder.parts[0:-1])) / (
+            r_study_subfolder = Path("/".join(study_subfolder.parts[:-1])) / (
                 "DT_" + study_subfolder.parts[-1]
             )
             os.rename(study_subfolder, r_study_subfolder)
@@ -304,7 +296,7 @@ class FileSystemBuilder:
                 if not line.startswith("EffectiveTE"):
                     continue
                 elif len(line) > 35:
-                    r_study_subfolder = Path("/".join(study_subfolder.parts[0:-1])) / (
+                    r_study_subfolder = Path("/".join(study_subfolder.parts[:-1])) / (
                         "T2_" + study_subfolder.parts[-1]
                     )
                     os.rename(study_subfolder, r_study_subfolder)
@@ -312,20 +304,17 @@ class FileSystemBuilder:
                 else:
                     if "MagTransOnOff = On \n" in met_lines:
                         r_study_subfolder = Path(
-                            "/".join(study_subfolder.parts[0:-1])
+                            "/".join(study_subfolder.parts[:-1])
                         ) / ("MT_" + study_subfolder.parts[-1])
                         os.rename(study_subfolder, r_study_subfolder)
-                        return None
                     elif ("MagTransOnOff = Off \n" in met_lines) and (
                         "DigFilter = Digital_Medium \n" in met_lines
                     ):
                         r_study_subfolder = Path(
-                            "/".join(study_subfolder.parts[0:-1])
+                            "/".join(study_subfolder.parts[:-1])
                         ) / ("M0_" + study_subfolder.parts[-1])
                         os.rename(study_subfolder, r_study_subfolder)
-                        return None
-                    else:
-                        return None
+                    return None
 
     def get_modality(self, study_subfolder_path: str):
         """Returns the modality of a subfolder path such as
@@ -378,18 +367,19 @@ class FileSystemBuilder:
                     ):
                         patient = "_".join(subfolder.parts[-2].split("_")[1:])
                         msg = (
-                            f"La modalidad {processed_modal} del estudio {patient} ya ha "
-                            "sido procesada.\n¿Desea volver a procesarla?"
+                            f"La modalidad {processed_modal} del estudio {patient} ya "
+                            "ha sido procesada.\n¿Desea volver a procesarla?"
                         )
                         avoid_subfolder = ut.ask_user(msg)
                         if avoid_subfolder:  # if process again
                             ready = ""
                             while ready != "y":
                                 msg = (
-                                    f"\n{hmg.warn}El resultado del procesamiento anterior "
-                                    f"de {processed_modal} del estudio {patient} no se conservará.\n"
-                                    f'\n{hmg.ask}Si desea guardarlo debe hacerlo ahora. Pulse "y" para '
-                                    f"continuar.\n{hmg.pointer}"
+                                    f"\n{hmg.warn}El resultado del procesamiento "
+                                    f"anterior de {processed_modal} del estudio "
+                                    f"{patient} no se conservará.\n"
+                                    f"\n{hmg.ask}Si desea guardarlo debe hacerlo ahora."
+                                    f' Pulse "y" para continuar.\n{hmg.pointer}'
                                 )
                                 ready = input(msg)
                                 ready = ready.lower()
