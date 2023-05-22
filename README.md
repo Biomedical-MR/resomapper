@@ -2,7 +2,7 @@
 
 [![PyPI version](https://img.shields.io/pypi/v/resomapper?color=blue)](https://pypi.python.org/pypi/resomapper)
 [![Documentation Status](https://readthedocs.org/projects/resomapper/badge/?version=latest)](https://resomapper.readthedocs.io/en/latest/?badge=latest)
-[![License: MIT]![PyPI - License](https://img.shields.io/pypi/l/resomapper?color=orange)](https://opensource.org/licenses/MIT)
+[![License: MIT]![PyPI - License](https://img.shields.io/badge/license-MIT-orange)](https://opensource.org/licenses/MIT)
 
 Welcome to `resomapper`, a pipeline for processing MR images and generating parametric maps. 
 
