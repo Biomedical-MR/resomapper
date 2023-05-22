@@ -21,11 +21,6 @@ from resomapper.utils import Mask, ask_user
 warnings.filterwarnings("ignore")
 
 
-# @click.command()
-def test():
-    print("Testing if this works! aaa")
-
-
 def cli():
     """Comand Line Interface of resomapper:
 

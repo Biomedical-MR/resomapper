@@ -6,7 +6,8 @@ from tkinter.messagebox import askyesno
 import matplotlib.pyplot as plt
 import nibabel as nib
 import numpy as np
-from scipy.ndimage import rotate
+
+# from scipy.ndimage import rotate
 from skimage.restoration import denoise_nl_means
 from skimage.transform import rotate
 
