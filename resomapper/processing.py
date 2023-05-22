@@ -273,7 +273,8 @@ class DTIProcessor:
                 f"\n{hmg.warn}Has introducido un número de b valores diferente al adquirido."
             )
             print(
-                f"Has especificado {n_b_val}, cuando se adquirieron {n_b_val_real}. Se va a continuar con el valor real."
+                f"Has especificado {n_b_val}, cuando se adquirieron {n_b_val_real}. "
+                "Se va a continuar con el valor real."
             )
             n_b_val = n_b_val_real
         else:
@@ -317,7 +318,8 @@ class DTIProcessor:
         if n_dirs == n_dirs_real:
             print(f"\n{hmg.info}Número de direcciones correcto.")
             new_dirs = ask_user(
-                f"¿Deseas eliminar direcciones antes de continuar? En caso contrario, se continuará con el número original ({n_dirs_real})."
+                "¿Deseas eliminar direcciones antes de continuar? En caso contrario,"
+                f" se continuará con el número original ({n_dirs_real})."
             )
             if new_dirs:
                 while True:
@@ -619,7 +621,7 @@ class DTIProcessor:
         R2_maps = []
         print(f"\n{hmg.info}Generando mapas de R\u00b2.")
         if n_b_val > 1:
-            for d in range(0, n_dirs):
+            for d in range(n_dirs):
                 # residuals
                 # dir_res = residuals[
                 #     :, :, :, (leap[d] + 1) : ((leap[d]) + (1 + n_b_val))
@@ -848,7 +850,7 @@ class TimeCollector:
                 print("No has introducido un número correcto.")
 
         print("Deberás introducir los TR de mayor a menor.\n")
-        for i in range(0, n_tr):
+        for i in range(n_tr):
             tr = input(f"Introduce el tiempo de repetición {i+1}.\n")
             trs.append(tr)
 
