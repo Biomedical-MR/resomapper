@@ -12,3 +12,7 @@ python:
     - requirements: docs/requirements.txt
     - method: pip
       path: .
+      
+# Enable pdf docs generation
+formats:
+  - pdf
