@@ -40,7 +40,7 @@ During this process the terminal will display some information prompts that can 
 ## 3. Selection of modalities to process
 The next step will be to select the modalities we want to process. Currently, in **resomapper**, we have implemented the posibility to generate T1, T2, T2*, MT and DTI parametric maps. A pop-up window will appear showing all these possibilities. We can check all we want and press {kbd}`OK` to start. For each study in the working directory, the selected modalities will be processed in case their adquisitions are present.
 
-```{figure} static/2_select_modal.png
+```{figure} _static/2_select_modal.png
 ---
 width: 250px
 name: select_modal
@@ -63,7 +63,7 @@ The first step for each instance will be to create the masks or ROIs (Region Of 
 
 If the study has already been processed and stored in the working directory so there is an available previous mask, you will be asked if you want to reuse it, so that you do not have to create it again.
 
-```{figure} static/3_mask_creation.png
+```{figure} _static/3_mask_creation.png
 ---
 width: 500px
 name: img_mask_creation
@@ -74,7 +74,7 @@ Manual mask creation.
 
 After creating the masks for all slices, a pop-up window will appear with a preview of all of them. Once viewed, press {kbd}`enter` (do it while the window is on focus, you can click on it first to make sure), and the terminal will ask if it is correct. If you are not satisfied with the masks created, you can repeat the process as many times as necessary.
 
-```{figure} static/4_mask_visualization.png
+```{figure} _static/4_mask_visualization.png
 ---
 width: 500px
 name: mask_visualization
@@ -93,7 +93,7 @@ Before starting the processing, we will have the option to preprocess the images
 
 In case you want to perform preprocessing, a pop-up window will be shown asking for the filtering parameters. The first and second ones must be integrers, while the last one can be either an integrer or a decimal number. In the {ref}`noise-filter` section you can see what these parameters mean.
 
-```{figure} static/5_preprocessing_params.png
+```{figure} _static/5_preprocessing_params.png
 ---
 width: 250px
 name: preprocessing_params
@@ -104,7 +104,7 @@ Parameter selection window.
 
 Next, a window will appear showing the original image and the preprocessed image, while asking if everything is correct via the terminal. If you are not satisfied with the result, you can repeat the preprocessing as many times as you wish.
 
-```{figure} static/6_filtered_result.png
+```{figure} _static/6_filtered_result.png
 ---
 width: 500px
 name: filtered_result
@@ -129,7 +129,7 @@ This step is taken to help the user keep track of the adquisiton information. Th
 
 However, in the case of the number of gradient directions, it may be the case that you want to remove some of the directions from the image because they were not acquired correctly. For this reason, if a number smaller than the real was specified, the user will be asked if that's the number of directions desired instead. Anyways, if the correct number was introduced, the user will also be asked if any directions need to be removed, just in case. In both scenarios, after confirming the number of directions to be deleted, the index of those will be asked, as shown below.
 
-```{figure} static/7_DWI_parameters.png
+```{figure} _static/7_DWI_parameters.png
 ---
 width: 600px
 name: DWI_parmeters
@@ -140,7 +140,7 @@ Diffusion imaging parameter specification.
 
 Once we have confirmed all these adquisition parameters, the vector of effective b values and the directions matrix will be shown in the terminal. See the image below to learn how this vector and matrix are structured.
 
-```{figure} static/8_vector_matrix.png
+```{figure} _static/8_vector_matrix.png
 ---
 width: 500px
 name: vector_matrix
@@ -181,7 +181,7 @@ Regardless of your choice, a R{sup}`2` map will be saved for these modalities. T
 ## 7. Saving the maps
 Each time a map or a result is generated, in any of the modalities, a pop-up window will open showing the result. In addition, it will be possible to modify the color scale in which it is displayed, specifying the minimum and maximum value, as well as the name of the color palette.
 
-```{figure} static/9_map_scale.png
+```{figure} _static/9_map_scale.png
 ---
 width: 500px
 name: map_scale
@@ -192,7 +192,7 @@ Map scaling windows.
 
 The different color palettes and their names can be found in the figure below (see ). The recommended ones are "turbo" (selected by default), and "jet". You can try different combinations and visualize them by pressing the {kbd}`Refresh` button. Once you are satisfied, click on {kbd}`Accept` to save the map.
 
-```{figure} static/colorbars.png
+```{figure} _static/colorbars.png
 ---
 width: 500px
 name: colorbars
@@ -219,7 +219,7 @@ As searching the whole image is computationally expensive, we generally work by 
 
 The image below shows, in blue, the neighborhood defined by a distance D; in orange, the target pixel P; and in green, a region with a size T of 3x3 around P. The algorithm places a region of size T around each pixel Q that is within the neighborhood and that is in the range of values allowed by H. In the image, it is observed that Q1 and Q2 will serve to obtain the new value of P, but Q3 will not because it is outside the neighborhood. In the case of Q4, as the intensity values of its region are different from those of P, it will be a region that will also be discarded. To obtain the new value of P, a weighted sum of the average values of the pixels contained in each of the Q regions will be made, where each Q region will have a weight associated with a distance value (color distance, i.e. how similar the gray values are) between itself and the P region.
 
-```{figure} static/filter_non_local_means.png
+```{figure} _static/filter_non_local_means.png
 ---
 width: 500px
 name: filter_non_local_means

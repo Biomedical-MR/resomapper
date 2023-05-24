@@ -132,7 +132,7 @@ The working directory is a folder where all the studies you want to process must
 
 The studies must be in [**Bruker raw ParaVision format**](https://imaging.mrc-cbu.cam.ac.uk/imaging/FormatBruker) (not DICOM or others). This means that they will have a similar structure to the one shown in the figure below.
 
-```{figure} static/bruker_folder.png
+```{figure} _static/bruker_folder.png
 ---
 width: 400px
 name: bruker_folder
