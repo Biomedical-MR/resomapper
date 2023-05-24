@@ -44,3 +44,6 @@ myst_enable_extensions = [
 # a list of builtin themes.
 #
 html_theme = "sphinx_rtd_theme"
+html_static_path = ["static"]
+html_logo = "logo_fixed_white.svg"
+html_favicon = "favicon_resomapper.ico"
