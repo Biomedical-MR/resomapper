@@ -1,6 +1,4 @@
-![resomapper](_static/logo_fixed.svg)
-
-# Welcome to resomapper
+# ![resomapper](_static/logo_fixed.svg)
 
 Welcome to the documentation of **resomapper**, a pipeline for processing MR images and generating parametric maps. 
 
