@@ -1,10 +1,10 @@
 <!-- ![resomapper](_static/logo_fixed.svg) -->
-# Welcome to **resomapper**
 ```{image} _static/logo_fixed.svg
 :name: resomapper_logo
 :align: right
-:width: 200px
+:width: 150px
 ```
+# Welcome to **resomapper**
 
 Welcome to the documentation of **resomapper**, a pipeline for processing MR images and generating parametric maps. 
 
@@ -50,12 +50,12 @@ Then, to start using **resomapper**, you'll need to follow these steps:
 4. Finally, retrieve all the resulting maps and files obtained after processing from the same working folder ([here](output_files) you can find more information on what is each file and its location).
 
 % Overview: main page also in toctree
-%```{toctree}
-%:maxdepth: 1
-%:hidden:
+```{toctree}
+:maxdepth: 1
+:hidden:
 
-%self
-%```
+self
+```
 
 ```{toctree}
 :maxdepth: 1
