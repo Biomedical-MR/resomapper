@@ -1,7 +1,7 @@
 ```{image} _static/logo_fixed.svg
 :name: resomapper_logo
 :align: right
-:width: 100px
+:width: 120px
 ```
 # Welcome to **resomapper**
 
@@ -49,12 +49,12 @@ Then, to start using **resomapper**, you'll need to follow these steps:
 4. Finally, retrieve all the resulting maps and files obtained after processing from the same working folder ([here](output_files) you can find more information on what is each file and its location).
 
 % Overview: main page also in toctree
-```{toctree}
-:maxdepth: 1
-:hidden:
+%```{toctree}
+%:maxdepth: 1
+%:hidden:
 
-self
-```
+%self
+%```
 
 ```{toctree}
 :maxdepth: 1
