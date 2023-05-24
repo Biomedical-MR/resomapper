@@ -12,3 +12,10 @@ python:
     - requirements: docs/requirements.txt
     - method: pip
       path: .
+      
+# Enable pdf docs generation
+sphinx:
+  fail_on_warning: true
+
+formats:
+  - pdf
