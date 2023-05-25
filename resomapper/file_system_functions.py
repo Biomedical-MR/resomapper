@@ -43,17 +43,16 @@ def check_cwd(cwd: bool, return_cwd=True):
     """Checks if current work directory contains the studies.
     Otherwise, changes path.
 
-    Parameters
-    ----------
-        cwd : boolean
-            If True we are in the correct path, if False we are not
-            and a change of path is needed
-        return_cwd : bool
-            Return or not current work directory
-    Returns
-    --------
-        Path-like, optional
-            Current work directory can be returned
+    Args:
+        cwd (bool): If True, it indicates that we are in the correct path. If False, it
+            indicates that we are not in the correct path and a change of path
+            is needed.
+        return_cwd (bool, optional): Indicates whether to return the current working
+            directory or not. Defaults to True.
+
+    Returns:
+        path-like or None: The current working directory if return_cwd is True,
+        otherwise None (nothing is returned).
     """
     if not cwd:
         while True:

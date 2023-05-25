@@ -3,7 +3,6 @@ import multiprocessing
 import os
 import traceback
 import warnings
-from pathlib import Path
 
 from colorama import just_fix_windows_console
 
@@ -91,21 +90,10 @@ def cli():
         current_modal = study_name.split("_")[0]
         print(f"\n\n{hmg.new_modal}Procesamiento del mapa de {current_modal}")
 
-        mask_path = Path("/".join(study.parts[:-1])) / "mask.nii"
-        if mask_path.exists():
-            reuse_mask = ask_user(
-                "¿Deseas reutilizar la máscara creada para este sujeto?"
-            )
-
-        if (not mask_path.exists()) or (not reuse_mask):
-            mask = Mask(study)
-            correct_selection = False
-            while not correct_selection:
-                mask.create_mask()
-                correct_selection = ask_user(
-                    "¿Es la previsualización de la selección lo que deseas?"
-                )
-            print(f"\n{hmg.info}Máscara creada correctamente.")
+        # Mask specification and creation
+        mask = Mask(study)
+        mode = mask.select_mask_mode()
+        mask_path = mask.create_mask(mode)
 
         want_preprocess = ask_user("¿Deseas realizar un preprocesado de este estudio?")
 
