@@ -24,7 +24,7 @@ from dipy.reconst.dti import (
 
 from resomapper.myrelax import getT1TR, getT2T2star
 from resomapper.utils import Headermsg as hmg
-from resomapper.utils import ask_user
+from resomapper.utils import ask_user, check_shapes
 
 warnings.filterwarnings("ignore")
 
@@ -93,6 +93,9 @@ class MTProcessor:
             mt_off, _ = load_nifti(f_mtoff_path)  # affine matrix is the same
             mask, _ = load_nifti(self.mask_path)
 
+            check_shapes(mt_on, mask)
+            check_shapes(mt_off, mask)
+
             # apply mask
             mt_on = mt_on * mask
             mt_off = mt_off * mask
@@ -152,6 +155,9 @@ class MTProcessor:
                 mt_off, _ = load_nifti(f_mtoff_path)  # affine matrix is the same
                 mask, _ = load_nifti(self.mask_path)
 
+                check_shapes(mt_on, mask)
+                check_shapes(mt_off, mask)
+
                 # apply mask
                 mt_on = mt_on * mask
                 mt_off = mt_off * mask
@@ -183,6 +189,9 @@ class MTProcessor:
                     mt_on, affine1 = load_nifti(f_mton_path)
                     mt_off, _ = load_nifti(f_mtoff_path)  # affine matrix is the same
                     mask, _ = load_nifti(self.mask_path)
+
+                    check_shapes(mt_on, mask)
+                    check_shapes(mt_off, mask)
 
                     # apply mask
                     mt_on = mt_on * mask
@@ -517,6 +526,8 @@ class DTIProcessor:
             mask, affine = load_nifti(
                 Path("/".join(self.study_path.parts[:-1])) / "mask.nii"
             )
+
+        check_shapes(data, mask)
 
         # apply mask
         for i in range(data.shape[3]):  # para cada imagen de cada slice
@@ -960,6 +971,9 @@ class TMapProcessor:
                 f_name = self.study_path.parts[-1][3:] + "_subscan_0.nii.gz"
                 f_path = str(self.study_path / f_name)
                 out_path = f_path[:-7]  # remove .nii
+
+                check_shapes(f_path, self.mask_path)
+
                 getT2T2star.TxyFitME(
                     f_path,
                     time_paths[1],
@@ -969,10 +983,13 @@ class TMapProcessor:
                     self.mask_path,
                 )
 
-            except NameError:
+            except (NameError, FileNotFoundError):
                 f_name = self.study_path.parts[-1][3:] + ".nii.gz"
                 f_path = str(self.study_path / f_name)
                 out_path = f_path[:-7]  # remove .nii
+
+                check_shapes(f_path, self.mask_path)
+
                 getT2T2star.TxyFitME(
                     f_path,
                     time_paths[1],
@@ -989,6 +1006,9 @@ class TMapProcessor:
                 f_name = self.study_path.parts[-1][4:] + "_subscan_0.nii.gz"
                 f_path = str(self.study_path / f_name)
                 out_path = f_path[:-7]  # remove .nii
+
+                check_shapes(f_path, self.mask_path)
+
                 getT2T2star.TxyFitME(
                     f_path,
                     time_paths[2],
@@ -997,10 +1017,13 @@ class TMapProcessor:
                     self.n_cpu,
                     self.mask_path,
                 )
-            except NameError:
+            except (NameError, FileNotFoundError):
                 f_name = self.study_path.parts[-1][4:] + ".nii.gz"
                 f_path = str(self.study_path / f_name)
                 out_path = f_path[:-7]  # remove .nii
+
+                check_shapes(f_path, self.mask_path)
+
                 getT2T2star.TxyFitME(
                     f_path,
                     time_paths[2],
@@ -1017,6 +1040,9 @@ class TMapProcessor:
                 f_name = self.study_path.parts[-1][3:] + "_subscan_0.nii.gz"
                 f_path = str(self.study_path / f_name)
                 out_path = f_path[:-7]  # remove .nii.gz
+
+                check_shapes(f_path, self.mask_path)
+
                 getT1TR.TxyFitME(
                     f_path,
                     time_paths[0],
@@ -1025,10 +1051,13 @@ class TMapProcessor:
                     self.n_cpu,
                     self.mask_path,
                 )
-            except NameError:
+            except (NameError, FileNotFoundError):
                 f_name = self.study_path.parts[-1][3:] + ".nii.gz"
                 f_path = str(self.study_path / f_name)
                 out_path = f_path[:-7]  # remove .nii
+
+                check_shapes(f_path, self.mask_path)
+
                 getT1TR.TxyFitME(
                     f_path,
                     time_paths[0],
