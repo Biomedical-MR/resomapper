@@ -87,6 +87,30 @@ def ask_user_options(question, options):
             )
 
 
+def check_shapes(img, mask):
+    """Check if an image and mask have the same shapes.
+
+    Args:
+        img (ndarray)
+        mask (ndarray)
+    """
+    if type(img) != np.array:
+        img, affine = load_nifti(img)
+    if type(mask) != np.array:
+        mask, affine = load_nifti(mask)
+    if img.shape[:2] != mask.shape[:2]:
+        print(
+            f"\n{Headermsg.error}Mask and image have different shapes. "
+            "Please check that you have selected a suitable mask for this study.\n\n"
+            "More info:\n"
+            f"- Image: resolution {img.shape[0]}x{img.shape[1]}, "
+            f"{img.shape[2]} slices."
+            f"- Mask: resolution {mask.shape[0]}x{mask.shape[1]}, "
+            f"{mask.shape[2]} slices."
+        )
+        exit()
+
+
 ###############################################################################
 # Mask creation
 ###############################################################################
