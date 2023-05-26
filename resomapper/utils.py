@@ -69,7 +69,6 @@ def ask_user_options(question, options):
 
     Returns:
         str: The selected option.
-
     """
     while True:
         print("\n" + Headermsg.ask + question)
@@ -88,11 +87,14 @@ def ask_user_options(question, options):
 
 
 def check_shapes(img, mask):
-    """Check if an image and mask have the same shapes.
+    """Check if an image and mask have the same shapes (resolution and slices).
+    If the input arguments are file paths, the 'load_nifti' function is used to load the
+    respective NIfTI files. The program will terminate if the shapes of the image and
+    mask do not match.
 
     Args:
-        img (ndarray)
-        mask (ndarray)
+        img (numpy.ndarray or str): Input image array or path to the image file.
+        mask (numpy.ndarray or str): Input mask array or path to the image file.
     """
     if type(img) != np.array:
         img, affine = load_nifti(img)
@@ -116,6 +118,11 @@ def check_shapes(img, mask):
 ###############################################################################
 class Mask:
     def __init__(self, study_subfolder: str) -> None:
+        """Initialize a new instance of the Mask class.
+
+        Args:
+            study_subfolder (str): The path or name of the study subfolder.
+        """
         self.study_subfolder = study_subfolder
 
     def prepare_vol(self, vol_3d):
@@ -126,7 +133,7 @@ class Mask:
             vol_3d (ndarray): Input image.
 
         Returns:
-            vol_prepared (list): Transformed image ready for visualization.
+            list: Transformed image ready for visualization.
         """
         n_slc = vol_3d.shape[2]  # numer of slices
         vol_prepared = []
@@ -148,6 +155,16 @@ class Mask:
         return vol_prepared
 
     def min_max_normalization(self, img):
+        """Applies min-max normalization to the input image. Creates a copy of the input
+        image and computes the minimum and maximum values. The image is normalized using
+        the formula (img - min_val) / (max_val - min_val).
+
+        Args:
+            img (numpy.ndarray): Input image array.
+
+        Returns:
+            numpy.ndarray: Normalized image array.
+        """
         new_img = img.copy()
         new_img = new_img.astype(np.float32)
 
@@ -159,6 +176,31 @@ class Mask:
         return new_img
 
     def click(self, event, x, y, flags, param):
+        """Event handler function for mouse clicks.
+
+        Args:
+            event: The type of mouse event (left button down, right button down, etc.).
+            x: The x-coordinate of the mouse click position.
+            y: The y-coordinate of the mouse click position.
+            flags: Additional flags associated with the mouse event.
+            param: Additional parameters associated with the mouse event.
+
+        The function handles mouse click events and updates the global variables
+        'status' and 'counter'. If the event is a left button down click, the function
+        appends the coordinates of the click position to the list specified by
+        'param[counter]'. If the event is a right button down click, the function
+        performs the same action as the left click and also sets the 'status' variable
+        to 0, indicating that the click operation is finished.
+
+        Note:
+            - The global variables 'status' and 'counter' are used and updated within
+              this function.
+            - The 'param' argument is expected to be a list or an array-like object.
+
+        Example:
+            mouse_params = [[] for _ in range(5)] # Create list to store click positions
+            cv2.setMouseCallback("window", click, param=mouse_params)
+        """
         global status
         global counter
         if event == cv2.EVENT_LBUTTONDOWN:  # left click
@@ -170,8 +212,33 @@ class Mask:
             status = 0  # finish
 
     def itera(self, ima, refPT):
-        """Shows slices for masking. Left click adds a line and right click
-        closes the polygon. Next slice will be showed after right click.
+        """Iteratively displays slices for masking.Left click adds a line and right
+        click closes the polygon. Next slice will be showed after right click.
+
+        Args:
+            ima (numpy.ndarray): Input image array.
+            refPT (list): List to store the masked vertices for each slice.
+
+        The 'click' event handler is used to handle mouse events and update the 'refPT'
+        list with the coordinates of the drawn lines. The function continues to display
+        and process slices until all slices have been processed or until the 'c' key or
+        a right-click event is detected. At that point, the function returns the updated
+        'refPT' list.
+
+        Note:
+            - The global variables 'counter' and 'status' are used and updated within
+              this function.
+            - The 'click' event handler is set using 'cv2.setMouseCallback' with the
+              'refPT' argument.
+
+        Returns:
+            list: Updated 'refPT' list with the masked vertices for each slice.
+
+        Example:
+            image = np.zeros((256, 256, 3), dtype=np.uint8)  # Create a blank image
+            ref_points = [[] for _ in range(10)]  # Create list to store masked vertices
+            masker = Mask(study_path)
+            masked_vertices = masker.itera(image, ref_points)
         """
         global counter
         global status
@@ -206,7 +273,26 @@ class Mask:
         return refPT
 
     def draw_mask(self):
-        """Create binary mask for the brain and save it as a nii file."""
+        """Creates a binary mask for the roi where processing will take place and saves
+        it as a NIfTI file. The user is prompted to create the mask by selecting
+        contours in a pop-up window.
+
+        The function loads the appropriate input image based on the study type, prepares
+        the volume and creates a list of lists, 'refPT', to store the vertexes of the
+        masks for each slice. The user is then presented with the selected contours
+        overlaid on the image slices, and the function saves the image files and waits
+        for a keyboard enter from the user to proceed.
+
+        Next, the function creates a binary mask by filling the contours with ones and
+        resizing the mask to match the original image dimensions. The resulting masks
+        are converted to a NIfTI format by transposing the axes to match the expected
+        shape. The mask is saved both in the method subfolder and the
+        subject folder for reusability.
+
+        Example:
+            masker = Mask(study_path)
+            mask.draw_mask()
+        """
 
         study_name = self.study_subfolder.parts[-2]
         print(
@@ -305,17 +391,17 @@ class Mask:
         )
 
     def create_mask(self, mode="manual"):
-        """Create a mask for the study image.
-        Manual: manual drawing, allowing several tries if user is not satisfied.
-        Reuse: reuse last mask used for the current patient.
-        file_selection: manually select a mask file already created.
+        """Create a mask for the study image. Implemented modes:
+        - 'manual': manual drawing, allowing several tries if user is not satisfied.
+        - 'reuse': reuse last mask used for the current patient.
+        - 'file_selection': manually select a mask file already created.
 
         Args:
             mode (str, optional): The mode indicating the masking behavior.
                 Defaults to "manual".
 
         Returns:
-            path to the study's mask
+            Path: Study's mask file path.
         """
         study_path = self.study_subfolder
         dst_mask_path = study_path / "mask.nii"
@@ -348,6 +434,18 @@ class Mask:
         return dst_mask_path
 
     def select_mask_mode(self):
+        """Prompt the user to select the mode for specifying the mask for the study.
+        The function checks if a previous mask file exists in the subject's folder to
+        determine if the reuse option is available.
+
+        Returns:
+            str: The selected mask mode.
+
+        Possible return values:
+            - "reuse": The user selected to reuse the last created mask.
+            - "manual": The user selected manual selection mode.
+            - "file_selection": The user selected to select another file.
+        """
         study_path = self.study_subfolder
         options = {
             "m": "Selección manual de la máscara.",
