@@ -527,7 +527,9 @@ class DTIProcessor:
                 Path("/".join(self.study_path.parts[:-1])) / "mask.nii"
             )
 
-        check_shapes(data, mask)
+        check_shapes(
+            data, mask, callback_func=self.process_DTI, study_path=self.study_path
+        )
 
         # apply mask
         for i in range(data.shape[3]):  # para cada imagen de cada slice

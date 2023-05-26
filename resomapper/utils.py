@@ -86,7 +86,7 @@ def ask_user_options(question, options):
             )
 
 
-def check_shapes(img, mask):
+def check_shapes(img, mask, callback_func=None, study_path=None):
     """Check if an image and mask have the same shapes (resolution and slices).
     If the input arguments are file paths, the 'load_nifti' function is used to load the
     respective NIfTI files. The program will terminate if the shapes of the image and
@@ -96,20 +96,28 @@ def check_shapes(img, mask):
         img (numpy.ndarray or str): Input image array or path to the image file.
         mask (numpy.ndarray or str): Input mask array or path to the image file.
     """
-    if type(img) != np.array:
+    if not isinstance(img, np.ndarray):
         img, affine = load_nifti(img)
-    if type(mask) != np.array:
+    if not isinstance(mask, np.ndarray):
         mask, affine = load_nifti(mask)
-    if img.shape[:2] != mask.shape[:2]:
+
+    if img.shape[:3] != mask.shape[:3]:
         print(
             f"\n{Headermsg.error}Mask and image have different shapes. "
             "Please check that you have selected a suitable mask for this study.\n\n"
             "More info:\n"
             f"- Image: resolution {img.shape[0]}x{img.shape[1]}, "
-            f"{img.shape[2]} slices."
+            f"{img.shape[2]} slices.\n"
             f"- Mask: resolution {mask.shape[0]}x{mask.shape[1]}, "
             f"{mask.shape[2]} slices."
         )
+        # if (callback_func is not None) and (study_path is not None):
+        #     mask = Mask(study_path)
+        #     mode = mask.select_mask_mode()
+        #     mask.create_mask(mode)
+        #     callback_func()
+        # else:
+        #     exit()
         exit()
 
 
@@ -421,7 +429,7 @@ class Mask:
         elif mode == "file_selection":
             src_path = fs.select_file()
             ext = os.path.splitext(src_path)[1]
-            if src_path is not None and ext in [".nii", ".nii.gz"]:
+            if src_path is not None and ext in [".nii", ".gz"]:
                 shutil.copy(src_path, dst_mask_path)
             else:
                 print(f"\n{Headermsg.error}You didn't select a NiFTI file.")
