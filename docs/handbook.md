@@ -59,9 +59,13 @@ At this point, the processing of the several studies will start. A message will 
 
 (mask_creation)=
 ## 4. Creating a mask
-The first step for each instance will be to create the masks or ROIs (Region Of Interest) where we want the processing to take place (in the case of neuroimaging, we need to extract the brain). Pop-up windows will be shown for each slice where the mask can be manually created following the steps shown in the terminal (left-clicking to create lines and right-clicking to close the outline). 
+The first step for each instance will be to create the masks or ROIs (Region Of Interest) where we want the processing to take place (in the case of neuroimaging, we need to extract the brain). To do so, the user will be asked between the following options:
 
-If the study has already been processed and stored in the working directory so there is an available previous mask, you will be asked if you want to reuse it, so that you do not have to create it again.
+* **Selecting a file** that contains a binary mask, in NiFTI format.
+
+* **Reusing the last mask** used for the current study. This option will be available only if any of the modals have been processed before and there is a mask file stored in the general study folder.
+
+* **Manually creating a mask** by drawing it. In this case, pop-up windows will be shown for each slice where the mask can be manually created following the steps shown in the terminal (left-clicking to create lines and right-clicking to close the outline). 
 
 ```{figure} _static/3_mask_creation.png
 ---

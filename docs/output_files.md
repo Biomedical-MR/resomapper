@@ -53,7 +53,7 @@ Also in the processed studies folder, we can find the masks created to select th
 * **mask.nii**
 * **shape_slice_(_x_).png**
 
-These files will be under the modality folder where they where originally created (**_modal_\_procesado\__name of the study\_adquisition number_**), as well as in the general folder of the processed study for studies where we reuse the mask in different modalities (**procesado\__name of the study_**).
+These files will be under the modality folder where they where originally created (**_modal_\_procesado\__name of the study\_adquisition number_**), and also a copy of the last mask created during the processing of the study will be stored in the general folder of the processed study for studies (**procesado\__name of the study_**).
 
 ---
 
