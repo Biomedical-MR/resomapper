@@ -91,6 +91,10 @@ Mask pre-visualization window.
 Make sure to **press {kbd}`enter`** when the mask pre-visualization window is open to continue the process, and not close it with the {kbd}`X` tab. It can be easy to lose these window between other ones we may have opened before.
 ```
 
+```{note}
+After specifying a mask, the program will check if the images to be processed and the seleted mask match. If you have accidentally selected a mask file with more slices or different resolution, you will have the option to select the mask again.
+```
+
 (preprocessing)=
 ## 5. Preprocessing the images
 Before starting the processing, we will have the option to preprocess the images before generating the parametric map. Currently, this preprocessing consist on a noise reduction filtering step (see {ref}`noise-filter` for more details). 
