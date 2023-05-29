@@ -2,11 +2,9 @@ import glob
 import os
 import re
 import shutil
-import time
 import tkinter as tk
 import warnings
 from pathlib import Path
-from tkinter import *
 
 import dipy.reconst.dti as dti
 import matplotlib.cm as cm
@@ -25,7 +23,7 @@ from dipy.reconst.dti import (
 
 from resomapper.myrelax import getT1TR, getT2T2star
 from resomapper.utils import Headermsg as hmg
-from resomapper.utils import ask_user, check_shapes, Mask
+from resomapper.utils import ask_user, check_shapes
 
 warnings.filterwarnings("ignore")
 
@@ -98,7 +96,8 @@ class MTProcessor:
                     for number in mt_folders_list:
                         if (number > n_mt) or (number < 1):
                             print(
-                                f"\n{hmg.error}Por favor, introduce números entre 1 y {n_mt}."
+                                f"\n{hmg.error}Por favor, introduce números entre "
+                                f"1 y {n_mt}."
                             )
                             input_ready = False
                             break
@@ -237,7 +236,8 @@ class MTProcessor:
         #     Heatmap().save_heatmap(mt_map, "MT", out_path=str(self.mt_study_path))
         # else:
         #     print(
-        #         f"\n{hmg.warn}Has adquirido imágenes de MT con diferentes slopes para este estudio ({n_mt})."
+        #         f"\n{hmg.warn}Has adquirido imágenes de MT con diferentes slopes "
+        #         f"para este estudio ({n_mt})."
         #     )
 
         #     input_ready = False
@@ -255,13 +255,15 @@ class MTProcessor:
         #             for number in mt_folders_list:
         #                 if (number > n_mt) or (number < 1):
         #                     print(
-        #                         f"\n{hmg.error}Por favor, introduce números entre 1 y {n_mt}."
+        #                         f"\n{hmg.error}Por favor, introduce números entre 1 y"
+        #                         f" {n_mt}."
         #                     )
         #                     input_ready = False
         #                     break
         #         except Exception:
         #             print(
-        #                 f'\n{hmg.error}Por favor, introduce sólo números separados por "," (si hay más de uno).'
+        #                 f'\n{hmg.error}Por favor, introduce sólo números separados'
+        #                 f' por "," (si hay más de uno).'
         #             )
 
         #     mt_folders_list = [*set(mt_folders_list)]
@@ -364,7 +366,8 @@ class DTIProcessor:
             try:
                 n_b_val = int(
                     input(
-                        f"\n{hmg.ask}¿Número de b valores para cada dirección?\n{hmg.pointer}"
+                        f"\n{hmg.ask}¿Número de b valores para cada dirección?"
+                        f"\n{hmg.pointer}"
                     )
                 )
                 break
@@ -408,7 +411,8 @@ class DTIProcessor:
 
         if n_b_val != n_b_val_real:
             print(
-                f"\n{hmg.warn}Has introducido un número de b valores diferente al adquirido."
+                f"\n{hmg.warn}Has introducido un número de b valores diferente "
+                "al adquirido."
             )
             print(
                 f"Has especificado {n_b_val}, cuando se adquirieron {n_b_val_real}. "
@@ -420,10 +424,12 @@ class DTIProcessor:
 
         if n_basal != n_basal_real:
             print(
-                f"\n{hmg.warn}Has introducido un valor de imágenes basales diferente al adquirido."
+                f"\n{hmg.warn}Has introducido un valor de imágenes basales diferente "
+                "al adquirido."
             )
             print(
-                f"Has especificado {n_basal}, cuando se adquirieron {n_basal_real}. Se va a continuar con el valor real."
+                f"Has especificado {n_basal}, cuando se adquirieron {n_basal_real}. "
+                "Se va a continuar con el valor real."
             )
             n_basal = n_basal_real
         else:
@@ -431,16 +437,18 @@ class DTIProcessor:
 
         if n_dirs != n_dirs_real:
             print(
-                f"\n{hmg.warn}Has introducido un valor de direcciones diferente al adquirido."
+                f"\n{hmg.warn}Has introducido un valor de direcciones diferente "
+                "al adquirido."
             )
             print(f"Has especificado {n_dirs}, cuando se adquirieron {n_dirs_real}.")
             valid_n_dirs = False
-            while valid_n_dirs == False:
+            while not valid_n_dirs:
                 if n_dirs > n_dirs_real:
                     while True:
                         try:
                             print(
-                                f"\nPrueba otra vez. Debes intruducir un valor menor o igual a {n_dirs_real}."
+                                "\nPrueba otra vez. Debes intruducir un valor "
+                                f"menor o igual a {n_dirs_real}."
                             )
                             n_dirs = int(
                                 input(
@@ -464,7 +472,8 @@ class DTIProcessor:
                     try:
                         n_dirs_to_rm = int(
                             input(
-                                f"\n{hmg.ask}¿Cuántas direcciones deseas eliminar?\n{hmg.pointer}"
+                                f"\n{hmg.ask}¿Cuántas direcciones deseas eliminar?"
+                                f"\n{hmg.pointer}"
                             )
                         )
                         if 0 <= n_dirs_to_rm < n_dirs_real:
@@ -472,7 +481,8 @@ class DTIProcessor:
                             break
                         else:
                             print(
-                                f"{hmg.error}Debes introducir un número entre 0 y {n_dirs_real}."
+                                f"{hmg.error}Debes introducir un número entre "
+                                f"0 y {n_dirs_real}."
                             )
                     except ValueError:
                         print(f"{hmg.error}Debes introducir un número.")
@@ -485,7 +495,8 @@ class DTIProcessor:
                     try:
                         n_dirs_to_rm = int(
                             input(
-                                f"\n{hmg.ask}¿Cuántas direcciones deseas eliminar?\n{hmg.pointer}"
+                                f"\n{hmg.ask}¿Cuántas direcciones deseas eliminar?"
+                                f"\n{hmg.pointer}"
                             )
                         )
                         if 0 <= n_dirs_to_rm < n_dirs_real:
@@ -493,7 +504,8 @@ class DTIProcessor:
                             break
                         else:
                             print(
-                                f"{hmg.error}Debes introducir un número entre 0 y {n_dirs_real}."
+                                f"{hmg.error}Debes introducir un número entre "
+                                f"0 y {n_dirs_real}."
                             )
                     except ValueError:
                         print(f"{hmg.error}Debes introducir un número.")
@@ -518,7 +530,8 @@ class DTIProcessor:
                             print(f"{hmg.error}Esa dirección ya la has especificado.")
                         else:
                             print(
-                                f"{hmg.error}Debes introducir un número entre 1 y {n_dirs_real}."
+                                f"{hmg.error}Debes introducir un número "
+                                f"entre 1 y {n_dirs_real}."
                             )
                     except ValueError:
                         print(f"{hmg.error}Debes introducir un número.")
@@ -549,7 +562,8 @@ class DTIProcessor:
         else:
             b_vals = np.loadtxt(src_bvals)
             print(
-                f"\n{hmg.info}Mostrado lista de valores b adquirida del archivo métodos.\n"
+                f"\n{hmg.info}Mostrado lista de valores b adquirida del archivo "
+                "métodos.\n"
             )
             print(b_vals, "\n")
 
@@ -1330,8 +1344,8 @@ class R2MapGenerator:
         while True:
             try:
                 th = input(
-                    f"\n{hmg.ask}Introduce el valor que quieres usar como tolerancia (R\u00b2)."
-                    f" Ha de ser un valor entre 0 y 1.\n{hmg.pointer}"
+                    f"\n{hmg.ask}Introduce el valor que quieres usar como tolerancia "
+                    f"(R\u00b2). Ha de ser un valor entre 0 y 1.\n{hmg.pointer}"
                 )
                 th = float(th)
                 if th > 0.99:
@@ -1384,14 +1398,14 @@ class Heatmap:
             try:
                 vmin = float(input("Introduce el valor mínimo.\n"))
                 break
-            except:
+            except Exception:
                 print("No has introducido un número.")
 
         while True:
             try:
                 vmax = float(input("Introduce el valor máximo.\n"))
                 break
-            except:
+            except Exception:
                 print("No has introducido un número.")
 
         return vmin, vmax
@@ -1498,7 +1512,8 @@ class Heatmap:
                 )
 
                 print(
-                    f"\n{hmg.ask}Indica cómo quieres guardar los mapas en la ventana emergente."
+                    f"\n{hmg.ask}Indica cómo quieres guardar los mapas en la "
+                    "ventana emergente."
                 )
 
                 # create a frame
@@ -1506,28 +1521,28 @@ class Heatmap:
                 root.title("MyX")
 
                 # declaring string variable for storing values
-                color_min = IntVar()
-                color_max = IntVar()
-                colormap = StringVar()
+                color_min = tk.IntVar()
+                color_max = tk.IntVar()
+                colormap = tk.StringVar()
 
-                Label(root, text="Mínimo", font=("calibre", 10, "bold")).grid(
+                tk.Label(root, text="Mínimo", font=("calibre", 10, "bold")).grid(
                     row=0, column=0
                 )
-                Label(root, text="Máximo", font=("calibre", 10, "bold")).grid(
+                tk.Label(root, text="Máximo", font=("calibre", 10, "bold")).grid(
                     row=2, column=0
                 )
-                Label(root, text="Color", font=("calibre", 10, "bold")).grid(
+                tk.Label(root, text="Color", font=("calibre", 10, "bold")).grid(
                     row=4, column=0
                 )
 
                 # creating entries for inputs
-                color_min_entry = Entry(
+                color_min_entry = tk.Entry(
                     root, textvariable=color_min, font=("calibre", 10, "normal")
                 )
-                color_max_entry = Entry(
+                color_max_entry = tk.Entry(
                     root, textvariable=color_max, font=("calibre", 10, "normal")
                 )
-                colormap_entry = Entry(
+                colormap_entry = tk.Entry(
                     root, textvariable=colormap, font=("calibre", 10, "normal")
                 )
 
@@ -1589,10 +1604,10 @@ class Heatmap:
                     root.destroy()
                     root.quit()
 
-                Button(root, text="Actualizar", command=get_selection).grid(
+                tk.Button(root, text="Actualizar", command=get_selection).grid(
                     row=6, column=0
                 )
-                Button(root, text="Aceptar", command=close).grid(row=6, column=1)
+                tk.Button(root, text="Aceptar", command=close).grid(row=6, column=1)
 
                 root.mainloop()
 
@@ -1662,9 +1677,9 @@ class Heatmap:
         root.title("MyX")
 
         # declaring string variable for storing values
-        color_min = IntVar()
-        color_max = IntVar()
-        colormap = StringVar()
+        color_min = tk.IntVar()
+        color_max = tk.IntVar()
+        colormap = tk.StringVar()
 
         tk.Label(root, text="Mínimo", font=("calibre", 10, "bold")).grid(
             row=0, column=0
@@ -1732,7 +1747,7 @@ class Heatmap:
             root.destroy()
             root.quit()
 
-        Button(root, text="Actualizar", command=get_selection).grid(row=6, column=0)
-        Button(root, text="Aceptar", command=close).grid(row=6, column=1)
+        tk.Button(root, text="Actualizar", command=get_selection).grid(row=6, column=0)
+        tk.Button(root, text="Aceptar", command=close).grid(row=6, column=1)
 
         root.mainloop()
