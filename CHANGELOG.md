@@ -1,6 +1,11 @@
 # Changelog
 
-<!--next-version-placeholder-->
+## v0.2.0 (29/05/2023)
+
+### Features
+
+- Added the possibility to choose a mask file.
+- Added checking of mask and image dimensions, asking for a new mask if they don't match.
 
 ## v0.1.1 (16/05/2023)
 
