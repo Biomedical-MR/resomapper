@@ -86,7 +86,8 @@ def ask_user_options(question, options):
             )
 
 
-def check_shapes(img, mask, callback_func=None, study_path=None):
+# def check_shapes(img, mask, callback_func=None, study_path=None):
+def check_shapes(img, mask):
     """Check if an image and mask have the same shapes (resolution and slices).
     If the input arguments are file paths, the 'load_nifti' function is used to load the
     respective NIfTI files. The program will terminate if the shapes of the image and
@@ -95,6 +96,9 @@ def check_shapes(img, mask, callback_func=None, study_path=None):
     Args:
         img (numpy.ndarray or str): Input image array or path to the image file.
         mask (numpy.ndarray or str): Input mask array or path to the image file.
+
+    Returns:
+        bool: True if mask and image match dimensions, False if not.
     """
     if not isinstance(img, np.ndarray):
         img, affine = load_nifti(img)
@@ -111,6 +115,9 @@ def check_shapes(img, mask, callback_func=None, study_path=None):
             f"- Mask: resolution {mask.shape[0]}x{mask.shape[1]}, "
             f"{mask.shape[2]} slices."
         )
+        return False
+    else:
+        return True
         # if (callback_func is not None) and (study_path is not None):
         #     mask = Mask(study_path)
         #     mode = mask.select_mask_mode()
@@ -118,7 +125,7 @@ def check_shapes(img, mask, callback_func=None, study_path=None):
         #     callback_func()
         # else:
         #     exit()
-        exit()
+        # exit()
 
 
 ###############################################################################
@@ -424,6 +431,8 @@ class Mask:
 
         elif mode == "reuse":
             src_path = Path("/".join(study_path.parts[:-1])) / "mask.nii"
+            if os.path.exists(dst_mask_path):
+                os.remove(dst_mask_path)
             shutil.copy(src_path, dst_mask_path)
 
         elif mode == "file_selection":
@@ -431,6 +440,9 @@ class Mask:
             ext = os.path.splitext(src_path)[1]
             if src_path is not None and ext in [".nii", ".gz"]:
                 shutil.copy(src_path, dst_mask_path)
+                # if os.path.exists(dst_mask_path):
+                #     os.remove(dst_mask_path)
+                # shutil.copy(src_path, dst_mask_path)
             else:
                 print(f"\n{Headermsg.error}You didn't select a NiFTI file.")
                 exit()
