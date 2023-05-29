@@ -91,21 +91,31 @@ def cli():
         print(f"\n\n{hmg.new_modal}Procesamiento del mapa de {current_modal}")
 
         # Mask specification and creation
-        mask = Mask(study)
-        mode = mask.select_mask_mode()
-        mask_path = mask.create_mask(mode)
-
-        want_preprocess = ask_user("¿Deseas realizar un preprocesado de este estudio?")
+        masker = Mask(study)
+        mode = masker.select_mask_mode()
+        mask_path = masker.create_mask(mode)
 
         if study_name.startswith("DT"):
             dti_map_pro = DTIProcessor(root_path, study)
-            if want_preprocess:
+            ok_mask = dti_map_pro.check_DTI_data()
+            while not ok_mask:
+                mode = masker.select_mask_mode()
+                mask_path = masker.create_mask(mode)
+                ok_mask = dti_map_pro.check_DTI_data()
+
+            if ask_user("¿Deseas realizar un preprocesado de este estudio?"):
                 Preprocessing([study]).preprocess()
             dti_map_pro.process_DTI()
 
         elif study_name.startswith("MT"):
             mt_map_pro = MTProcessor(study, mask_path)
-            if want_preprocess:
+            ok_mask = mt_map_pro.check_MT_data()
+            while not ok_mask:
+                mode = masker.select_mask_mode()
+                mask_path = masker.create_mask(mode)
+                ok_mask = mt_map_pro.check_MT_data()
+
+            if ask_user("¿Deseas realizar un preprocesado de este estudio?"):
                 Preprocessing([study]).preprocess()
             mt_map_pro.process_MT()
 
@@ -114,7 +124,13 @@ def cli():
             t_map_pro = TMapProcessor(
                 study, mask_path, n_cpu=n_cpu, fitting_mode="nonlinear"
             )
-            if want_preprocess:
+            ok_mask = t_map_pro.check_T_data()
+            while not ok_mask:
+                mode = masker.select_mask_mode()
+                mask_path = masker.create_mask(mode)
+                ok_mask = t_map_pro.check_T_data()
+
+            if ask_user("¿Deseas realizar un preprocesado de este estudio?"):
                 Preprocessing([study]).preprocess()
             t_map_pro.process_T_map(f_time_paths)
 

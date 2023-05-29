@@ -34,7 +34,7 @@ def select_file():
     root.withdraw()
     file_path = filedialog.askopenfilename()
     root.destroy()
-    root.mainloop()
+    # root.mainloop()
 
     return Path(file_path)
 
