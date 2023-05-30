@@ -657,8 +657,11 @@ class DTIProcessor:
         n_b_val, n_basal, n_dirs = self.ask_dti_info()
 
         # create B values and B dirs files
-        f_bvals = self.root_path / "supplfiles" / "Bvalues.bval"
-        f_dirs = self.root_path / "supplfiles" / "Bdirs.bvec"
+        # f_bvals = self.root_path / "supplfiles" / "Bvalues.bval"
+        # f_dirs = self.root_path / "supplfiles" / "Bdirs.bvec"
+
+        f_bvals = self.study_path / "Bvalues.bval"
+        f_dirs = self.study_path / "Bdirs.bvec"
 
         b_vals, dirs, n_b_val, n_basal, n_dirs, indexes_to_rm = self.get_bvals_n_dirs(
             n_b_val, n_basal, n_dirs
@@ -718,8 +721,11 @@ class DTIProcessor:
             data[:, :, :, i] = data[:, :, :, i] * mask
 
         # read b values (bvals) and gradient directions (bvecs)
-        bval_path = str(self.root_path / "supplfiles" / "bvalues.bval")
-        bvec_path = str(self.root_path / "supplfiles" / "Bdirs.bvec")
+        # bval_path = str(self.root_path / "supplfiles" / "bvalues.bval")
+        # bvec_path = str(self.root_path / "supplfiles" / "Bdirs.bvec")
+
+        bval_path = str(self.study_path / "bvalues.bval")
+        bvec_path = str(self.study_path / "Bdirs.bvec")
         bvals, bvecs = read_bvals_bvecs(bval_path, bvec_path)
 
         # create gradient table. You can access gradients with gtab.gradients
