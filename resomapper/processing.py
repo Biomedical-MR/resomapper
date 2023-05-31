@@ -884,106 +884,106 @@ class TimeCollector:
         return times_paths
 
     # GET TIMES MANUALLY
-    def get_TR(self):
-        trs = []
-        while True:
-            try:
-                n_tr = int(
-                    input(
-                        "¿Cuántos tiempos de repetición se usaron "
-                        "en la acquisición de T1?\n"
-                    )
-                )
-                break
-            except ValueError:
-                print("No has introducido un número correcto.")
+    # def get_TR(self):
+    #     trs = []
+    #     while True:
+    #         try:
+    #             n_tr = int(
+    #                 input(
+    #                     "¿Cuántos tiempos de repetición se usaron "
+    #                     "en la acquisición de T1?\n"
+    #                 )
+    #             )
+    #             break
+    #         except ValueError:
+    #             print("No has introducido un número correcto.")
 
-        print("Deberás introducir los TR de mayor a menor.\n")
-        for i in range(n_tr):
-            tr = input(f"Introduce el tiempo de repetición {i+1}.\n")
-            trs.append(tr)
+    #     print("Deberás introducir los TR de mayor a menor.\n")
+    #     for i in range(n_tr):
+    #         tr = input(f"Introduce el tiempo de repetición {i+1}.\n")
+    #         trs.append(tr)
 
-        return trs
+    #     return trs
 
-    def get_TE(self):
-        init_te = int(input("¿Primer tiempo de eco en T2? "))
-        n_te = int(input("¿Cuántos tiempos de eco hay en T2? "))
-        interval = int(input("¿Separación entre tiempos de eco? "))
+    # def get_TE(self):
+    #     init_te = int(input("¿Primer tiempo de eco en T2? "))
+    #     n_te = int(input("¿Cuántos tiempos de eco hay en T2? "))
+    #     interval = int(input("¿Separación entre tiempos de eco? "))
 
-        return list(range(init_te, interval * n_te + interval, interval))
+    #     return list(range(init_te, interval * n_te + interval, interval))
 
-    def get_TE_star(self):
-        init_te_star = float(input("¿Primer tiempo de eco en T2 estrella? "))
-        n_te_star = float(input("¿Cuántos tiempos de eco hay en T2 estrella? "))
-        interval_star = float(input("¿Separación entre tiempos de eco? "))
+    # def get_TE_star(self):
+    #     init_te_star = float(input("¿Primer tiempo de eco en T2 estrella? "))
+    #     n_te_star = float(input("¿Cuántos tiempos de eco hay en T2 estrella? "))
+    #     interval_star = float(input("¿Separación entre tiempos de eco? "))
 
-        return list(np.arange(init_te_star, interval_star * n_te_star, interval_star))
+    #     return list(np.arange(init_te_star, interval_star * n_te_star, interval_star))
 
-    def get_requested_times(self, modal: str):
-        if modal == "T1":
-            return self.get_TR()
-        elif modal == "T2":
-            return self.get_TE()
-        elif modal == "T2E":
-            return self.get_TE_star()
+    # def get_requested_times(self, modal: str):
+    #     if modal == "T1":
+    #         return self.get_TR()
+    #     elif modal == "T2":
+    #         return self.get_TE()
+    #     elif modal == "T2E":
+    #         return self.get_TE_star()
 
-    def get_selected_time(self, selected_modal: str):
-        """If it does not exists, fuction returns a file with sequence
-        times (TR, TE or TE*). If it alredy exists, returns that file, as
-        it will have the same times.
+    # def get_selected_time(self, selected_modal: str):
+    #     """If it does not exists, fuction returns a file with sequence
+    #     times (TR, TE or TE*). If it alredy exists, returns that file, as
+    #     it will have the same times.
 
-        Parameters
-        ----------
-            selected_modal: str
-                selected modality to process (T1, T2 or T2*).
-        Returns
-        -------
-            file_path: str
-                path to the file with the written times.
-        """
-        # define modalities names and time files names
-        modals = ["T1", "T2", "T2E"]
-        time_file_names = [
-            "TiemposRepeticion.txt",
-            "TiemposEco.txt",
-            "TiemposEcoStar.txt",
-        ]
+    #     Parameters
+    #     ----------
+    #         selected_modal: str
+    #             selected modality to process (T1, T2 or T2*).
+    #     Returns
+    #     -------
+    #         file_path: str
+    #             path to the file with the written times.
+    #     """
+    #     # define modalities names and time files names
+    #     modals = ["T1", "T2", "T2E"]
+    #     time_file_names = [
+    #         "TiemposRepeticion.txt",
+    #         "TiemposEco.txt",
+    #         "TiemposEcoStar.txt",
+    #     ]
 
-        modal_idx = modals.index(selected_modal)
-        file_name = time_file_names[
-            modal_idx
-        ]  # get file name (str) associated to modality
+    #     modal_idx = modals.index(selected_modal)
+    #     file_name = time_file_names[
+    #         modal_idx
+    #     ]  # get file name (str) associated to modality
 
-        file_path = str(self.root_path / "supplfiles" / file_name)
-        if not os.path.exists(file_path):
-            times = self.get_requested_times(selected_modal)  # collects times
-            with open(file_path, "w+") as f:  # creates file
-                f.write(" ".join([str(t) for t in times]))
-        else:
-            print("[INFO]: Usando archivo de sujeto anterior para tiempos de eco T2")
+    #     file_path = str(self.root_path / "supplfiles" / file_name)
+    #     if not os.path.exists(file_path):
+    #         times = self.get_requested_times(selected_modal)  # collects times
+    #         with open(file_path, "w+") as f:  # creates file
+    #             f.write(" ".join([str(t) for t in times]))
+    #     else:
+    #         print("[INFO]: Usando archivo de sujeto anterior para tiempos de eco T2")
 
-        return file_path
+    #     return file_path
 
-    def get_times_manual(self):
-        """Manually, you get times associated to T1, T2, T2E modalities i.e.
-        TR, TE, TE*, respectively. If a modality has not been selected by
-        the user to be processed returns an empty string."""
+    # def get_times_manual(self):
+    #     """Manually, you get times associated to T1, T2, T2E modalities i.e.
+    #     TR, TE, TE*, respectively. If a modality has not been selected by
+    #     the user to be processed returns an empty string."""
 
-        times = []
-        for modal in ["T1", "T2", "T2E"]:  # orden de los tiempos: tr, te, ts
-            if modal in self.modals_to_process:
-                time = self.get_selected_time(modal)
-                times.append(time)
-            else:
-                times.append("")
+    #     times = []
+    #     for modal in ["T1", "T2", "T2E"]:  # orden de los tiempos: tr, te, ts
+    #         if modal in self.modals_to_process:
+    #             time = self.get_selected_time(modal)
+    #             times.append(time)
+    #         else:
+    #             times.append("")
 
-        return times
+    #     return times
 
     def get_times(self, how="auto"):
         if how == "auto":
             time_paths = self.get_times_auto()
-        else:
-            time_paths = self.get_times_manual()
+        # else:
+        #     time_paths = self.get_times_manual()
 
         return time_paths
 
