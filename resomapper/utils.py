@@ -14,7 +14,20 @@ import resomapper.file_system_functions as fs
 
 
 class Headermsg:
-    """Class containing headers for messages during execution of the CLI."""
+    """Headers for messages shown during execution of the CLI.
+
+    Attributes:
+        info (str): Header for information messages.
+        warn (str): Header for warning messages.
+        error (str): Header for error messages.
+        success (str): Header for success messages.
+        pointer (str): Header for pointer messages.
+        ask (str): Header for question messages.
+        welcome (str): Header for the welcome message.
+        new_patient1 (str): Header for new patient study message (part 1).
+        new_patient2 (str): Header for new patient study message (part 2).
+        new_modal (str): Header for new modal message.
+    """
 
     info = "\x1b[0;30;44m [INFO] \x1b[0m "
     warn = "\x1b[0;30;43m [WARNING] \x1b[0m "
@@ -87,7 +100,6 @@ def ask_user_options(question, options):
             )
 
 
-# def check_shapes(img, mask, callback_func=None, study_path=None):
 def check_shapes(img, mask):
     """Check if an image and mask have the same shapes (resolution and slices).
     If the input arguments are file paths, the 'load_nifti' function is used to load the
@@ -119,20 +131,14 @@ def check_shapes(img, mask):
         return False
     else:
         return True
-        # if (callback_func is not None) and (study_path is not None):
-        #     mask = Mask(study_path)
-        #     mode = mask.select_mask_mode()
-        #     mask.create_mask(mode)
-        #     callback_func()
-        # else:
-        #     exit()
-        # exit()
 
 
 ###############################################################################
 # Mask creation
 ###############################################################################
 class Mask:
+    """Mask creating workflow."""
+
     def __init__(self, study_subfolder: str) -> None:
         """Initialize a new instance of the Mask class.
 
@@ -142,8 +148,7 @@ class Mask:
         self.study_subfolder = study_subfolder
 
     def prepare_vol(self, vol_3d):
-        """Some modifications are needed on the volume: 270 degrees
-        rotation and image flip.
+        """Some modifications on the volume: 270 degrees rotation and image flip.
 
         Args:
             vol_3d (ndarray): Input image.
@@ -171,7 +176,7 @@ class Mask:
         return vol_prepared
 
     def min_max_normalization(self, img):
-        """Applies min-max normalization to the input image. Creates a copy of the input
+        """Apply min-max normalization to the input image. Creates a copy of the input
         image and computes the minimum and maximum values. The image is normalized using
         the formula (img - min_val) / (max_val - min_val).
 
@@ -228,7 +233,7 @@ class Mask:
             status = 0  # finish
 
     def itera(self, ima, refPT):
-        """Iteratively displays slices for masking.Left click adds a line and right
+        """Iteratively display slices for masking. Left click adds a line and right
         click closes the polygon. Next slice will be showed after right click.
 
         Args:
@@ -289,7 +294,7 @@ class Mask:
         return refPT
 
     def draw_mask(self):
-        """Creates a binary mask for the roi where processing will take place and saves
+        """Create a binary mask for the roi where processing will take place and save
         it as a NIfTI file. The user is prompted to create the mask by selecting
         contours in a pop-up window.
 

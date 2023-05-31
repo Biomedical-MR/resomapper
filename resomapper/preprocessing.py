@@ -11,7 +11,7 @@ import numpy as np
 from skimage.restoration import denoise_nl_means
 from skimage.transform import rotate
 
-from resomapper.utils import Headermsg as hmg  # Added by Raquel
+from resomapper.utils import Headermsg as hmg
 from resomapper.utils import ask_user
 
 warnings.filterwarnings("ignore")

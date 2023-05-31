@@ -265,13 +265,6 @@ class DTIProcessor:
                     n_b_val_real = int(re.search("\d+", line)[0])
                 elif line.startswith("DwAoImages"):
                     n_basal_real = int(re.search("\d+", line)[0])
-            # for idx, line in enumerate(lines):
-            #     if line.startswith("DwNDiffDir"):
-            #         n_dirs_real = int(re.search("\d+", line).group(0))
-            #     elif line.startswith("DwNDiffExpEach"):
-            #         n_b_val_real = int(re.search("\d+", line).group(0))
-            #     elif line.startswith("DwAoImages"):
-            #         n_basal_real = int(re.search("\d+", line).group(0))
 
         if n_b_val != n_b_val_real:
             print(
@@ -1219,16 +1212,13 @@ class R2MapGenerator:
 class Heatmap:
     def rotate(self, array_2d):
         list_of_tuples = zip(*array_2d[::-1])
-        rotated_element = [list(elem) for elem in list_of_tuples]
-
-        return rotated_element
+        return [list(elem) for elem in list_of_tuples]
 
     def change_colormap(self):
         while True:
             cmap_name = input("Introduce el nombre del mapa de colores.\n")
             try:
-                cmap = cm.get_cmap(cmap_name)
-                return cmap
+                return cm.get_cmap(cmap_name)
             except ValueError:
                 print(
                     f'Has introducido "{cmap_name}" y ese nombre no corresponde '
@@ -1484,11 +1474,10 @@ class Heatmap:
         change color range and color map. Do not use for ADC maps, use
         save_ADC_heatmap function instead.
 
-        Parameters
-        ----------
-            maps: stack of maps (one map per slice)
-            map_type: name of the map
-            out_path: string path to save output maps
+        Args:
+            maps (numpy.array): stack of maps (one map per slice)
+            map_type (str): name of the map
+            out_path (str): string path to save output maps
         """
         cmap = plt.cm.turbo  # select default cmap
         # cmap.set_bad('black', 1)  # paints NaN values in black

@@ -75,19 +75,10 @@ class FileSystemBuilder:
     def create_dir(self):
         """Creates 'convertidos' and 'procesados' folders."""
 
-        # folders = ["convertidos", "procesados", "supplfiles"]
         folders = ["convertidos", "procesados"]
         for folder_name in folders:
             if not (self.root_path / folder_name).exists():
                 (self.root_path / folder_name).mkdir(parents=True)
-
-        # self.empty_supplfiles()
-
-    def empty_supplfiles(self):
-        supplfiles_path = self.root_path / "supplfiles"
-        if supplfiles_path.exists():
-            for f in os.listdir(supplfiles_path):
-                os.remove(self.root_path / "supplfiles" / f)
 
     def get_studies(self):
         """Get only studies folders. Returns a list with the
@@ -319,6 +310,12 @@ class FileSystemBuilder:
     def get_modality(self, study_subfolder_path: str):
         """Returns the modality of a subfolder path such as
         "C:// * //T2_convertidos*"
+
+        Args:
+            study_subfolder_path (str): Path to the subfolder.
+
+        Returns:
+            str: The modality of the subfolder.
         """
         if study_subfolder_path.parts[-1][:3] == "T1_":
             return "T1"
@@ -336,14 +333,12 @@ class FileSystemBuilder:
     def get_selected_studies(self):
         """Returns those studies that will be processed. Checks if a modality
         has alredy been processed. In that case gives two options:
-            a) Remove it and processed again
-            b) Do not process it again.
+            - Remove it and processed again
+            - Do not process it again.
 
-        Returns
-        -------
-            subfolders_paths: list(Path)
-                path to modality subfolders that will be processed.
-            modals_to_process : list(str)
+        Returns:
+            subfolders_paths (list): Paths to modality subfolders to be processed.
+            modals_to_process (list): Modalities present in the studies to process.
         """
 
         self.proc_study_subfolders = self.get_study_subfolders("procesados")
