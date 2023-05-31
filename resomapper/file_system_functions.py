@@ -16,7 +16,10 @@ warnings.filterwarnings("ignore")
 
 
 def select_directory():
-    """Allows selection of root directory showing a file explorer window."""
+    """Allows selection of root directory showing a file explorer window.
+
+    Returns:
+        Path: full path to the selected directory."""
 
     root = tk.Tk()
     root.withdraw()
@@ -28,7 +31,11 @@ def select_directory():
 
 
 def select_file():
-    """Allows selection of a file."""
+    """Allows selection of a file showing a file explorer window.
+
+    Returns:
+        Path: full path to the selected file.
+    """
 
     root = tk.Tk()
     root.withdraw()
@@ -69,11 +76,18 @@ def check_cwd(cwd: bool, return_cwd=True):
 
 
 class FileSystemBuilder:
+    """File and folder organization workflow."""
+
     def __init__(self, root_path) -> None:
+        """Initialize a new instance of the FileSystemBuilder class.
+
+        Args:
+            root_path (str): The path of the working directory.
+        """
         self.root_path = root_path
 
     def create_dir(self):
-        """Creates 'convertidos' and 'procesados' folders."""
+        """Create 'convertidos' and 'procesados' folders."""
 
         folders = ["convertidos", "procesados"]
         for folder_name in folders:
@@ -81,15 +95,20 @@ class FileSystemBuilder:
                 (self.root_path / folder_name).mkdir(parents=True)
 
     def get_studies(self):
-        """Get only studies folders. Returns a list with the
-        name of the studies."""
+        """Get only studies folders present in the working directory. Returns a list
+        with the names of the studies folders.
+
+        Returns:
+            list: list of paths to the studies folders in the working directory.
+        """
 
         not_studies = ["procesados", "convertidos", "supplfiles", ".DS_Store"]
         return [s for s in os.listdir(self.root_path) if s not in not_studies]
 
     def convert_bru_to_nii(self):
-        """Convert from Bruker to Niftii. Get files to convert from
-        'convertidos' folder."""
+        """Convert all studies present in the workinf folder from Bruker to Niftii.
+        Converted files will be stored in the 'convertidos' folder.
+        """
 
         studies_names = self.get_studies()
         self.path_converted = self.root_path / "convertidos"
@@ -97,7 +116,14 @@ class FileSystemBuilder:
         converter.perform_conversion_bru2nii()
 
     def get_study_subfolders(self, directory: str):
-        """Get subfolders of a directory located in root_path."""
+        """Get subfolders of a directory located in root_path.
+
+        Args:
+            directory (str): Name of the directory.
+
+        Returns:
+            Generator: A generator that yields subfolder paths.
+        """
         directory = self.root_path / directory
         return directory.glob("*/*")
 
@@ -110,8 +136,11 @@ class FileSystemBuilder:
                 self.add_method_to_subfolder(subfolder)
 
     def ask_preprocessing(self):
-        """Select from a checklist those modalities to be processed. Returns a
-        list of str with the selected modalities."""
+        """Select from a checklist those modalities to be processed.
+
+        Returns:
+            list: list of str with the selected modalities.
+        """
 
         print(
             f"\n{hmg.ask}Marca qué modalidades deseas procesar en la ventana emergente."
@@ -151,9 +180,13 @@ class FileSystemBuilder:
         ]
 
     def get_converted_files(self, known_modals=False):
-        """Get those files we want to transfer to 'procesados' folder.
-        Returns  a list including *method.txt, *.nii, *DwEffBval.txt and
-        *DwGradVec.txt files."""
+        """Get the files' names of those that we want to transfer from 'convertidos'
+        to 'procesados' folder.
+
+        Returns:
+            list: a list including *method.txt, *.nii, *DwEffBval.txt and
+                *DwGradVec.txt files.
+        """
 
         # add an uderscore to distingish T2 from T2E and change DTI per DT
         modals = []
@@ -201,12 +234,11 @@ class FileSystemBuilder:
         """Transfer files from 'convertidos' to 'procesados' folder.
         If folder alredy exists in destiny, it will not be overwritten.
 
-        Parameters
-        ----------
-            src_paths : list(Path)
-                Paths to source folder
-            dst_paths : list(Path)
-                Paths to destination folder
+        Args:
+            src_paths (list(Path)): Paths to source folder.
+                Defaults to None (automatically selected).
+            dst_paths (list(Path)): Paths to destination folder.
+                Defaults to None (automatically selected).
         """
 
         # replicate the file directory from 'convertidos' to 'procesados' taking
@@ -240,9 +272,119 @@ class FileSystemBuilder:
                             archivo {src_path.split("/|//")[-1]}'
                     )
 
+    # def add_method_to_subfolder2(self, study_subfolder: str):
+    #     """Adds method (T1, T2, T2*, D, MTon, MToff) to study subfolder name.
+    #     It discriminates by adquisition and method.
+
+    #     Args:
+    #         study_subfolder (str): Name or path of the study subfolder.
+
+    #     The 'acquisition_method.txt' file located in the study subfolder to determine
+    #     the acquisition method.
+
+    #     The following acquisition methods are handled:
+    #     - "RAREVTR": T1 modality.
+    #     - "MGE": T2* modality.
+    #     - "DtiEpi": Diffusion (DT) modality.
+    #     - "MSME": T2, M0, or MT modality.
+
+    #     For "MSME" acquisition method, it additionally reads the '*method.txt' file in
+    #     the subfolder to determine the specific method.
+    #     - If the method contains "EffectiveTE" and its length is greater than 35, the
+    #       subfolder is renamed as T2.
+    #     - If the method contains "MagTransOnOff = On", the subfolder is
+    #       renamed as MTon.
+    #     - If the method contains "MagTransOnOff = Off" and
+    #       "DigFilter = Digital_Medium", the subfolder is renamed as MToff.
+    #     """
+
+    #     f_adq = "acquisition_method.txt"
+    #     path_adq = study_subfolder / f_adq
+
+    #     try:
+    #         with open(path_adq, "r") as f:
+    #             adq_lines = f.readlines()
+    #     except FileNotFoundError:
+    #         # patch to avoid 'variable referenced before assignment error'
+    #         adq_lines = [""]
+
+    #     # rename study subfolder
+    #     if adq_lines[0] == "RAREVTR":  # T1
+    #         r_study_subfolder = Path("/".join(study_subfolder.parts[:-1])) / (
+    #             "T1_" + study_subfolder.parts[-1]
+    #         )
+    #         os.rename(study_subfolder, r_study_subfolder)
+
+    #     elif adq_lines[0] == "MGE":  # T2STAR
+    #         r_study_subfolder = Path("/".join(study_subfolder.parts[:-1])) / (
+    #             "T2E_" + study_subfolder.parts[-1]
+    #         )
+    #         os.rename(study_subfolder, r_study_subfolder)
+
+    #     elif adq_lines[0] == "DtiEpi":  # DIFFUSION
+    #         r_study_subfolder = Path("/".join(study_subfolder.parts[:-1])) / (
+    #             "DT_" + study_subfolder.parts[-1]
+    #         )
+    #         os.rename(study_subfolder, r_study_subfolder)
+
+    #     elif adq_lines[0] == "MSME":  # T2, M0 or MT
+    #         f_method = study_subfolder.parts[-1] + "_method.txt"
+    #         path_met = study_subfolder / f_method  # path to *method.txt file
+
+    #         try:
+    #             with open(path_met, "r") as f:
+    #                 met_lines = f.readlines()
+    #         except FileNotFoundError:
+    #             print(f"{hmg.error}Archivo no encontrado.")
+
+    #         for line in met_lines:
+    #             if not line.startswith("EffectiveTE"):
+    #                 continue
+    #             elif len(line) > 35:
+    #                 r_study_subfolder = Path("/".join(study_subfolder.parts[:-1])) / (
+    #                     "T2_" + study_subfolder.parts[-1]
+    #                 )
+    #                 os.rename(study_subfolder, r_study_subfolder)
+    #                 return None
+    #             else:
+    #                 if "MagTransOnOff = On \n" in met_lines:
+    #                     r_study_subfolder = Path(
+    #                         "/".join(study_subfolder.parts[:-1])
+    #                     ) / ("MT_" + study_subfolder.parts[-1])
+    #                     os.rename(study_subfolder, r_study_subfolder)
+    #                 elif ("MagTransOnOff = Off \n" in met_lines) and (
+    #                     "DigFilter = Digital_Medium \n" in met_lines
+    #                 ):
+    #                     r_study_subfolder = Path(
+    #                         "/".join(study_subfolder.parts[:-1])
+    #                     ) / ("M0_" + study_subfolder.parts[-1])
+    #                     os.rename(study_subfolder, r_study_subfolder)
+    #                 return None
+
     def add_method_to_subfolder(self, study_subfolder: str):
         """Adds method (T1, T2, T2*, D, MTon, MToff) to study subfolder name.
-        It discriminates by adquisition and method."""
+        It discriminates by adquisition and method.
+
+        Args:
+            study_subfolder (str): Name or path of the study subfolder.
+
+        The 'acquisition_method.txt' file located in the study subfolder to determine
+        the acquisition method.
+
+        The following acquisition methods are handled:
+        - "RAREVTR": T1 modality.
+        - "MGE": T2* modality.
+        - "DtiEpi": Diffusion (DT) modality.
+        - "MSME": T2, M0, or MT modality.
+
+        For "MSME" acquisition method, it additionally reads the '*method.txt' file in
+        the subfolder to determine the specific method.
+        - If the method contains "EffectiveTE" and its length is greater than 35, the
+          subfolder is renamed as T2.
+        - If the method contains "MagTransOnOff = On", the subfolder is renamed as MTon.
+        - If the method contains "MagTransOnOff = Off" and "DigFilter = Digital_Medium",
+          the subfolder is renamed as MToff.
+        """
 
         f_adq = "acquisition_method.txt"
         path_adq = study_subfolder / f_adq
@@ -254,26 +396,18 @@ class FileSystemBuilder:
             # patch to avoid 'variable referenced before assignment error'
             adq_lines = [""]
 
-        # rename study subfolder
-        if adq_lines[0] == "RAREVTR":  # T1
-            r_study_subfolder = Path("/".join(study_subfolder.parts[:-1])) / (
-                "T1_" + study_subfolder.parts[-1]
-            )
-            os.rename(study_subfolder, r_study_subfolder)
+        acquisition_method = adq_lines[0].strip()
 
-        elif adq_lines[0] == "MGE":  # T2STAR
-            r_study_subfolder = Path("/".join(study_subfolder.parts[:-1])) / (
-                "T2E_" + study_subfolder.parts[-1]
-            )
-            os.rename(study_subfolder, r_study_subfolder)
+        new_prefix = None
 
-        elif adq_lines[0] == "DtiEpi":  # DIFFUSION
-            r_study_subfolder = Path("/".join(study_subfolder.parts[:-1])) / (
-                "DT_" + study_subfolder.parts[-1]
-            )
-            os.rename(study_subfolder, r_study_subfolder)
-
-        elif adq_lines[0] == "MSME":  # T2, M0 or MT
+        # Rename study subfolder based on acquisition method
+        if acquisition_method == "RAREVTR":  # T1
+            new_prefix = "T1_"
+        elif acquisition_method == "MGE":  # T2STAR
+            new_prefix = "T2E_"
+        elif acquisition_method == "DtiEpi":  # DIFFUSION
+            new_prefix = "DT_"
+        elif acquisition_method == "MSME":  # T2, M0 or MT
             f_method = study_subfolder.parts[-1] + "_method.txt"
             path_met = study_subfolder / f_method  # path to *method.txt file
 
@@ -282,30 +416,27 @@ class FileSystemBuilder:
                     met_lines = f.readlines()
             except FileNotFoundError:
                 print(f"{hmg.error}Archivo no encontrado.")
+                return None
 
             for line in met_lines:
-                if not line.startswith("EffectiveTE"):
-                    continue
-                elif len(line) > 35:
-                    r_study_subfolder = Path("/".join(study_subfolder.parts[:-1])) / (
-                        "T2_" + study_subfolder.parts[-1]
-                    )
-                    os.rename(study_subfolder, r_study_subfolder)
-                    return None
-                else:
-                    if "MagTransOnOff = On \n" in met_lines:
-                        r_study_subfolder = Path(
-                            "/".join(study_subfolder.parts[:-1])
-                        ) / ("MT_" + study_subfolder.parts[-1])
-                        os.rename(study_subfolder, r_study_subfolder)
-                    elif ("MagTransOnOff = Off \n" in met_lines) and (
-                        "DigFilter = Digital_Medium \n" in met_lines
-                    ):
-                        r_study_subfolder = Path(
-                            "/".join(study_subfolder.parts[:-1])
-                        ) / ("M0_" + study_subfolder.parts[-1])
-                        os.rename(study_subfolder, r_study_subfolder)
-                    return None
+                if line.startswith("EffectiveTE") and len(line) > 35:
+                    new_prefix = "T2_"
+                    break
+                elif line == "MagTransOnOff = On \n":
+                    new_prefix = "MT_"
+                    break
+                elif (
+                    line == "MagTransOnOff = Off \n"
+                    and "DigFilter = Digital_Medium \n" in met_lines
+                ):
+                    new_prefix = "M0_"
+                    break
+
+        if new_prefix:
+            r_study_subfolder = Path("/".join(study_subfolder.parts[:-1])) / (
+                new_prefix + study_subfolder.parts[-1]
+            )
+            os.rename(study_subfolder, r_study_subfolder)
 
     def get_modality(self, study_subfolder_path: str):
         """Returns the modality of a subfolder path such as
@@ -382,21 +513,21 @@ class FileSystemBuilder:
                     # remove folder and files contained in it
                     shutil.rmtree(str(subfolder))
                     # create folder again
-                    src_path = Path(
-                        str(subfolder)
-                        .replace("procesados", "convertidos")
-                        .replace("procesado", "convertido")
-                    )
-                    files_to_trasnfer = self.get_converted_files([processed_modal])
+                    # src_path = Path(
+                    #     str(subfolder)
+                    #     .replace("procesados", "convertidos")
+                    #     .replace("procesado", "convertido")
+                    # )
+                    files_to_transfer = self.get_converted_files([processed_modal])
                     dst_paths = [
                         Path(
                             str(f)
                             .replace("convertidos", "procesados")
                             .replace("convertido", "procesado")
                         )
-                        for f in files_to_trasnfer
+                        for f in files_to_transfer
                     ]
-                    self.transfer_files(files_to_trasnfer, dst_paths)
+                    self.transfer_files(files_to_transfer, dst_paths)
                     subfolders_paths.append(subfolder)
 
         return subfolders_paths, self.modals_to_process
@@ -408,23 +539,31 @@ class FileSystemBuilder:
 
 
 class Bru2NiiConverter:
+    """Conversion from Bruker files to NIfTI files workflow."""
+
     def __init__(self, root_path: str, converted_path: str, studies: list) -> None:
+        """Initialize a new instance of the Bru2NiiConverter class.
+
+        Args:
+            root_path (str): Path of the working directory.
+            converted_path (str): Path of the output folder ('convertidos').
+            studies (list): List of paths to the studies folders in the working dir.
+        """
         self.root_path = root_path
         self.converted_path = converted_path
         self.studies = studies
 
     def convert_bru_2_nii(self, study):
-        """Convert Bruker files to NIfTI
-        Parameters
-        ----------
-            study : str
-                Name of the study to convert
+        """Convert Bruker files of one study to NIfTI.
 
-        To understand the Bruker2Nifti converter, you can check a example in:
+        Args:
+            study (str): Name of the study to convert.
+
+        Note:
+            To understand the Bruker2Nifti converter, you can check a example in:
             https://github.com/SebastianoF/bruker2nifti/wiki/
-
-        Setting get_method or save_human_readable to False is
-        extremely not recommended
+            Setting get_method or save_human_readable to False is
+            extremely not recommended
         """
         pfo_study_in = str(self.root_path / study)
         pfo_study_out = str(self.root_path / "convertidos")
@@ -447,7 +586,10 @@ class Bru2NiiConverter:
         bru.convert()
 
     def perform_conversion_bru2nii(self):
-        """Three cases:
+        """Check if any studies have already been converted and convert those that
+        haven't or those that the user wants to reconvert.
+
+        Three cases:
         1. No study has been converted
         2. All studies have been converted
         3. Some studies have been converted
@@ -459,7 +601,7 @@ class Bru2NiiConverter:
             for study in self.studies:
                 self.convert_bru_2_nii(study)
                 conv_studies.append(study)
-            df_conv_studies = pd.DataFrame(conv_studies)
+            # df_conv_studies = pd.DataFrame(conv_studies)
             print(f"\n{hmg.info}Ya se han convertido todos los estudios.")
 
         else:

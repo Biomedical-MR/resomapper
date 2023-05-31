@@ -848,7 +848,8 @@ class TimeCollector:
             study_name = subfolder.parts[-1]
             if (
                 study_name.startswith("T1_")
-                and study_name[:2] in self.modals_to_process
+                and "T1" in self.modals_to_process
+                # and study_name[:2] in self.modals_to_process
             ):
                 TR_times = self.read_times(subfolder, "MultiRepTime", 3)
                 TR_times_path = self.write_times(
@@ -858,7 +859,8 @@ class TimeCollector:
 
             elif (
                 study_name.startswith("T2_")
-                and study_name[:2] in self.modals_to_process
+                and "T2" in self.modals_to_process
+                # and study_name[:2] in self.modals_to_process
             ):
                 TE_times = self.read_times(subfolder, "EffectiveTE", 3)
                 TE_times_path = self.write_times(TE_times, "TiemposEco.txt", subfolder)
@@ -866,7 +868,8 @@ class TimeCollector:
 
             elif (
                 study_name.startswith("T2E_")
-                and study_name[:3] in self.modals_to_process
+                and "T2E" in self.modals_to_process
+                # and study_name[:3] in self.modals_to_process
             ):
                 TEs_times = self.read_times(subfolder, "EffectiveTE", 4)
                 TEs_times_path = self.write_times(
