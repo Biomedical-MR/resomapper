@@ -71,7 +71,8 @@ class MTProcessor:
         # return study_path
 
     def select_MT_acq(self):
-        n_mt = int(len(list(self.mt_study_path.glob("*.nii.gz"))) / 2)
+        # n_mt = int(len(list(self.mt_study_path.glob("*.nii.gz"))) / 2)
+        n_mt = len(list(self.mt_study_path.glob("*.nii.gz"))) // 2
 
         if n_mt == 1:
             mt_folders_list = [1]
@@ -173,9 +174,6 @@ class MTProcessor:
             mt_off, _ = load_nifti(f_mtoff_path)  # affine matrix is the same
             mask, _ = load_nifti(self.mask_path)
 
-            # check_shapes(mt_on, mask)
-            # check_shapes(mt_off, mask)
-
             # apply mask
             mt_on = mt_on * mask
             mt_off = mt_off * mask
@@ -207,147 +205,6 @@ class MTProcessor:
                 saving_path = str(self.mt_study_path / "MT_map.nii")
                 save_nifti(saving_path, mt_map.astype(np.float32), affine1)
                 Heatmap().save_heatmap(mt_map, "MT", out_path=str(self.mt_study_path))
-
-        # n_mt = int(len(list(self.mt_study_path.glob("*.nii.gz"))) / 2)
-
-        # if n_mt == 1:
-        #     f_mton_path = list(self.mt_study_path.glob("procesado_MT_*.nii.gz"))[0]
-        #     f_mtoff_path = list(self.mt_study_path.glob("procesado_M0_*.nii.gz"))[0]
-
-        #     # from nifti to array
-        #     mt_on, affine1 = load_nifti(f_mton_path)
-        #     mt_off, _ = load_nifti(f_mtoff_path)  # affine matrix is the same
-        #     mask, _ = load_nifti(self.mask_path)
-
-        #     check_shapes(mt_on, mask)
-        #     check_shapes(mt_off, mask)
-
-        #     # apply mask
-        #     mt_on = mt_on * mask
-        #     mt_off = mt_off * mask
-
-        #     # get maps
-        #     print(f"\n{hmg.info}Generando mapa de MT.")
-        #     mt_map = self.compute_MT_map(mt_on, mt_off)
-
-        #     # save as .nii file and save heatmaps
-        #     saving_path = str(self.mt_study_path / "MT_map.nii")
-        #     save_nifti(saving_path, mt_map.astype(np.float32), affine1)
-        #     Heatmap().save_heatmap(mt_map, "MT", out_path=str(self.mt_study_path))
-        # else:
-        #     print(
-        #         f"\n{hmg.warn}Has adquirido imágenes de MT con diferentes slopes "
-        #         f"para este estudio ({n_mt})."
-        #     )
-
-        #     input_ready = False
-        #     while not input_ready:
-        #         mt_folders_input = input(
-        #             f"\n{hmg.ask}Indica el número de la carpeta de adquisición que "
-        #             f"desas procesar (entre 1 y {n_mt}). "
-        #             "Si deseas procesar más de una carpeta, introduce los diferentes "
-        #             f'números separados por ",".\n{hmg.pointer}'
-        #         )
-        #         mt_folders_input = mt_folders_input.split(",")
-        #         try:
-        #             mt_folders_list = [int(x.strip()) for x in mt_folders_input]
-        #             input_ready = True
-        #             for number in mt_folders_list:
-        #                 if (number > n_mt) or (number < 1):
-        #                     print(
-        #                         f"\n{hmg.error}Por favor, introduce números entre 1 y"
-        #                         f" {n_mt}."
-        #                     )
-        #                     input_ready = False
-        #                     break
-        #         except Exception:
-        #             print(
-        #                 f'\n{hmg.error}Por favor, introduce sólo números separados'
-        #                 f' por "," (si hay más de uno).'
-        #             )
-
-        #     mt_folders_list = [*set(mt_folders_list)]
-
-        #     if len(mt_folders_list) == 1:
-        #         subscan_index = mt_folders_list[0] - 1
-        #         f_mton_path = list(
-        #             self.mt_study_path.glob(
-        #                 f"procesado_MT_*subscan_{subscan_index}.nii*"
-        #             )
-        #         )[0]
-        #         f_mtoff_path = list(
-        #             self.mt_study_path.glob(
-        #                 f"procesado_M0_*subscan_{subscan_index}.nii*"
-        #             )
-        #         )[0]
-
-        #         # from nifti to array
-        #         mt_on, affine1 = load_nifti(f_mton_path)
-        #         mt_off, _ = load_nifti(f_mtoff_path)  # affine matrix is the same
-        #         mask, _ = load_nifti(self.mask_path)
-
-        #         check_shapes(mt_on, mask)
-        #         check_shapes(mt_off, mask)
-
-        #         # apply mask
-        #         mt_on = mt_on * mask
-        #         mt_off = mt_off * mask
-
-        #         # get maps
-        #         print(f"\n{hmg.info}Generando mapa de MT.")
-        #         mt_map = self.compute_MT_map(mt_on, mt_off)
-
-        #         # save as .nii file and save heatmaps
-        #         saving_path = str(self.mt_study_path / "MT_map.nii")
-        #         save_nifti(saving_path, mt_map.astype(np.float32), affine1)
-        #         Heatmap().save_heatmap(mt_map, "MT", out_path=str(self.mt_study_path))
-
-        #     else:
-        #         for i in mt_folders_list:
-        #             subscan_index = i - 1
-        #             f_mton_path = list(
-        #                 self.mt_study_path.glob(
-        #                     f"procesado_MT_*subscan_{subscan_index}.nii*"
-        #                 )
-        #             )[0]
-        #             f_mtoff_path = list(
-        #                 self.mt_study_path.glob(
-        #                     f"procesado_M0_*subscan_{subscan_index}.nii*"
-        #                 )
-        #             )[0]
-
-        #             # from nifti to array
-        #             mt_on, affine1 = load_nifti(f_mton_path)
-        #             mt_off, _ = load_nifti(f_mtoff_path)  # affine matrix is the same
-        #             mask, _ = load_nifti(self.mask_path)
-
-        #             check_shapes(mt_on, mask)
-        #             check_shapes(mt_off, mask)
-
-        #             # apply mask
-        #             mt_on = mt_on * mask
-        #             mt_off = mt_off * mask
-
-        #             # get maps
-        #             print(f"\n{hmg.info}Generando mapa de MT (carpeta {i}).")
-        #             mt_map = self.compute_MT_map(mt_on, mt_off)
-
-        #             try:
-        #                 os.mkdir(str(self.mt_study_path / str(i)))
-        #             except Exception:
-        #                 pass
-
-        #             # save as .nii file and save heatmaps
-        #             mt_map_filename = f"MT_map_{str(i)}.nii"
-        #             saving_path = os.path.join(
-        #                 str(self.mt_study_path), str(i), mt_map_filename
-        #             )
-        #             save_nifti(saving_path, mt_map.astype(np.float32), affine1)
-        #             Heatmap().save_heatmap(
-        #                 mt_map,
-        #                 "MT",
-        #                 out_path=os.path.join(str(self.mt_study_path), str(i)),
-        #             )
 
 
 ###############################################################################
@@ -401,13 +258,20 @@ class DTIProcessor:
         method_path = list(self.study_path.glob("procesado_*_method.txt"))[0]
         with open(method_path, "r") as f:
             lines = f.readlines()
-            for idx, line in enumerate(lines):
+            for line in lines:
                 if line.startswith("DwNDiffDir"):
-                    n_dirs_real = int(re.search("\d+", line).group(0))
+                    n_dirs_real = int(re.search("\d+", line)[0])
                 elif line.startswith("DwNDiffExpEach"):
-                    n_b_val_real = int(re.search("\d+", line).group(0))
+                    n_b_val_real = int(re.search("\d+", line)[0])
                 elif line.startswith("DwAoImages"):
-                    n_basal_real = int(re.search("\d+", line).group(0))
+                    n_basal_real = int(re.search("\d+", line)[0])
+            # for idx, line in enumerate(lines):
+            #     if line.startswith("DwNDiffDir"):
+            #         n_dirs_real = int(re.search("\d+", line).group(0))
+            #     elif line.startswith("DwNDiffExpEach"):
+            #         n_b_val_real = int(re.search("\d+", line).group(0))
+            #     elif line.startswith("DwAoImages"):
+            #         n_basal_real = int(re.search("\d+", line).group(0))
 
         if n_b_val != n_b_val_real:
             print(
@@ -699,31 +563,11 @@ class DTIProcessor:
                 Path("/".join(self.study_path.parts[:-1])) / "mask.nii"
             )
 
-        # check_shapes(
-        #     data, mask, callback_func=self.process_DTI, study_path=self.study_path
-        # )
-        # ok_mask = check_shapes(data, mask)
-        # while not ok_mask:
-        #     mode = self.masker.select_mask_mode()
-        #     self.masker.create_mask(mode)
-        #     # while True:
-        #     #     try:
-        #     #         masker.create_mask(mode)
-        #     #         break
-        #     #     except PermissionError:
-        #     #         print("retrying")
-        #     #         time.sleep(5)
-        #     mask, affine = load_nifti(self.study_path / "mask.nii")
-        #     ok_mask = check_shapes(data, mask)
-
         # apply mask
         for i in range(data.shape[3]):  # para cada imagen de cada slice
             data[:, :, :, i] = data[:, :, :, i] * mask
 
         # read b values (bvals) and gradient directions (bvecs)
-        # bval_path = str(self.root_path / "supplfiles" / "bvalues.bval")
-        # bvec_path = str(self.root_path / "supplfiles" / "Bdirs.bvec")
-
         bval_path = str(self.study_path / "bvalues.bval")
         bvec_path = str(self.study_path / "Bdirs.bvec")
         bvals, bvecs = read_bvals_bvecs(bval_path, bvec_path)
@@ -986,15 +830,6 @@ class TimeCollector:
         except FileNotFoundError:
             print(f"{hmg.error}El directorio no existe.")
 
-    # def write_times(self, times: list, file_name: str):
-    #     """Write times, overwritting if file alredy exists."""
-
-    #     file_path = self.root_path / "supplfiles" / file_name
-    #     with open(file_path, "w") as f:
-    #         f.write(" ".join([t for t in times]))
-
-    #     return file_path
-
     def write_times(self, times: list, file_name: str, subfolder: str):
         """Write times, overwritting if file alredy exists."""
 
@@ -1003,46 +838,6 @@ class TimeCollector:
             f.write(" ".join([t for t in times]))
 
         return file_path
-
-    # def get_times_auto(self):
-    #     """Read times (TR, TE, TEs) automatically from method.txt files
-    #     located in T1, T2, T2* subfolders.
-
-    #     Returns
-    #     -------
-    #     times_paths: list
-    #         Contains TR in position 0, TE in position 1, and TEs in position 2.
-    #         It has to be in this way as other functions expect a varible with
-    #         times in this particular structure."""
-
-    #     times_paths = [[], [], []]  # empty list that will store times
-    #     for subfolder in self.studies_to_process:
-    #         study_name = subfolder.parts[-1]
-    #         if (
-    #             study_name.startswith("T1_")
-    #             and study_name[:2] in self.modals_to_process
-    #         ):
-    #             TR_times = self.read_times(subfolder, "MultiRepTime", 3)
-    #             TR_times_path = self.write_times(TR_times, "TiemposRepeticion.txt")
-    #             times_paths[0] = TR_times_path
-
-    #         elif (
-    #             study_name.startswith("T2_")
-    #             and study_name[:2] in self.modals_to_process
-    #         ):
-    #             TE_times = self.read_times(subfolder, "EffectiveTE", 3)
-    #             TE_times_path = self.write_times(TE_times, "TiemposEco.txt")
-    #             times_paths[1] = TE_times_path
-
-    #         elif (
-    #             study_name.startswith("T2E_")
-    #             and study_name[:3] in self.modals_to_process
-    #         ):
-    #             TEs_times = self.read_times(subfolder, "EffectiveTE", 4)
-    #             TEs_times_path = self.write_times(TEs_times, "TiemposEcoStar.txt")
-    #             times_paths[2] = TEs_times_path
-
-    #     return times_paths
 
     def get_times_auto(self):
         """Read times (TR, TE, TEs) automatically from method.txt files
@@ -1219,150 +1014,6 @@ class TMapProcessor:
             f_path = str(self.study_path / f_name)
             return check_shapes(f_path, self.mask_path)
 
-    # def process_T_map(self, time_paths):
-    #     """Processing of T1, T2, T2* maps using functions located in "myrelax".
-    #     R^2 map is also computed. All maps are saved.
-    #     """
-
-    #     if "T2_" in str(self.study_path):
-    #         method = "T2"
-    #         print(f"\n{hmg.info}Generando mapa de T2.\n")
-    #         try:
-    #             f_name = self.study_path.parts[-1][3:] + "_subscan_0.nii.gz"
-    #             f_path = str(self.study_path / f_name)
-    #             out_path = f_path[:-7]  # remove .nii
-
-    #             # check_shapes(f_path, self.mask_path)
-
-    #             getT2T2star.TxyFitME(
-    #                 f_path,
-    #                 time_paths[1],
-    #                 out_path,
-    #                 self.fitting_mode,
-    #                 self.n_cpu,
-    #                 self.mask_path,
-    #             )
-
-    #         except (NameError, FileNotFoundError):
-    #             f_name = self.study_path.parts[-1][3:] + ".nii.gz"
-    #             f_path = str(self.study_path / f_name)
-    #             out_path = f_path[:-7]  # remove .nii
-
-    #             # check_shapes(f_path, self.mask_path)
-
-    #             getT2T2star.TxyFitME(
-    #                 f_path,
-    #                 time_paths[1],
-    #                 out_path,
-    #                 self.fitting_mode,
-    #                 self.n_cpu,
-    #                 self.mask_path,
-    #             )
-
-    #     elif "T2E" in str(self.study_path):
-    #         method = "T2E"
-    #         print(f"\n{hmg.info}Generando mapa de T2E.\n")
-    #         try:
-    #             f_name = self.study_path.parts[-1][4:] + "_subscan_0.nii.gz"
-    #             f_path = str(self.study_path / f_name)
-    #             out_path = f_path[:-7]  # remove .nii
-
-    #             # check_shapes(f_path, self.mask_path)
-
-    #             getT2T2star.TxyFitME(
-    #                 f_path,
-    #                 time_paths[2],
-    #                 out_path,
-    #                 self.fitting_mode,
-    #                 self.n_cpu,
-    #                 self.mask_path,
-    #             )
-    #         except (NameError, FileNotFoundError):
-    #             f_name = self.study_path.parts[-1][4:] + ".nii.gz"
-    #             f_path = str(self.study_path / f_name)
-    #             out_path = f_path[:-7]  # remove .nii
-
-    #             # check_shapes(f_path, self.mask_path)
-
-    #             getT2T2star.TxyFitME(
-    #                 f_path,
-    #                 time_paths[2],
-    #                 out_path,
-    #                 self.fitting_mode,
-    #                 self.n_cpu,
-    #                 self.mask_path,
-    #             )
-
-    #     elif "T1" in str(self.study_path):
-    #         method = "T1"
-    #         print(f"\n{hmg.info}Generando mapa de T1.\n")
-    #         try:
-    #             f_name = self.study_path.parts[-1][3:] + "_subscan_0.nii.gz"
-    #             f_path = str(self.study_path / f_name)
-    #             out_path = f_path[:-7]  # remove .nii.gz
-
-    #             # check_shapes(f_path, self.mask_path)
-
-    #             getT1TR.TxyFitME(
-    #                 f_path,
-    #                 time_paths[0],
-    #                 out_path,
-    #                 self.fitting_mode,
-    #                 self.n_cpu,
-    #                 self.mask_path,
-    #             )
-    #         except (NameError, FileNotFoundError):
-    #             f_name = self.study_path.parts[-1][3:] + ".nii.gz"
-    #             f_path = str(self.study_path / f_name)
-    #             out_path = f_path[:-7]  # remove .nii
-
-    #             # check_shapes(f_path, self.mask_path)
-
-    #             getT1TR.TxyFitME(
-    #                 f_path,
-    #                 time_paths[0],
-    #                 out_path,
-    #                 self.fitting_mode,
-    #                 self.n_cpu,
-    #                 self.mask_path,
-    #             )
-
-    #     # create a folder to store useful files
-    #     if not (self.study_path / "mapas").exists():
-    #         (self.study_path / "mapas").mkdir(parents=True)
-
-    #     # get those paths related to T1 map
-    #     T_paths = sorted(glob.glob(str(self.study_path / "*ME.nii")))
-    #     T_paths[0], T_paths[2] = T_paths[2], T_paths[0]  # puts *SSEME.nii file first
-
-    #     for T_path in T_paths:
-    #         T_maps_folder = str(self.study_path / "mapas")
-    #         shutil.move(T_path, T_maps_folder)
-    #         T_path = Path(T_path)
-    #         T_path = str((self.study_path / "mapas") / T_path.parts[-1])
-
-    #         # compute T^2 map and save it
-    #         if T_path.endswith("SSEME.nii"):
-    #             sse, affine = load_nifti(T_path)
-    #             data, affine = load_nifti(f_path)
-    #             R2_map = R2MapGenerator().get_R2_map(data=data, sse=sse)
-    #             R2_map_path = T_maps_folder + "/" + "R2_map.nii"
-    #             save_nifti(R2_map_path, R2_map.astype(np.float32), affine)
-
-    #         # save T1/T2/T2E heatmap and filter by R^2 if required
-    #         elif T_path.endswith("TxyME.nii"):
-    #             T_map, affine = load_nifti(T_path)
-    #             saving_path = T_maps_folder + "/" + f"{method}_map"
-    #             apply_filter = ask_user("¿Quieres usar el filtro de ajuste?")
-    #             if apply_filter:
-    #                 th = R2MapGenerator().select_threshold()
-    #                 f_R2_map = R2MapGenerator().get_filtered_R2(
-    #                     R2_map_path, f"{method}_map", th
-    #                 )
-    #                 T_map = T_map * f_R2_map
-    #                 save_nifti(saving_path, T_map.astype(np.float32), affine)
-    #             Heatmap().save_heatmap(T_map, method, T_maps_folder)
-
     def process_T_map(self, time_paths):
         """Processing of T1, T2, T2* maps using functions located in "myrelax".
         R^2 map is also computed. All maps are saved.
@@ -1375,8 +1026,6 @@ class TMapProcessor:
                 f_name = self.study_path.parts[-1][3:] + "_subscan_0.nii.gz"
                 f_path = str(self.study_path / f_name)
                 out_path = f_path[:-7]  # remove .nii
-
-                # check_shapes(f_path, self.mask_path)
 
                 getT2T2star.TxyFitME(
                     f_path,
@@ -1391,8 +1040,6 @@ class TMapProcessor:
                 f_name = self.study_path.parts[-1][3:] + ".nii.gz"
                 f_path = str(self.study_path / f_name)
                 out_path = f_path[:-7]  # remove .nii
-
-                # check_shapes(f_path, self.mask_path)
 
                 getT2T2star.TxyFitME(
                     f_path,
@@ -1411,8 +1058,6 @@ class TMapProcessor:
                 f_path = str(self.study_path / f_name)
                 out_path = f_path[:-7]  # remove .nii
 
-                # check_shapes(f_path, self.mask_path)
-
                 getT2T2star.TxyFitME(
                     f_path,
                     time_paths[self.study_path],
@@ -1425,8 +1070,6 @@ class TMapProcessor:
                 f_name = self.study_path.parts[-1][4:] + ".nii.gz"
                 f_path = str(self.study_path / f_name)
                 out_path = f_path[:-7]  # remove .nii
-
-                # check_shapes(f_path, self.mask_path)
 
                 getT2T2star.TxyFitME(
                     f_path,
@@ -1445,8 +1088,6 @@ class TMapProcessor:
                 f_path = str(self.study_path / f_name)
                 out_path = f_path[:-7]  # remove .nii.gz
 
-                # check_shapes(f_path, self.mask_path)
-
                 getT1TR.TxyFitME(
                     f_path,
                     time_paths[self.study_path],
@@ -1459,8 +1100,6 @@ class TMapProcessor:
                 f_name = self.study_path.parts[-1][3:] + ".nii.gz"
                 f_path = str(self.study_path / f_name)
                 out_path = f_path[:-7]  # remove .nii
-
-                # check_shapes(f_path, self.mask_path)
 
                 getT1TR.TxyFitME(
                     f_path,

@@ -134,7 +134,7 @@ def cli():
                 Preprocessing([study]).preprocess()
             t_map_pro.process_T_map(f_time_paths)
 
-    fs_builder.empty_supplfiles()
+    # fs_builder.empty_supplfiles()
     print(f"\n{hmg.success}Procesamiento terminado.")
 
 

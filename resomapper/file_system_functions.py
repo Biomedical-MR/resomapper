@@ -75,12 +75,13 @@ class FileSystemBuilder:
     def create_dir(self):
         """Creates 'convertidos' and 'procesados' folders."""
 
-        folders = ["convertidos", "procesados", "supplfiles"]
+        # folders = ["convertidos", "procesados", "supplfiles"]
+        folders = ["convertidos", "procesados"]
         for folder_name in folders:
             if not (self.root_path / folder_name).exists():
                 (self.root_path / folder_name).mkdir(parents=True)
 
-        self.empty_supplfiles()
+        # self.empty_supplfiles()
 
     def empty_supplfiles(self):
         supplfiles_path = self.root_path / "supplfiles"
