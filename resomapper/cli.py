@@ -20,7 +20,7 @@ warnings.filterwarnings("ignore")
 
 
 def cli():
-    """Comand Line Interface of resomapper:
+    """Comand Line Interface of resomapper.
 
     1. Select root directory where studies are stored.
     2. Convert Bruker studies to nifti.

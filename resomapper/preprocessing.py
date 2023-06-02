@@ -1,7 +1,6 @@
 import tkinter as tk
 import warnings
 from math import trunc
-from tkinter.messagebox import askyesno
 
 import matplotlib.pyplot as plt
 import nibabel as nib
@@ -18,6 +17,11 @@ warnings.filterwarnings("ignore")
 
 
 def get_preprocessing_params():
+    """Show a window to select the parameters to perform non local means denoising.
+
+    Returns:
+        list: Filtering parameters list [search distance, window size, h value]
+    """
     print(f"\n{hmg.ask}Indica los parámetros de preprocesado en la ventana emergente.")
 
     root = tk.Tk()
@@ -79,37 +83,6 @@ def get_preprocessing_params():
         return entries
     except NameError:
         return ""
-
-
-def ask_yes_no_preprocessing():
-    """Creates a window to ask a question that has a yes/no answer."""
-
-    warnings.filterwarnings("ignore")
-
-    root = tk.Tk()
-    root.withdraw()
-    answer = askyesno(title="MyX", message="¿Quieres realizar un preprocesado?")
-    root.destroy()
-    # añadir root.quit para que funcione (creo)
-
-    root.mainloop()
-
-    return answer
-
-
-def ask_yes_no_mask():
-    """Creates a window to ask a question that has a yes/no answer."""
-    warnings.filterwarnings("ignore")
-
-    root = tk.Tk()
-    root.withdraw()
-    msg = "¿Quieres reutilizar la última máscara hecha para este sujeto?"
-    answer = askyesno(title="MyX", message=msg)
-    root.destroy()
-
-    root.mainloop()
-
-    return answer
 
 
 class Preprocessing:
