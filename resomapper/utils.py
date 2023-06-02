@@ -6,14 +6,28 @@ import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 from dipy.io.image import load_nifti, save_nifti
-from PIL import Image
 from scipy.ndimage import rotate
+
+# from PIL import Image
 
 import resomapper.file_system_functions as fs
 
 
 class Headermsg:
-    """Class containing headers for messages during execution of the CLI."""
+    """Headers for messages shown during execution of the CLI.
+
+    Attributes:
+        info (str): Header for information messages.
+        warn (str): Header for warning messages.
+        error (str): Header for error messages.
+        success (str): Header for success messages.
+        pointer (str): Header for pointer messages.
+        ask (str): Header for question messages.
+        welcome (str): Header for the welcome message.
+        new_patient1 (str): Header for new patient study message (part 1).
+        new_patient2 (str): Header for new patient study message (part 2).
+        new_modal (str): Header for new modal message.
+    """
 
     info = "\x1b[0;30;44m [INFO] \x1b[0m "
     warn = "\x1b[0;30;43m [WARNING] \x1b[0m "
@@ -86,7 +100,6 @@ def ask_user_options(question, options):
             )
 
 
-# def check_shapes(img, mask, callback_func=None, study_path=None):
 def check_shapes(img, mask):
     """Check if an image and mask have the same shapes (resolution and slices).
     If the input arguments are file paths, the 'load_nifti' function is used to load the
@@ -118,20 +131,14 @@ def check_shapes(img, mask):
         return False
     else:
         return True
-        # if (callback_func is not None) and (study_path is not None):
-        #     mask = Mask(study_path)
-        #     mode = mask.select_mask_mode()
-        #     mask.create_mask(mode)
-        #     callback_func()
-        # else:
-        #     exit()
-        # exit()
 
 
 ###############################################################################
 # Mask creation
 ###############################################################################
 class Mask:
+    """Mask creating workflow."""
+
     def __init__(self, study_subfolder: str) -> None:
         """Initialize a new instance of the Mask class.
 
@@ -141,8 +148,7 @@ class Mask:
         self.study_subfolder = study_subfolder
 
     def prepare_vol(self, vol_3d):
-        """Some modifications are needed on the volume: 270 degrees
-        rotation and image flip.
+        """Some modifications on the volume: 270 degrees rotation and image flip.
 
         Args:
             vol_3d (ndarray): Input image.
@@ -170,7 +176,7 @@ class Mask:
         return vol_prepared
 
     def min_max_normalization(self, img):
-        """Applies min-max normalization to the input image. Creates a copy of the input
+        """Apply min-max normalization to the input image. Creates a copy of the input
         image and computes the minimum and maximum values. The image is normalized using
         the formula (img - min_val) / (max_val - min_val).
 
@@ -227,7 +233,7 @@ class Mask:
             status = 0  # finish
 
     def itera(self, ima, refPT):
-        """Iteratively displays slices for masking.Left click adds a line and right
+        """Iteratively display slices for masking. Left click adds a line and right
         click closes the polygon. Next slice will be showed after right click.
 
         Args:
@@ -288,7 +294,7 @@ class Mask:
         return refPT
 
     def draw_mask(self):
-        """Creates a binary mask for the roi where processing will take place and saves
+        """Create a binary mask for the roi where processing will take place and save
         it as a NIfTI file. The user is prompted to create the mask by selecting
         contours in a pop-up window.
 
@@ -301,8 +307,7 @@ class Mask:
         Next, the function creates a binary mask by filling the contours with ones and
         resizing the mask to match the original image dimensions. The resulting masks
         are converted to a NIfTI format by transposing the axes to match the expected
-        shape. The mask is saved both in the method subfolder and the
-        subject folder for reusability.
+        shape. The mask is saved both in the method subfolder.
 
         Example:
             masker = Mask(study_path)
@@ -370,8 +375,9 @@ class Mask:
             img_poly = cv2.polylines(
                 img_copy, [poly], True, (255, 255, 255), thickness=3
             )
-            im = Image.fromarray(img_poly)
-            im.save(self.study_subfolder / f"shape_slice_{str(i+1)}.png")
+            # Removed saving png images - not needed
+            # im = Image.fromarray(img_poly)
+            # im.save(self.study_subfolder / f"shape_slice_{str(i+1)}.png")
 
             ax[i].imshow(img_poly, cmap="gray")
             ax[i].set_title(f"Slice {i+1}")
@@ -396,14 +402,8 @@ class Mask:
         masks = np.asarray(masks)
         masks = masks.transpose(2, 1, 0)
 
-        # saving mask in both method subfolder and subject folder
-        # (for reusing mask purposes)
+        # saving mask in method subfolder
         save_nifti(self.study_subfolder / "mask", masks.astype(np.float32), affine)
-        save_nifti(
-            Path("/".join(self.study_subfolder.parts[:-1])) / "mask",
-            masks.astype(np.float32),
-            affine,
-        )
 
     def create_mask(self, mode="manual"):
         """Create a mask for the study image. Implemented modes:
@@ -420,6 +420,7 @@ class Mask:
         """
         study_path = self.study_subfolder
         dst_mask_path = study_path / "mask.nii"
+        reusing_mask_path = Path("/".join(study_path.parts[:-1])) / "mask.nii"
         if mode == "manual":
             correct_selection = False
             while not correct_selection:
@@ -428,21 +429,29 @@ class Mask:
                     "¿Es la previsualización de la selección lo que deseas?"
                 )
             print(f"\n{Headermsg.info}Máscara creada correctamente.")
+            shutil.copy(dst_mask_path, reusing_mask_path)
 
         elif mode == "reuse":
             src_path = Path("/".join(study_path.parts[:-1])) / "mask.nii"
-            if os.path.exists(dst_mask_path):
-                os.remove(dst_mask_path)
             shutil.copy(src_path, dst_mask_path)
 
         elif mode == "file_selection":
             src_path = fs.select_file()
+            ok_file = False
+            while not ok_file:
+                if src_path in [dst_mask_path, reusing_mask_path]:
+                    print(
+                        f"\n{Headermsg.error}You selected the same mask as before. "
+                        "Try again"
+                    )
+                    src_path = fs.select_file()
+                    ok_file = False
+                else:
+                    ok_file = True
             ext = os.path.splitext(src_path)[1]
             if src_path is not None and ext in [".nii", ".gz"]:
                 shutil.copy(src_path, dst_mask_path)
-                # if os.path.exists(dst_mask_path):
-                #     os.remove(dst_mask_path)
-                # shutil.copy(src_path, dst_mask_path)
+                shutil.copy(src_path, reusing_mask_path)
             else:
                 print(f"\n{Headermsg.error}You didn't select a NiFTI file.")
                 exit()
@@ -453,10 +462,15 @@ class Mask:
 
         return dst_mask_path
 
-    def select_mask_mode(self):
+    def select_mask_mode(self, again=False):
         """Prompt the user to select the mode for specifying the mask for the study.
         The function checks if a previous mask file exists in the subject's folder to
         determine if the reuse option is available.
+
+        Args:
+            again (bool, optional): whether we are calling this function the first time
+                or a second time after an error when checking the mask and image
+                resolutions. In that case, the reuse option is not available.
 
         Returns:
             str: The selected mask mode.
@@ -473,10 +487,10 @@ class Mask:
         }
 
         last_mask_path = Path("/".join(study_path.parts[:-1])) / "mask.nii"
-        if last_mask_path.exists():
+        if last_mask_path.exists() and not again:
             options["r"] = "Reutilizar la última máscara creada para este sujeto."
 
-        question = "Selecciona cómo quieres especificar la máscara para este estudio:"
+        question = "Selecciona cómo quieres especificar la máscara para este estudio."
         selected_option = ask_user_options(question, options)
         if selected_option == "r":
             return "reuse"

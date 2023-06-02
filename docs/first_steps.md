@@ -158,7 +158,6 @@ In addition, the following folders will be automatically generated during the CL
 
 * **"Convertidos" folder:** will contain the original studies converted to NIfTI format. The subfolders of a study with possible interest for processing will have a prefix to better identify them (DT, MT, T1, T2 or T2E).
 * **"Procesados" folder:** will contain the results of processing. Within each study there will be a subfolder with the results for each processed modality. What each file consists of in these folders according to the modality will be specified later.
-* **"supplfiles" folder:** it is generated to save temporary files during the execution. It is not necessary to do anything with it and can be deleted.
 
 ```{note}
 It is advisable to empty the working directory and save the files of interest before processing new studies. This will help to avoid confusing files and making mistakes. You can also have several work folders.

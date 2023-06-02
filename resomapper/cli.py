@@ -1,4 +1,3 @@
-# import click
 import multiprocessing
 import os
 import traceback
@@ -21,7 +20,7 @@ warnings.filterwarnings("ignore")
 
 
 def cli():
-    """Comand Line Interface of resomapper:
+    """Comand Line Interface of resomapper.
 
     1. Select root directory where studies are stored.
     2. Convert Bruker studies to nifti.
@@ -99,7 +98,7 @@ def cli():
             dti_map_pro = DTIProcessor(root_path, study)
             ok_mask = dti_map_pro.check_DTI_data()
             while not ok_mask:
-                mode = masker.select_mask_mode()
+                mode = masker.select_mask_mode(again=True)
                 mask_path = masker.create_mask(mode)
                 ok_mask = dti_map_pro.check_DTI_data()
 
@@ -111,7 +110,7 @@ def cli():
             mt_map_pro = MTProcessor(study, mask_path)
             ok_mask = mt_map_pro.check_MT_data()
             while not ok_mask:
-                mode = masker.select_mask_mode()
+                mode = masker.select_mask_mode(again=True)
                 mask_path = masker.create_mask(mode)
                 ok_mask = mt_map_pro.check_MT_data()
 
@@ -126,7 +125,7 @@ def cli():
             )
             ok_mask = t_map_pro.check_T_data()
             while not ok_mask:
-                mode = masker.select_mask_mode()
+                mode = masker.select_mask_mode(again=True)
                 mask_path = masker.create_mask(mode)
                 ok_mask = t_map_pro.check_T_data()
 
@@ -134,7 +133,6 @@ def cli():
                 Preprocessing([study]).preprocess()
             t_map_pro.process_T_map(f_time_paths)
 
-    fs_builder.empty_supplfiles()
     print(f"\n{hmg.success}Procesamiento terminado.")
 
 

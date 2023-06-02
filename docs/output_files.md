@@ -42,8 +42,13 @@ In the case of T1, T2 or T2* image processing, there are some files that are nam
 * **(...)_TxyME.nii -** NIfTI file containing the **T1, T2 or T2* parametric map**.
 * **(...)_SSEME.nii -** Fitting sum of squared errors.
 * **(...)_S0ME.nii -** T1w proton density, with receiver coil field bias.
-* **(...)_ExitME.nii -** Exit code (1 = successful fitting, 0 = background, -1 = 
-unsuccessful fitting)
+* **(...)_ExitME.nii -** Exit code (1 = successful fitting, 0 = background, -1 = unsuccessful fitting)
+* **TiemposRepeticion.txt, TiemposEco.txt or TiemposEcoStar.txt -** Times extracted from the method file during processing (for T1, T2 and T2* respectively).
+
+Also, for DTI processing, there are two additional files:
+
+* **Bvalues.bval -** Effective B values vector. Equal to **procesado_(name of the study)_(adquisition number)_DwEffBval.txt**, but removing values corresponding to removed directions during processing (if done).
+* **Bdirs.bvec -** Matrix of gradient directions. Equal to **procesado_(name of the study)_(adquisition number)_DwGradVec.txt**, but removing values corresponding to removed directions during processing (if done).
 
 
 ### Mask files

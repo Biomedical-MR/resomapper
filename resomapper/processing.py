@@ -71,7 +71,8 @@ class MTProcessor:
         # return study_path
 
     def select_MT_acq(self):
-        n_mt = int(len(list(self.mt_study_path.glob("*.nii.gz"))) / 2)
+        # n_mt = int(len(list(self.mt_study_path.glob("*.nii.gz"))) / 2)
+        n_mt = len(list(self.mt_study_path.glob("*.nii.gz"))) // 2
 
         if n_mt == 1:
             mt_folders_list = [1]
@@ -173,9 +174,6 @@ class MTProcessor:
             mt_off, _ = load_nifti(f_mtoff_path)  # affine matrix is the same
             mask, _ = load_nifti(self.mask_path)
 
-            # check_shapes(mt_on, mask)
-            # check_shapes(mt_off, mask)
-
             # apply mask
             mt_on = mt_on * mask
             mt_off = mt_off * mask
@@ -207,147 +205,6 @@ class MTProcessor:
                 saving_path = str(self.mt_study_path / "MT_map.nii")
                 save_nifti(saving_path, mt_map.astype(np.float32), affine1)
                 Heatmap().save_heatmap(mt_map, "MT", out_path=str(self.mt_study_path))
-
-        # n_mt = int(len(list(self.mt_study_path.glob("*.nii.gz"))) / 2)
-
-        # if n_mt == 1:
-        #     f_mton_path = list(self.mt_study_path.glob("procesado_MT_*.nii.gz"))[0]
-        #     f_mtoff_path = list(self.mt_study_path.glob("procesado_M0_*.nii.gz"))[0]
-
-        #     # from nifti to array
-        #     mt_on, affine1 = load_nifti(f_mton_path)
-        #     mt_off, _ = load_nifti(f_mtoff_path)  # affine matrix is the same
-        #     mask, _ = load_nifti(self.mask_path)
-
-        #     check_shapes(mt_on, mask)
-        #     check_shapes(mt_off, mask)
-
-        #     # apply mask
-        #     mt_on = mt_on * mask
-        #     mt_off = mt_off * mask
-
-        #     # get maps
-        #     print(f"\n{hmg.info}Generando mapa de MT.")
-        #     mt_map = self.compute_MT_map(mt_on, mt_off)
-
-        #     # save as .nii file and save heatmaps
-        #     saving_path = str(self.mt_study_path / "MT_map.nii")
-        #     save_nifti(saving_path, mt_map.astype(np.float32), affine1)
-        #     Heatmap().save_heatmap(mt_map, "MT", out_path=str(self.mt_study_path))
-        # else:
-        #     print(
-        #         f"\n{hmg.warn}Has adquirido imágenes de MT con diferentes slopes "
-        #         f"para este estudio ({n_mt})."
-        #     )
-
-        #     input_ready = False
-        #     while not input_ready:
-        #         mt_folders_input = input(
-        #             f"\n{hmg.ask}Indica el número de la carpeta de adquisición que "
-        #             f"desas procesar (entre 1 y {n_mt}). "
-        #             "Si deseas procesar más de una carpeta, introduce los diferentes "
-        #             f'números separados por ",".\n{hmg.pointer}'
-        #         )
-        #         mt_folders_input = mt_folders_input.split(",")
-        #         try:
-        #             mt_folders_list = [int(x.strip()) for x in mt_folders_input]
-        #             input_ready = True
-        #             for number in mt_folders_list:
-        #                 if (number > n_mt) or (number < 1):
-        #                     print(
-        #                         f"\n{hmg.error}Por favor, introduce números entre 1 y"
-        #                         f" {n_mt}."
-        #                     )
-        #                     input_ready = False
-        #                     break
-        #         except Exception:
-        #             print(
-        #                 f'\n{hmg.error}Por favor, introduce sólo números separados'
-        #                 f' por "," (si hay más de uno).'
-        #             )
-
-        #     mt_folders_list = [*set(mt_folders_list)]
-
-        #     if len(mt_folders_list) == 1:
-        #         subscan_index = mt_folders_list[0] - 1
-        #         f_mton_path = list(
-        #             self.mt_study_path.glob(
-        #                 f"procesado_MT_*subscan_{subscan_index}.nii*"
-        #             )
-        #         )[0]
-        #         f_mtoff_path = list(
-        #             self.mt_study_path.glob(
-        #                 f"procesado_M0_*subscan_{subscan_index}.nii*"
-        #             )
-        #         )[0]
-
-        #         # from nifti to array
-        #         mt_on, affine1 = load_nifti(f_mton_path)
-        #         mt_off, _ = load_nifti(f_mtoff_path)  # affine matrix is the same
-        #         mask, _ = load_nifti(self.mask_path)
-
-        #         check_shapes(mt_on, mask)
-        #         check_shapes(mt_off, mask)
-
-        #         # apply mask
-        #         mt_on = mt_on * mask
-        #         mt_off = mt_off * mask
-
-        #         # get maps
-        #         print(f"\n{hmg.info}Generando mapa de MT.")
-        #         mt_map = self.compute_MT_map(mt_on, mt_off)
-
-        #         # save as .nii file and save heatmaps
-        #         saving_path = str(self.mt_study_path / "MT_map.nii")
-        #         save_nifti(saving_path, mt_map.astype(np.float32), affine1)
-        #         Heatmap().save_heatmap(mt_map, "MT", out_path=str(self.mt_study_path))
-
-        #     else:
-        #         for i in mt_folders_list:
-        #             subscan_index = i - 1
-        #             f_mton_path = list(
-        #                 self.mt_study_path.glob(
-        #                     f"procesado_MT_*subscan_{subscan_index}.nii*"
-        #                 )
-        #             )[0]
-        #             f_mtoff_path = list(
-        #                 self.mt_study_path.glob(
-        #                     f"procesado_M0_*subscan_{subscan_index}.nii*"
-        #                 )
-        #             )[0]
-
-        #             # from nifti to array
-        #             mt_on, affine1 = load_nifti(f_mton_path)
-        #             mt_off, _ = load_nifti(f_mtoff_path)  # affine matrix is the same
-        #             mask, _ = load_nifti(self.mask_path)
-
-        #             check_shapes(mt_on, mask)
-        #             check_shapes(mt_off, mask)
-
-        #             # apply mask
-        #             mt_on = mt_on * mask
-        #             mt_off = mt_off * mask
-
-        #             # get maps
-        #             print(f"\n{hmg.info}Generando mapa de MT (carpeta {i}).")
-        #             mt_map = self.compute_MT_map(mt_on, mt_off)
-
-        #             try:
-        #                 os.mkdir(str(self.mt_study_path / str(i)))
-        #             except Exception:
-        #                 pass
-
-        #             # save as .nii file and save heatmaps
-        #             mt_map_filename = f"MT_map_{str(i)}.nii"
-        #             saving_path = os.path.join(
-        #                 str(self.mt_study_path), str(i), mt_map_filename
-        #             )
-        #             save_nifti(saving_path, mt_map.astype(np.float32), affine1)
-        #             Heatmap().save_heatmap(
-        #                 mt_map,
-        #                 "MT",
-        #                 out_path=os.path.join(str(self.mt_study_path), str(i)),
-        #             )
 
 
 ###############################################################################
@@ -401,13 +258,13 @@ class DTIProcessor:
         method_path = list(self.study_path.glob("procesado_*_method.txt"))[0]
         with open(method_path, "r") as f:
             lines = f.readlines()
-            for idx, line in enumerate(lines):
+            for line in lines:
                 if line.startswith("DwNDiffDir"):
-                    n_dirs_real = int(re.search("\d+", line).group(0))
+                    n_dirs_real = int(re.search("\d+", line)[0])
                 elif line.startswith("DwNDiffExpEach"):
-                    n_b_val_real = int(re.search("\d+", line).group(0))
+                    n_b_val_real = int(re.search("\d+", line)[0])
                 elif line.startswith("DwAoImages"):
-                    n_basal_real = int(re.search("\d+", line).group(0))
+                    n_basal_real = int(re.search("\d+", line)[0])
 
         if n_b_val != n_b_val_real:
             print(
@@ -657,8 +514,11 @@ class DTIProcessor:
         n_b_val, n_basal, n_dirs = self.ask_dti_info()
 
         # create B values and B dirs files
-        f_bvals = self.root_path / "supplfiles" / "Bvalues.bval"
-        f_dirs = self.root_path / "supplfiles" / "Bdirs.bvec"
+        # f_bvals = self.root_path / "supplfiles" / "Bvalues.bval"
+        # f_dirs = self.root_path / "supplfiles" / "Bdirs.bvec"
+
+        f_bvals = self.study_path / "Bvalues.bval"
+        f_dirs = self.study_path / "Bdirs.bvec"
 
         b_vals, dirs, n_b_val, n_basal, n_dirs, indexes_to_rm = self.get_bvals_n_dirs(
             n_b_val, n_basal, n_dirs
@@ -696,30 +556,13 @@ class DTIProcessor:
                 Path("/".join(self.study_path.parts[:-1])) / "mask.nii"
             )
 
-        # check_shapes(
-        #     data, mask, callback_func=self.process_DTI, study_path=self.study_path
-        # )
-        # ok_mask = check_shapes(data, mask)
-        # while not ok_mask:
-        #     mode = self.masker.select_mask_mode()
-        #     self.masker.create_mask(mode)
-        #     # while True:
-        #     #     try:
-        #     #         masker.create_mask(mode)
-        #     #         break
-        #     #     except PermissionError:
-        #     #         print("retrying")
-        #     #         time.sleep(5)
-        #     mask, affine = load_nifti(self.study_path / "mask.nii")
-        #     ok_mask = check_shapes(data, mask)
-
         # apply mask
         for i in range(data.shape[3]):  # para cada imagen de cada slice
             data[:, :, :, i] = data[:, :, :, i] * mask
 
         # read b values (bvals) and gradient directions (bvecs)
-        bval_path = str(self.root_path / "supplfiles" / "bvalues.bval")
-        bvec_path = str(self.root_path / "supplfiles" / "Bdirs.bvec")
+        bval_path = str(self.study_path / "bvalues.bval")
+        bvec_path = str(self.study_path / "Bdirs.bvec")
         bvals, bvecs = read_bvals_bvecs(bval_path, bvec_path)
 
         # create gradient table. You can access gradients with gtab.gradients
@@ -980,10 +823,10 @@ class TimeCollector:
         except FileNotFoundError:
             print(f"{hmg.error}El directorio no existe.")
 
-    def write_times(self, times: list, file_name: str):
+    def write_times(self, times: list, file_name: str, subfolder: str):
         """Write times, overwritting if file alredy exists."""
 
-        file_path = self.root_path / "supplfiles" / file_name
+        file_path = self.root_path / subfolder / file_name
         with open(file_path, "w") as f:
             f.write(" ".join([t for t in times]))
 
@@ -1000,136 +843,143 @@ class TimeCollector:
             It has to be in this way as other functions expect a varible with
             times in this particular structure."""
 
-        times_paths = [[], [], []]  # empty list that will store times
+        times_paths = {}  # empty dictionary that will store times
         for subfolder in self.studies_to_process:
             study_name = subfolder.parts[-1]
             if (
                 study_name.startswith("T1_")
-                and study_name[:2] in self.modals_to_process
+                and "T1" in self.modals_to_process
+                # and study_name[:2] in self.modals_to_process
             ):
                 TR_times = self.read_times(subfolder, "MultiRepTime", 3)
-                TR_times_path = self.write_times(TR_times, "TiemposRepeticion.txt")
-                times_paths[0] = TR_times_path
+                TR_times_path = self.write_times(
+                    TR_times, "TiemposRepeticion.txt", subfolder
+                )
+                times_paths[subfolder] = TR_times_path
 
             elif (
                 study_name.startswith("T2_")
-                and study_name[:2] in self.modals_to_process
+                and "T2" in self.modals_to_process
+                # and study_name[:2] in self.modals_to_process
             ):
                 TE_times = self.read_times(subfolder, "EffectiveTE", 3)
-                TE_times_path = self.write_times(TE_times, "TiemposEco.txt")
-                times_paths[1] = TE_times_path
+                TE_times_path = self.write_times(TE_times, "TiemposEco.txt", subfolder)
+                times_paths[subfolder] = TE_times_path
 
             elif (
                 study_name.startswith("T2E_")
-                and study_name[:3] in self.modals_to_process
+                and "T2E" in self.modals_to_process
+                # and study_name[:3] in self.modals_to_process
             ):
                 TEs_times = self.read_times(subfolder, "EffectiveTE", 4)
-                TEs_times_path = self.write_times(TEs_times, "TiemposEcoStar.txt")
-                times_paths[2] = TEs_times_path
+                TEs_times_path = self.write_times(
+                    TEs_times, "TiemposEcoStar.txt", subfolder
+                )
+                times_paths[subfolder] = TEs_times_path
 
         return times_paths
 
     # GET TIMES MANUALLY
-    def get_TR(self):
-        trs = []
-        while True:
-            try:
-                n_tr = int(
-                    input(
-                        "¿Cuántos tiempos de repetición se usaron "
-                        "en la acquisición de T1?\n"
-                    )
-                )
-                break
-            except ValueError:
-                print("No has introducido un número correcto.")
+    # def get_TR(self):
+    #     trs = []
+    #     while True:
+    #         try:
+    #             n_tr = int(
+    #                 input(
+    #                     "¿Cuántos tiempos de repetición se usaron "
+    #                     "en la acquisición de T1?\n"
+    #                 )
+    #             )
+    #             break
+    #         except ValueError:
+    #             print("No has introducido un número correcto.")
 
-        print("Deberás introducir los TR de mayor a menor.\n")
-        for i in range(n_tr):
-            tr = input(f"Introduce el tiempo de repetición {i+1}.\n")
-            trs.append(tr)
+    #     print("Deberás introducir los TR de mayor a menor.\n")
+    #     for i in range(n_tr):
+    #         tr = input(f"Introduce el tiempo de repetición {i+1}.\n")
+    #         trs.append(tr)
 
-        return trs
+    #     return trs
 
-    def get_TE(self):
-        init_te = int(input("¿Primer tiempo de eco en T2? "))
-        n_te = int(input("¿Cuántos tiempos de eco hay en T2? "))
-        interval = int(input("¿Separación entre tiempos de eco? "))
+    # def get_TE(self):
+    #     init_te = int(input("¿Primer tiempo de eco en T2? "))
+    #     n_te = int(input("¿Cuántos tiempos de eco hay en T2? "))
+    #     interval = int(input("¿Separación entre tiempos de eco? "))
 
-        return list(range(init_te, interval * n_te + interval, interval))
+    #     return list(range(init_te, interval * n_te + interval, interval))
 
-    def get_TE_star(self):
-        init_te_star = float(input("¿Primer tiempo de eco en T2 estrella? "))
-        n_te_star = float(input("¿Cuántos tiempos de eco hay en T2 estrella? "))
-        interval_star = float(input("¿Separación entre tiempos de eco? "))
+    # def get_TE_star(self):
+    #     init_te_star = float(input("¿Primer tiempo de eco en T2 estrella? "))
+    #     n_te_star = float(input("¿Cuántos tiempos de eco hay en T2 estrella? "))
+    #     interval_star = float(input("¿Separación entre tiempos de eco? "))
 
-        return list(np.arange(init_te_star, interval_star * n_te_star, interval_star))
+    #     return list(np.arange(init_te_star, interval_star * n_te_star, interval_star))
 
-    def get_requested_times(self, modal: str):
-        if modal == "T1":
-            return self.get_TR()
-        elif modal == "T2":
-            return self.get_TE()
-        elif modal == "T2E":
-            return self.get_TE_star()
+    # def get_requested_times(self, modal: str):
+    #     if modal == "T1":
+    #         return self.get_TR()
+    #     elif modal == "T2":
+    #         return self.get_TE()
+    #     elif modal == "T2E":
+    #         return self.get_TE_star()
 
-    def get_selected_time(self, selected_modal: str):
-        """If it does not exists, fuction returns a file with sequence
-        times (TR, TE or TE*). If it alredy exists, returns that file, as
-        it will have the same times.
+    # def get_selected_time(self, selected_modal: str):
+    #     """If it does not exists, fuction returns a file with sequence
+    #     times (TR, TE or TE*). If it alredy exists, returns that file, as
+    #     it will have the same times.
 
-        Parameters
-        ----------
-            selected_modal: str
-                selected modality to process (T1, T2 or T2*).
-        Returns
-        -------
-            file_path: str
-                path to the file with the written times.
-        """
-        # define modalities names and time files names
-        modals = ["T1", "T2", "T2E"]
-        time_file_names = [
-            "TiemposRepeticion.txt",
-            "TiemposEco.txt",
-            "TiemposEcoStar.txt",
-        ]
+    #     Parameters
+    #     ----------
+    #         selected_modal: str
+    #             selected modality to process (T1, T2 or T2*).
+    #     Returns
+    #     -------
+    #         file_path: str
+    #             path to the file with the written times.
+    #     """
+    #     # define modalities names and time files names
+    #     modals = ["T1", "T2", "T2E"]
+    #     time_file_names = [
+    #         "TiemposRepeticion.txt",
+    #         "TiemposEco.txt",
+    #         "TiemposEcoStar.txt",
+    #     ]
 
-        modal_idx = modals.index(selected_modal)
-        file_name = time_file_names[
-            modal_idx
-        ]  # get file name (str) associated to modality
+    #     modal_idx = modals.index(selected_modal)
+    #     file_name = time_file_names[
+    #         modal_idx
+    #     ]  # get file name (str) associated to modality
 
-        file_path = str(self.root_path / "supplfiles" / file_name)
-        if not os.path.exists(file_path):
-            times = self.get_requested_times(selected_modal)  # collects times
-            with open(file_path, "w+") as f:  # creates file
-                f.write(" ".join([str(t) for t in times]))
-        else:
-            print("[INFO]: Usando archivo de sujeto anterior para tiempos de eco T2")
+    #     file_path = str(self.root_path / "supplfiles" / file_name)
+    #     if not os.path.exists(file_path):
+    #         times = self.get_requested_times(selected_modal)  # collects times
+    #         with open(file_path, "w+") as f:  # creates file
+    #             f.write(" ".join([str(t) for t in times]))
+    #     else:
+    #         print("[INFO]: Usando archivo de sujeto anterior para tiempos de eco T2")
 
-        return file_path
+    #     return file_path
 
-    def get_times_manual(self):
-        """Manually, you get times associated to T1, T2, T2E modalities i.e.
-        TR, TE, TE*, respectively. If a modality has not been selected by
-        the user to be processed returns an empty string."""
+    # def get_times_manual(self):
+    #     """Manually, you get times associated to T1, T2, T2E modalities i.e.
+    #     TR, TE, TE*, respectively. If a modality has not been selected by
+    #     the user to be processed returns an empty string."""
 
-        times = []
-        for modal in ["T1", "T2", "T2E"]:  # orden de los tiempos: tr, te, ts
-            if modal in self.modals_to_process:
-                time = self.get_selected_time(modal)
-                times.append(time)
-            else:
-                times.append("")
+    #     times = []
+    #     for modal in ["T1", "T2", "T2E"]:  # orden de los tiempos: tr, te, ts
+    #         if modal in self.modals_to_process:
+    #             time = self.get_selected_time(modal)
+    #             times.append(time)
+    #         else:
+    #             times.append("")
 
-        return times
+    #     return times
 
     def get_times(self, how="auto"):
         if how == "auto":
             time_paths = self.get_times_auto()
-        else:
-            time_paths = self.get_times_manual()
+        # else:
+        #     time_paths = self.get_times_manual()
 
         return time_paths
 
@@ -1173,11 +1023,9 @@ class TMapProcessor:
                 f_path = str(self.study_path / f_name)
                 out_path = f_path[:-7]  # remove .nii
 
-                # check_shapes(f_path, self.mask_path)
-
                 getT2T2star.TxyFitME(
                     f_path,
-                    time_paths[1],
+                    time_paths[self.study_path],
                     out_path,
                     self.fitting_mode,
                     self.n_cpu,
@@ -1189,11 +1037,9 @@ class TMapProcessor:
                 f_path = str(self.study_path / f_name)
                 out_path = f_path[:-7]  # remove .nii
 
-                # check_shapes(f_path, self.mask_path)
-
                 getT2T2star.TxyFitME(
                     f_path,
-                    time_paths[1],
+                    time_paths[self.study_path],
                     out_path,
                     self.fitting_mode,
                     self.n_cpu,
@@ -1208,11 +1054,9 @@ class TMapProcessor:
                 f_path = str(self.study_path / f_name)
                 out_path = f_path[:-7]  # remove .nii
 
-                # check_shapes(f_path, self.mask_path)
-
                 getT2T2star.TxyFitME(
                     f_path,
-                    time_paths[2],
+                    time_paths[self.study_path],
                     out_path,
                     self.fitting_mode,
                     self.n_cpu,
@@ -1223,11 +1067,9 @@ class TMapProcessor:
                 f_path = str(self.study_path / f_name)
                 out_path = f_path[:-7]  # remove .nii
 
-                # check_shapes(f_path, self.mask_path)
-
                 getT2T2star.TxyFitME(
                     f_path,
-                    time_paths[2],
+                    time_paths[self.study_path],
                     out_path,
                     self.fitting_mode,
                     self.n_cpu,
@@ -1242,11 +1084,9 @@ class TMapProcessor:
                 f_path = str(self.study_path / f_name)
                 out_path = f_path[:-7]  # remove .nii.gz
 
-                # check_shapes(f_path, self.mask_path)
-
                 getT1TR.TxyFitME(
                     f_path,
-                    time_paths[0],
+                    time_paths[self.study_path],
                     out_path,
                     self.fitting_mode,
                     self.n_cpu,
@@ -1257,11 +1097,9 @@ class TMapProcessor:
                 f_path = str(self.study_path / f_name)
                 out_path = f_path[:-7]  # remove .nii
 
-                # check_shapes(f_path, self.mask_path)
-
                 getT1TR.TxyFitME(
                     f_path,
-                    time_paths[0],
+                    time_paths[self.study_path],
                     out_path,
                     self.fitting_mode,
                     self.n_cpu,
@@ -1377,16 +1215,13 @@ class R2MapGenerator:
 class Heatmap:
     def rotate(self, array_2d):
         list_of_tuples = zip(*array_2d[::-1])
-        rotated_element = [list(elem) for elem in list_of_tuples]
-
-        return rotated_element
+        return [list(elem) for elem in list_of_tuples]
 
     def change_colormap(self):
         while True:
             cmap_name = input("Introduce el nombre del mapa de colores.\n")
             try:
-                cmap = cm.get_cmap(cmap_name)
-                return cmap
+                return cm.get_cmap(cmap_name)
             except ValueError:
                 print(
                     f'Has introducido "{cmap_name}" y ese nombre no corresponde '
@@ -1642,11 +1477,10 @@ class Heatmap:
         change color range and color map. Do not use for ADC maps, use
         save_ADC_heatmap function instead.
 
-        Parameters
-        ----------
-            maps: stack of maps (one map per slice)
-            map_type: name of the map
-            out_path: string path to save output maps
+        Args:
+            maps (numpy.array): stack of maps (one map per slice)
+            map_type (str): name of the map
+            out_path (str): string path to save output maps
         """
         cmap = plt.cm.turbo  # select default cmap
         # cmap.set_bad('black', 1)  # paints NaN values in black

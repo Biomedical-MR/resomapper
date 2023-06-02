@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.2.1 (02/06/2023)
+
+### Fix
+
+- Removed the need of having a supplfiles folder
+- Fixed T map processing - previously, when different studies where present, repetition/echo times were not being used correctly.
+- Fixed the reusing of mask - previously, when selecting other files, they couldn't be reused.
+
 ## v0.2.0 (29/05/2023)
 
 ### Features
