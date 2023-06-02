@@ -1,5 +1,7 @@
 import numpy as np
 
+from scipy.optimize import curve_fit
+
 
 class ADCmProcessor:
     """Mono exponential ADC fitting."""
@@ -14,6 +16,9 @@ class ADCmProcessor:
         C * exp(-b * ADCm)
         """
         return C * np.exp(-b * ADCm)
+
+    def fit_voxel(self, x, y):
+        popt, pcov = curve_fit(lambda b, ADCm: np.exp(-b * ADCm), x, y)
 
 
 Models.append(
