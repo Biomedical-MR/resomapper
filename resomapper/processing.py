@@ -21,6 +21,7 @@ from dipy.reconst.dti import (
     fractional_anisotropy,
 )
 
+import resomapper.dwi.adcm as adcm
 from resomapper.myrelax import getT1TR, getT2T2star
 from resomapper.utils import Headermsg as hmg
 from resomapper.utils import ask_user, check_shapes
@@ -564,6 +565,19 @@ class DTIProcessor:
         bval_path = str(self.study_path / "bvalues.bval")
         bvec_path = str(self.study_path / "Bdirs.bvec")
         bvals, bvecs = read_bvals_bvecs(bval_path, bvec_path)
+
+        if n_dirs < 6:
+            print(
+                f"\n{hmg.warn}Para imágenes de menos de 6 direcciones no se puede "
+                "ajustar el modelo de DTI. Se va a realizar el ajuste monoexponencial "
+                "de ADC."
+            )
+            print(f"\n{hmg.info}Ajustando el modelo... Puede tardar unos segundos.")
+            adcm_map = adcm.fit_volume(bvals, dirs, n_basal, n_b_val, n_dirs, data)
+            save_nifti(
+                str(self.study_path / "ADC_map"), adcm_map.astype(np.float32), affine
+            )
+        exit()
 
         # create gradient table. You can access gradients with gtab.gradients
         gtab = gradient_table(bvals, bvecs, atol=1e-0)
