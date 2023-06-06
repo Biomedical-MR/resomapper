@@ -577,6 +577,9 @@ class DTIProcessor:
             save_nifti(
                 str(self.study_path / "ADC_map"), adcm_map.astype(np.float32), affine
             )
+            # fitted = adcm.ShowFitADC(adcm_map, data, bvals)
+            # fitted.show_fitting()
+            adcm.show_fitting(adcm_map, data, bvals)
         exit()
 
         # create gradient table. You can access gradients with gtab.gradients

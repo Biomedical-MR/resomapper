@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 from scipy.optimize import curve_fit, least_squares
 
@@ -11,26 +12,17 @@ from scipy.optimize import curve_fit, least_squares
 #         self.study_path = study_path
 
 
-# def adcm(self, b, ADCm, C=1):
-#     """ADC mono: single exponential decay.
-
-#     C * exp(-b * ADCm)
-#     """
-#     return C * np.exp(-b * ADCm)
-
-
-# def fit_voxel(self, x, y):
 def fit_voxel_test(x, y):
     popt, pcov = curve_fit(lambda b, ADCm: np.exp(-b * ADCm), x, y)
     return popt, pcov
 
 
-def adcm_model(adcm, b):
+def adcm_model(adcm, b, C=1):
     """ADC mono: single exponential decay.
 
     C * exp(-b * ADCm)
     """
-    return np.exp(-b * adcm)
+    return C * np.exp(-b * adcm)
 
 
 def residual(param, x, y):
@@ -39,8 +31,8 @@ def residual(param, x, y):
 
 
 def fit_voxel(x, y):
-    bounds = (0.0001, 0.003)
-    diff_step = 0.00001
+    # bounds = (0.0001, 0.003)
+    # diff_step = 0.00001
     x0 = [0.0005]
     results = least_squares(
         residual,
@@ -52,10 +44,9 @@ def fit_voxel(x, y):
     return results.x
 
 
-# img[x,y,slice,dirs/bvals]
+# img[x,y,slice,dirs+bvals]
 
 
-# def fit_volume(self, bvals, dirs, n_basal, n_bval, n_dirs, img):
 def fit_volume(bvals, dirs, n_basal, n_bval, n_dirs, img):
     adcm_map = np.zeros(list(img.shape[:3]) + [n_dirs])
     n_slices = img.shape[2]
@@ -71,11 +62,77 @@ def fit_volume(bvals, dirs, n_basal, n_bval, n_dirs, img):
                         adcm_map[x, y, j, i] = np.nan
                     else:
                         # adcm, _ = self.fit_voxel(xdata, ydata)
-                        # breakpoint()
                         adcm = fit_voxel(xdata, ydata)
-                        # breakpoint()
                         adcm_map[x, y, j, i] = adcm
     return adcm_map
+
+
+# class ShowFitADC:
+#     def __init__(self, adc_map, data, bval):
+#         self.adc_map = adc_map
+#         self.data = data
+#         self.bval = bval
+
+
+# def show_fitting(self):
+def show_fitting(adc_map, data, bval):
+    img = adc_map[:, :, 0, 0]
+    original_data = data
+    bvalues = bval
+    s0 = np.mean(original_data[:, :, :, :3], axis=3)
+
+    fig, ax = plt.subplots()
+    ax.imshow(img)
+
+    # Define a function to be called when a pixel is clicked
+    def onclick(event):
+        # Get the pixel coordinates
+        x, y = int(event.xdata), int(event.ydata)
+
+        # Get the pixel value
+        adc_value = img[x, y]
+
+        y_data = original_data[x, y, 0, 2:4] / s0[x, y, 0]
+        # y_data = [i / j for i, j in zip(original_data[x, y, 0, 2:4], s0[x, y, 2:4])]
+        x_data = bvalues[2:4]
+        # y_fitted = [adcm_model(adc_value, b) * s0[x, y, 0] for b in x_data]
+        # y_fitted = [adcm_model(adc_value, b) for b in x_data]
+        y_fitted = [
+            adcm_model(adc_value, b) for b in range(int(x_data[0]), int(x_data[-1]))
+        ]
+        x_fitted = list(range(int(x_data[0]), int(x_data[-1])))
+
+        # Generate some sample data for the plot
+        # data = np.random.normal(loc=pixel_value, scale=0.1, size=100)
+        # data = [1, 2, 3, 4, 5, 6, 7, 7, 8]
+
+        # Create a new figure and plot the data
+        fig2, ax2 = plt.subplots()
+        ax2.scatter(x_data, y_data, label="Raw data")
+        # ax2.plot(x_data, y_fitted, "k", label="Fitted curve")
+        ax2.plot(x_fitted, y_fitted, "k", label="Fitted curve")
+        ax2.set_ylabel("S / S0")
+        ax2.set_xlabel("b value")
+        ax2.legend()
+
+        # ax2.hist(data, bins=20)
+        ax2.set_title(f"ADC value: {adc_value:.5f}")
+
+        plt.show()
+
+    # Connect the onclick function to the figure
+    cid = fig.canvas.mpl_connect("button_press_event", onclick)
+
+    # Show the plot
+    plt.show()
+
+    # ax2.scatter(x, y, label="Raw data")
+    # ax.plot(x_fitted, y_fitted, "k", label="Fitted curve")
+    # ax.set_title("Using polyfit() to fit an exponential function")
+    # ax.set_ylabel("y-Values")
+    # ax.set_ylim(0, 500)
+    # ax.set_xlabel("x-Values")
+    # ax.legend()
 
     # normalize our original image dividing by s0
     # norm_data = np.zeros(data.shape)
