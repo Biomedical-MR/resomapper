@@ -573,13 +573,18 @@ class DTIProcessor:
                 "de ADC."
             )
             print(f"\n{hmg.info}Ajustando el modelo... Puede tardar unos segundos.")
-            adcm_map = adcm.fit_volume(bvals, dirs, n_basal, n_b_val, n_dirs, data)
+            adcm_map, s0_map = adcm.fit_volume(
+                bvals, dirs, n_basal, n_b_val, n_dirs, data
+            )
             save_nifti(
                 str(self.study_path / "ADC_map"), adcm_map.astype(np.float32), affine
             )
+            save_nifti(
+                str(self.study_path / "s0_map"), adcm_map.astype(np.float32), affine
+            )
             # fitted = adcm.ShowFitADC(adcm_map, data, bvals)
             # fitted.show_fitting()
-            adcm.show_fitting(adcm_map, data, bvals)
+            adcm.show_fitting(adcm_map, s0_map, data, bvals)
         exit()
 
         # create gradient table. You can access gradients with gtab.gradients

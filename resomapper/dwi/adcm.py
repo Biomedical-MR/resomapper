@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from scipy.optimize import curve_fit, least_squares
+from skimage.transform import rotate
 
 
 # class ADCmProcessor:
@@ -17,29 +18,39 @@ def fit_voxel_test(x, y):
     return popt, pcov
 
 
-def adcm_model(adcm, b, C=1):
+def adcm_model(adcm, s0, b):
     """ADC mono: single exponential decay.
 
     C * exp(-b * ADCm)
     """
-    return C * np.exp(-b * adcm)
+    return s0 * np.exp(-b * adcm)
+
+
+# def residual(param, x, y):
+#     adcm = param[0]
+#     return y - adcm_model(adcm, x)
 
 
 def residual(param, x, y):
     adcm = param[0]
-    return y - adcm_model(adcm, x)
+    s0 = param[1]
+    return y - adcm_model(adcm, s0, x)
 
 
 def fit_voxel(x, y):
-    # bounds = (0.0001, 0.003)
+    # bounds = ([0.0001, 0], [0.003, np.inf])
+    # bounds = [0.0001, 0.003]
+    bounds = ([0, 0], [np.inf, np.inf])
     # diff_step = 0.00001
-    x0 = [0.0005]
+    # x0 = [0.0005]
+    x0 = [0.0005, 1000]
     results = least_squares(
         residual,
         x0,
         args=(x, y),
-        # bounds=bounds,
+        bounds=bounds,
         # diff_step=diff_step,
+        # loss="soft_l1",
     )
     return results.x
 
@@ -49,22 +60,36 @@ def fit_voxel(x, y):
 
 def fit_volume(bvals, dirs, n_basal, n_bval, n_dirs, img):
     adcm_map = np.zeros(list(img.shape[:3]) + [n_dirs])
+    s0_map = np.zeros(list(img.shape[:3]) + [n_dirs])
     n_slices = img.shape[2]
-    s0 = np.mean(img[:, :, :, :n_basal], axis=3)
+    # s0 = np.mean(img[:, :, :, :n_basal], axis=3)
     for i in range(n_dirs):
         i_dir = i + n_basal + ((n_bval - 1) * (i - 1))
-        xdata = bvals[i_dir : i_dir + n_bval]
+        # xdata = bvals[i_dir : i_dir + n_bval]
+        xdata = np.append(bvals[:n_basal], bvals[i_dir : i_dir + n_bval])
         for j in range(n_slices):
             for x in range(img.shape[0]):
                 for y in range(img.shape[1]):
-                    ydata = img[x, y, j, i_dir : i_dir + n_bval] / s0[x, y, j]
-                    if all(np.isnan(ydata)):
-                        adcm_map[x, y, j, i] = np.nan
-                    else:
-                        # adcm, _ = self.fit_voxel(xdata, ydata)
-                        adcm = fit_voxel(xdata, ydata)
+                    # ydata = img[x, y, j, i_dir : i_dir + n_bval] / s0[x, y, j]
+                    if all(img[x, y, j, :n_basal]):
+                        ydata = np.append(
+                            img[x, y, j, :n_basal], img[x, y, j, i_dir : i_dir + n_bval]
+                        )
+
+                        adcm, s0 = fit_voxel(xdata, ydata)
                         adcm_map[x, y, j, i] = adcm
-    return adcm_map
+                        s0_map[x, y, j, i] = s0
+                    else:
+                        adcm_map[x, y, j, i] = np.nan
+
+                    # if not all(ydata):
+                    #     print(ydata)
+                    #     adcm_map[x, y, j, i] = np.nan
+                    # else:
+                    #     # adcm = fit_voxel(xdata, ydata)
+                    #     adcm, s0 = fit_voxel(xdata, ydata)
+                    #     adcm_map[x, y, j, i] = adcm
+    return adcm_map, s0_map
 
 
 # class ShowFitADC:
@@ -75,50 +100,73 @@ def fit_volume(bvals, dirs, n_basal, n_bval, n_dirs, img):
 
 
 # def show_fitting(self):
-def show_fitting(adc_map, data, bval):
+def show_fitting(adc_map, s0_map, data, bval):
     img = adc_map[:, :, 0, 0]
+    s0 = s0_map[:, :, 0, 0]
     original_data = data
     bvalues = bval
-    s0 = np.mean(original_data[:, :, :, :3], axis=3)
+    # s0 = np.mean(original_data[:, :, :, :3], axis=3)
 
-    fig, ax = plt.subplots()
-    ax.imshow(img)
+    fig, ax = plt.subplots(1, 2, figsize=(15, 6))
+
+    ax[0].imshow(np.fliplr(rotate(img, 270)), extent=(0, 128, 128, 0))
+    ax[1].text(
+        0.5,
+        0.5,
+        "Click on a pixel to show the curve fit.",
+        size=15,
+        ha="center",
+    )
 
     # Define a function to be called when a pixel is clicked
     def onclick(event):
         # Get the pixel coordinates
         x, y = int(event.xdata), int(event.ydata)
 
-        # Get the pixel value
-        adc_value = img[x, y]
+        try:
+            # Get the pixel value
+            adc_value = img[x, y]
 
-        y_data = original_data[x, y, 0, 2:4] / s0[x, y, 0]
-        # y_data = [i / j for i, j in zip(original_data[x, y, 0, 2:4], s0[x, y, 2:4])]
-        x_data = bvalues[2:4]
-        # y_fitted = [adcm_model(adc_value, b) * s0[x, y, 0] for b in x_data]
-        # y_fitted = [adcm_model(adc_value, b) for b in x_data]
-        y_fitted = [
-            adcm_model(adc_value, b) for b in range(int(x_data[0]), int(x_data[-1]))
-        ]
-        x_fitted = list(range(int(x_data[0]), int(x_data[-1])))
+            s0_value = s0[x, y]
+            y_data = np.append(original_data[x, y, 0, :3], original_data[x, y, 0, 3:5])
+            # y_data = original_data[x, y, 0, 2:4] / s0[x, y, 0]
 
-        # Generate some sample data for the plot
-        # data = np.random.normal(loc=pixel_value, scale=0.1, size=100)
-        # data = [1, 2, 3, 4, 5, 6, 7, 7, 8]
+            # y_data = original_data[x, y, 0, 2:4] / s0[x, y, 0]
 
-        # Create a new figure and plot the data
-        fig2, ax2 = plt.subplots()
-        ax2.scatter(x_data, y_data, label="Raw data")
-        # ax2.plot(x_data, y_fitted, "k", label="Fitted curve")
-        ax2.plot(x_fitted, y_fitted, "k", label="Fitted curve")
-        ax2.set_ylabel("S / S0")
-        ax2.set_xlabel("b value")
-        ax2.legend()
+            # y_data = [i / j for i, j in zip(original_data[x, y, 0, 2:4], s0[x, y, 2:4])]
 
-        # ax2.hist(data, bins=20)
-        ax2.set_title(f"ADC value: {adc_value:.5f}")
+            x_data = np.append(bvalues[:3], bvalues[3:5])
 
-        plt.show()
+            # x_data = bvalues[2:4]
+            # y_fitted = [adcm_model(adc_value, b) * s0[x, y, 0] for b in x_data]
+            # y_fitted = [adcm_model(adc_value, b) for b in x_data]
+            y_fitted = [
+                adcm_model(adc_value, s0_value, b)
+                for b in range(int(x_data[0]), int(x_data[-1]))
+            ]
+            x_fitted = list(range(int(x_data[0]), int(x_data[-1])))
+
+            # Generate some sample data for the plot
+            # data = np.random.normal(loc=pixel_value, scale=0.1, size=100)
+            # data = [1, 2, 3, 4, 5, 6, 7, 7, 8]
+
+            # Create a new figure and plot the data
+            # fig2, ax2 = plt.subplots()
+            ax[1].clear()
+            ax[1].scatter(x_data, y_data, label="Raw data")
+            # ax2.plot(x_data, y_fitted, "k", label="Fitted curve")
+            ax[1].plot(x_fitted, y_fitted, "k", label="Fitted curve")
+            ax[1].set_ylabel("S")
+            ax[1].set_xlabel("b value")
+            ax[1].legend()
+
+            # ax2.hist(data, bins=20)
+            ax[1].set_title(f"ADC value: {adc_value:.6f}. Pixel: {x},{y}.")
+
+            plt.show()
+
+        except IndexError:
+            pass
 
     # Connect the onclick function to the figure
     cid = fig.canvas.mpl_connect("button_press_event", onclick)
