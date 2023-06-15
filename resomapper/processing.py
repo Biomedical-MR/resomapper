@@ -24,7 +24,7 @@ from dipy.reconst.dti import (
 import resomapper.dwi.adcm as adcm
 from resomapper.myrelax import getT1TR, getT2T2star
 from resomapper.utils import Headermsg as hmg
-from resomapper.utils import ask_user, check_shapes
+from resomapper.utils import ask_user, ask_user_options, check_shapes
 
 warnings.filterwarnings("ignore")
 
@@ -572,19 +572,29 @@ class DTIProcessor:
                 "ajustar el modelo de DTI. Se va a realizar el ajuste monoexponencial "
                 "de ADC."
             )
+
+            question = "Elige el modelo que deseas ajustar."
+            options = {
+                "m": "Ajuste monoexponencial.",
+                "l": "Ajuste lineal.",
+            }
+            selected_model = ask_user_options(question, options)
+
             print(f"\n{hmg.info}Ajustando el modelo... Puede tardar unos segundos.")
             adcm_map, s0_map = adcm.fit_volume(
-                bvals, dirs, n_basal, n_b_val, n_dirs, data
+                bvals, dirs, n_basal, n_b_val, n_dirs, data, selected_model
             )
             save_nifti(
                 str(self.study_path / "ADC_map"), adcm_map.astype(np.float32), affine
             )
             save_nifti(
-                str(self.study_path / "s0_map"), adcm_map.astype(np.float32), affine
+                str(self.study_path / "s0_map"), s0_map.astype(np.float32), affine
             )
             # fitted = adcm.ShowFitADC(adcm_map, data, bvals)
             # fitted.show_fitting()
-            adcm.show_fitting(adcm_map, s0_map, data, bvals)
+            adcm.show_fitting(
+                adcm_map, s0_map, data, bvals, selected_model, n_basal, n_b_val
+            )
         exit()
 
         # create gradient table. You can access gradients with gtab.gradients
