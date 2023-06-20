@@ -66,6 +66,7 @@ def fit_voxel(x, y, residual):
 def fit_volume(bvals, dirs, n_basal, n_bval, n_dirs, img, selected_model):
     adcm_map = np.zeros(list(img.shape[:3]) + [n_dirs])
     s0_map = np.zeros(list(img.shape[:3]) + [n_dirs])
+    residual_map = np.zeros(list(img.shape[:3]) + [n_dirs])
     n_slices = img.shape[2]
 
     residual = residual_monoexp if selected_model == "m" else residual_linear
@@ -98,6 +99,8 @@ def fit_volume(bvals, dirs, n_basal, n_bval, n_dirs, img, selected_model):
                         adcm, s0 = fit_voxel(xdata, ydata, residual)
                         adcm_map[x, y, j, i] = adcm
                         s0_map[x, y, j, i] = s0
+                        # no es xdata ydata
+                        # residual_map[x, y, j, i] = residual([adcm, s0], xdata, ydata)
                     else:
                         adcm_map[x, y, j, i] = np.nan
 

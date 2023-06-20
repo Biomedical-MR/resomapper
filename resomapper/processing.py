@@ -595,7 +595,8 @@ class DTIProcessor:
                 adcm_map, s0_map, data, bvals, selected_model, n_basal, n_b_val
             )
 
-            # residuals =
+            # predicted_signal = 
+            # residuals = data - predicted_signal
         else:
             # create gradient table. You can access gradients with gtab.gradients
             gtab = gradient_table(bvals, bvecs, atol=1e-0)
@@ -605,7 +606,8 @@ class DTIProcessor:
             #   ...      ...      ...      ...
 
             print(
-                f"\n{hmg.info}Se está resolviendo el tensor. Puede tardar unos segundos."
+                f"\n{hmg.info}Se está resolviendo el tensor. "
+                "Puede tardar unos segundos."
             )
             tensor_model = dti.TensorModel(gtab, fit_method="NLLS")
 
@@ -614,7 +616,7 @@ class DTIProcessor:
             # Some documentation of tensor_model and tensor_fit
             # tensor_model.design_matrix:
             #   np.array with shape (n_basals + n_b_val*n_dirs, 6 + 1).
-            #   Matrix with bi[gxi^2, gyi^2, gzi^2, 2*gxi*gyi, 2*gxi*gzi, 2*gyi*gzi, -1],
+            #   Matrix with bi[gxi^2, gyi^2, gzi^2, 2*gxi*gyi, 2*gxi*gzi, 2*gyi*gzi, -1]
             #   with g values obtained from gtab.bvecs corresponding with gradient
             #   directions and bi are the b values obtained from gtab.bvals
             # tensor_model.gtab
@@ -702,7 +704,7 @@ class DTIProcessor:
             )
             R2_dir_path = self.study_path / f"Dir_{str(d + 1)}"
             R2_dir_path.mkdir(parents=True)
-            # save_nifti(R2_dir_path / "R2_map", R2_map.astype(np.float32), affine)
+            save_nifti(R2_dir_path / "R2_map", R2_map.astype(np.float32), affine)
             R2_maps.append(R2_map)
 
         save_nifti(
