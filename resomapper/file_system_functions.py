@@ -464,7 +464,7 @@ class FileSystemBuilder:
     def get_selected_studies(self):
         """Returns those studies that will be processed. Checks if a modality
         has alredy been processed. In that case gives two options:
-            - Remove it and processed again
+            - Remove it and process it again.
             - Do not process it again.
 
         Returns:
@@ -486,18 +486,15 @@ class FileSystemBuilder:
                     if (
                         (("ADC_map.nii" in os.listdir(subfolder)) and modal == "DT")
                         or (("mapas" in os.listdir(subfolder)) and fnmatch(modal, "T*"))
-                        or (
-                            ("MT_map" in str([f for f in os.walk(subfolder)]))
-                            and modal == "MT"
-                        )
+                        or ("MT_map" in str(list(os.walk(subfolder))) and modal == "MT")
                     ):
                         patient = "_".join(subfolder.parts[-2].split("_")[1:])
                         msg = (
                             f"La modalidad {processed_modal} del estudio {patient} ya "
                             "ha sido procesada.\n¿Desea volver a procesarla?"
                         )
-                        avoid_subfolder = ut.ask_user(msg)
-                        if avoid_subfolder:  # if process again
+                        process_again = ut.ask_user(msg)
+                        if process_again:  # if process again
                             ready = ""
                             while ready != "y":
                                 msg = (
@@ -509,26 +506,29 @@ class FileSystemBuilder:
                                 )
                                 ready = input(msg)
                                 ready = ready.lower()
+                    else:
+                        process_again = True
 
-                    # remove folder and files contained in it
-                    shutil.rmtree(str(subfolder))
-                    # create folder again
-                    # src_path = Path(
-                    #     str(subfolder)
-                    #     .replace("procesados", "convertidos")
-                    #     .replace("procesado", "convertido")
-                    # )
-                    files_to_transfer = self.get_converted_files([processed_modal])
-                    dst_paths = [
-                        Path(
-                            str(f)
-                            .replace("convertidos", "procesados")
-                            .replace("convertido", "procesado")
-                        )
-                        for f in files_to_transfer
-                    ]
-                    self.transfer_files(files_to_transfer, dst_paths)
-                    subfolders_paths.append(subfolder)
+                    if process_again:
+                        # remove folder and files contained in it
+                        shutil.rmtree(str(subfolder))
+                        # create folder again
+                        # src_path = Path(
+                        #     str(subfolder)
+                        #     .replace("procesados", "convertidos")
+                        #     .replace("procesado", "convertido")
+                        # )
+                        files_to_transfer = self.get_converted_files([processed_modal])
+                        dst_paths = [
+                            Path(
+                                str(f)
+                                .replace("convertidos", "procesados")
+                                .replace("convertido", "procesado")
+                            )
+                            for f in files_to_transfer
+                        ]
+                        self.transfer_files(files_to_transfer, dst_paths)
+                        subfolders_paths.append(subfolder)
 
         return subfolders_paths, self.modals_to_process
 

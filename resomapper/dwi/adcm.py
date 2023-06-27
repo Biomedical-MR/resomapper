@@ -1,3 +1,4 @@
+import itertools
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -13,12 +14,30 @@ from matplotlib.widgets import Slider
 def adcm_model(adcm, s0, b):
     """ADC mono-exponential decay model.
 
-    C * exp(-b * ADCm)
+    s0 * exp(-b * ADCm)
+
+    Args:
+        adcm (float): ADC value.
+        s0 (float): S0 value.
+        b (float): B value.
+
+    Returns:
+        float: Calculated signal value.
     """
     return s0 * np.exp(-b * adcm)
 
 
 def residual_monoexp(param, x, y):
+    """Calculates the residual of the ADC mono-exponential decay model.
+
+    Args:
+        param (list): List of the model's parameters [adc, s0].
+        x (float): Independent variable value (B value).
+        y (float): Observed signal value.
+
+    Returns:
+        float: Residual value.
+    """
     adcm = param[0]
     s0 = param[1]
     return y - adcm_model(adcm, s0, x)
@@ -28,11 +47,29 @@ def adcl_model(adcl, s0, b):
     """ADC linear model.
 
     ln(S) = ln(S0) - b * ADCl
+
+    Args:
+        adcl (float): ADC value.
+        s0 (float): S0 value.
+        b (float): B value.
+
+    Returns:
+        float: Calculated logarithm of signal value.
     """
     return np.log(s0) - (b * adcl)
 
 
 def residual_linear(param, x, y):
+    """Calculates the residual of the ADC linear model.
+
+    Args:
+        param (list): List of the model's parameters [adc, s0].
+        x (float): Independent variable value (B value).
+        y (float): Observed signal value.
+
+    Returns:
+        float: Residual value.
+    """
     adcl = param[0]
     s0 = param[1]
     return np.log(y) - adcl_model(adcl, s0, x)
@@ -42,11 +79,27 @@ def residual_linear(param, x, y):
 # Fitting functions
 ###############################################################################
 
+# img[pixel_x, pixel_y, slice, dirs+bvals]
+# ADCm    0.0001 mm2/ms to 0.003 mm2/ms with step size of 0.00001 mm2/ms.
+# bval    s/mm2
+
 
 def fit_voxel(x, y, residual):
-    bounds = ([0, 0], [np.inf, np.inf])
+    """Fitting of an adc model curve for a single pixel, using non linear least squares.
+
+    Args:
+        x (list): Independent variable (B values).
+        y (list): Observed signal values.
+        residual (function): Function to calculate residual (residual_monoexponenital
+            or residual_linear)
+
+    Returns:
+        list: Result of optimizing the model parameters [adc value, s0 value]
+    """
+    bounds = ([0, 0], [np.inf, np.inf])  # Lower and upper bounds for each parameter
     # diff_step = 0.00001
-    x0 = [0.0005, 1000]
+    x0 = [0.0005, 1000]  # Starting point for adc and s0
+    # Note: starting points could be estimated differently for a more accurate start
     results = least_squares(
         residual,
         x0,
@@ -58,20 +111,32 @@ def fit_voxel(x, y, residual):
     return results.x
 
 
-# img[x,y,slice,dirs+bvals]
-# ADCm    0.0001 mm2/ms to 0.003 mm2/ms with step size of 0.00001 mm2/ms.
-# bval    s/mm2
+def fit_volume(bvals, n_basal, n_bval, n_dirs, img, selected_model):
+    """Fitting of an adc model curve for a whole image, using non linear least squares.
 
+    Args:
+        bvals (numpy.array): List of effective b values.
+        n_basal (int): Number of basal images adquired.
+        n_bval (int): Number of b values for each direction adquired.
+        n_dirs (int): Number of directions adquired.
+        img (numpy.array): Original image.
+        selected_model (str): "m" if you want to fit the monoexponential decay model,
+            "l" if you want to fit the linearized model.
 
-def fit_volume(bvals, dirs, n_basal, n_bval, n_dirs, img, selected_model):
-    adcm_map = np.zeros(list(img.shape[:3]) + [n_dirs])
+    Returns:
+        numpy.array: adc_map, map of calculated adc values.
+        numpy.array: s0_map, map of calculated s0 values.
+        numpy.array: residual_map, map of residual errors.
+        numpy.array: predicted_data, map of predicted signal using the fitted model.
+    """
+    adc_map = np.zeros(list(img.shape[:3]) + [n_dirs])
     s0_map = np.zeros(list(img.shape[:3]) + [n_dirs])
-    residual_map = np.zeros(list(img.shape[:3]) + [n_dirs])
     n_slices = img.shape[2]
 
     residual = residual_monoexp if selected_model == "m" else residual_linear
 
-    # s0 = np.mean(img[:, :, :, :n_basal], axis=3)
+    # When more than 1 basal image, they are averaged and used as 1. Could be changed to
+    # use all of them.
     for i in range(n_dirs):
         i_dir = n_basal + (n_bval * i)
 
@@ -83,7 +148,6 @@ def fit_volume(bvals, dirs, n_basal, n_bval, n_dirs, img, selected_model):
         for j in range(n_slices):
             for x in range(img.shape[0]):
                 for y in range(img.shape[1]):
-                    # ydata = img[x, y, j, i_dir : i_dir + n_bval] / s0[x, y, j]
                     if all(img[x, y, j, :n_basal]):
                         if n_basal > 1:
                             ydata = np.append(
@@ -96,15 +160,36 @@ def fit_volume(bvals, dirs, n_basal, n_bval, n_dirs, img, selected_model):
                                 img[x, y, j, i_dir : i_dir + n_bval],
                             )
 
-                        adcm, s0 = fit_voxel(xdata, ydata, residual)
-                        adcm_map[x, y, j, i] = adcm
+                        adc, s0 = fit_voxel(xdata, ydata, residual)
+                        adc_map[x, y, j, i] = adc
                         s0_map[x, y, j, i] = s0
-                        # no es xdata ydata
-                        # residual_map[x, y, j, i] = residual([adcm, s0], xdata, ydata)
-                    else:
-                        adcm_map[x, y, j, i] = np.nan
 
-    return adcm_map, s0_map
+                    else:
+                        adc_map[x, y, j, i] = np.nan
+
+    predicted_data = np.zeros(list(img.shape[:3]) + [n_dirs * n_bval])
+    residual_map = np.zeros(list(img.shape[:3]) + [n_dirs * n_bval])
+
+    for x, y, j, i in itertools.product(
+        range(img.shape[0]),
+        range(img.shape[1]),
+        range(n_slices),
+        range(n_basal, img.shape[3]),
+    ):
+        i_dir = round((i - n_basal) / n_bval)
+        if selected_model == "m":
+            predicted_data[x, y, j, i - n_basal] = adcm_model(
+                adc_map[x, y, j, i_dir], s0_map[x, y, j, i_dir], bvals[i]
+            )
+        else:
+            predicted_data[x, y, j, i - n_basal] = np.exp(
+                adcl_model(adc_map[x, y, j, i_dir], s0_map[x, y, j, i_dir], bvals[i])
+            )
+        residual_map[x, y, j, i - n_basal] = (
+            img[x, y, j, i] - predicted_data[x, y, j, i - n_basal]
+        )
+
+    return adc_map, s0_map, residual_map, predicted_data
 
 
 ###############################################################################
@@ -112,7 +197,23 @@ def fit_volume(bvals, dirs, n_basal, n_bval, n_dirs, img, selected_model):
 ###############################################################################
 
 
-def show_fitting(adc_map, s0_map, data, bval, selected_model, n_basal, n_b_val):
+def show_fitting_adc(adc_map, s0_map, data, bval, selected_model, n_basal, n_b_val):
+    """Shows the resulting ADC map and the fitted curves for each pixel.
+
+    To see the curves, click on a pixel and a graph will appear showing dots for the
+    original data and a line showing the fitted curve. Use the sliders to browse between
+    slices and directions.
+
+    Args:
+        adc_map (numpy.array): Calculated ADC values map.
+        s0_map (numpy.array): Calculated S0 values map.
+        data (numpy.array): Original image.
+        bval (numpy.array): List of effective b values.
+        selected_model (str): "m" if the monoexponential model was used for fitting,
+            "l" if the linearized model was used.
+        n_basal (int): Number of basal images adquired.
+        n_b_val (int): Number of b values per direction.
+    """
     initial_slice = 0
     initial_dir = 0
     current_slice = adc_map[:, :, initial_slice, initial_dir]
@@ -157,8 +258,8 @@ def show_fitting(adc_map, s0_map, data, bval, selected_model, n_basal, n_b_val):
         valstep=1,
     )
 
-    # Update the image when the slider value changes
     def update_slice(val):
+        """Update the image when the slider value changes."""
         nonlocal current_slice
         nonlocal s0
 
@@ -186,8 +287,8 @@ def show_fitting(adc_map, s0_map, data, bval, selected_model, n_basal, n_b_val):
     slice_slider.on_changed(update_slice)
     dir_slider.on_changed(update_slice)
 
-    # Define a function to be called when a pixel is clicked
     def onclick(event):
+        """Event handler to show the corresponding graph when a pixel is clicked."""
         # Get the pixel coordinates
         try:
             x, y = int(event.xdata), int(event.ydata)

@@ -16,7 +16,6 @@ from dipy.core.sphere import Sphere
 from dipy.io.gradients import read_bvals_bvecs
 from dipy.io.image import load_nifti, save_nifti
 from dipy.reconst.dti import (
-    _nlls_err_func,
     apparent_diffusion_coef,
     fractional_anisotropy,
 )
@@ -432,35 +431,6 @@ class DTIProcessor:
         dirs = dirs.T
         return [b_vals, dirs, n_b_val, n_basal, n_dirs, indexes_to_rm]
 
-    def get_residuals(self, design_matrix, data, weighting=None, sigma=None, jac=True):
-        """Computes non-liear least squares per each pixel and returns a map
-        of residual errors.  It uses ordinary least squares (OLS) as starting
-        point for optimization. The residual error is obtained per direction
-        and per b value, including basal images (b=0)."""
-
-        # preparing data
-        data[data == 0] = 1
-        r_data = data.reshape((-1, data.shape[-1]))  # vectorize data
-
-        # OLS parameters are used as the starting point for optimization
-        log_s = np.log(r_data)
-        inv_design = np.linalg.pinv(design_matrix)
-        ols_params = np.dot(inv_design, log_s.T).T
-
-        # iterate over each voxel and compute non linear least squares error function
-        residuals = np.empty((r_data.shape[0], data.shape[3]))
-        for vox in range(r_data.shape[0]):
-            start_params = ols_params[vox]  # 7 params per voxel
-            if jac:
-                # Error func for the non-linear least-squares fit of the tensor.
-                residuals[vox] = _nlls_err_func(
-                    start_params, design_matrix, r_data[vox], weighting, sigma
-                )
-        # reshape to the original shape
-        residuals.shape = data.shape[:]
-
-        return residuals
-
     def compute_map(self, map_type: str):
         unit_change = 1_000_000
 
@@ -581,8 +551,8 @@ class DTIProcessor:
             selected_model = ask_user_options(question, options)
 
             print(f"\n{hmg.info}Ajustando el modelo... Puede tardar unos segundos.")
-            adcm_map, s0_map = adcm.fit_volume(
-                bvals, dirs, n_basal, n_b_val, n_dirs, data, selected_model
+            adcm_map, s0_map, residuals, prediction = adcm.fit_volume(
+                bvals, n_basal, n_b_val, n_dirs, data, selected_model
             )
             save_nifti(
                 str(self.study_path / "ADC_map"), adcm_map.astype(np.float32), affine
@@ -590,13 +560,64 @@ class DTIProcessor:
             save_nifti(
                 str(self.study_path / "s0_map"), s0_map.astype(np.float32), affine
             )
+            save_nifti(
+                str(self.study_path / "res_map"), residuals.astype(np.float32), affine
+            )
+            save_nifti(
+                str(self.study_path / "pred_signal"),
+                prediction.astype(np.float32),
+                affine,
+            )
 
-            adcm.show_fitting(
+            adcm.show_fitting_adc(
                 adcm_map, s0_map, data, bvals, selected_model, n_basal, n_b_val
             )
 
-            # predicted_signal = 
-            # residuals = data - predicted_signal
+            R2_maps = []
+            print(f"\n{hmg.info}Generando mapas de R\u00b2.")
+
+            for d in range(n_dirs):
+                # compute R^2 maps
+                i_dir = n_basal + d * n_b_val
+                R2_map = R2MapGenerator().get_R2_map(
+                    data[:, :, :, i_dir : i_dir + n_b_val],
+                    residuals=residuals[:, :, :, d : d + n_b_val],
+                )
+                R2_dir_path = self.study_path / f"Dir_{str(d + 1)}"
+                R2_dir_path.mkdir(parents=True)
+                save_nifti(R2_dir_path / "R2_map", R2_map.astype(np.float32), affine)
+                R2_maps.append(R2_map)
+
+            save_nifti(
+                self.study_path / "R2_map",
+                np.moveaxis(np.array(R2_maps), 0, -1),
+                affine,
+            )
+
+            # ask if filtering is desired
+            apply_filter = ask_user("¿Quieres usar el filtro de ajuste?")
+
+            # select threshold and create R^2 maps
+            if apply_filter:
+                # get R2 maps and apply threshold to them to get the masks/filters
+                R2_map_paths = list(self.study_path.glob("Dir_*/*"))
+                f_R2_maps = []
+
+                th = R2MapGenerator().select_threshold()
+                for R2_map_path in R2_map_paths:
+                    # f_R2_map shape: (x_dim, y_dim, n_slices)
+                    f_R2_map = R2MapGenerator().get_filtered_R2(R2_map_path, "DTI", th)
+                    f_R2_maps.append(
+                        f_R2_map
+                    )  # filtered R2 maps for all gradient directions
+            else:
+                f_R2_maps = np.ones(np.shape(R2_maps))
+                f_R2_maps_slc = None
+
+            # save adc filtered heatmaps
+            f_ADC_maps = np.rollaxis(adcm_map, axis=3) * np.array(f_R2_maps)
+            vmin, vmax, cmap = Heatmap().save_ADC_heatmap(f_ADC_maps, self.study_path)
+
         else:
             # create gradient table. You can access gradients with gtab.gradients
             gtab = gradient_table(bvals, bvecs, atol=1e-0)
@@ -609,7 +630,8 @@ class DTIProcessor:
                 f"\n{hmg.info}Se está resolviendo el tensor. "
                 "Puede tardar unos segundos."
             )
-            tensor_model = dti.TensorModel(gtab, fit_method="NLLS")
+            # Estimation of S0 needs to be returned for calculating r2 maps later
+            tensor_model = dti.TensorModel(gtab, fit_method="NLLS", return_S0_hat=True)
 
             tensor_fit = tensor_model.fit(data)
             self.tensor = tensor_fit
@@ -661,135 +683,120 @@ class DTIProcessor:
                 str(self.study_path / "ADC_map"), ADC_maps.astype(np.float32), affine
             )
 
-            # compute R^2 error maps
-            # design matrix computed as:
-            #   bi[gxi^2, gyi^2, gzi^2, 2*gxi*gyi, 2*gxi*gzi, 2*gyi*gzi, -1],
-            # and -1 will be multiplied by ln(S0)
-
-            # design_matrix = tensor_model.design_matrix
-
-            # get errors between the real signal and the predicted signal per our model
-
-            # residuals = self.get_residuals(design_matrix, data)
-
-            # get basal information
-            # basal_residuals = residuals[:, :, :, 0:n_basal]
-            # basal_data = data[:, :, :, 0:n_basal]
-
             # get the signal predicted by the fitted DTI model
-            # the predicted signal is normalized, as it is divided by S0
             predicted_signal = tensor_fit.predict(gtab)
-
-            # s0 is the average of the basal images (no diffusion gradient)
-            s0 = np.mean(data[:, :, :, :n_basal], axis=3)
-
-            # normalize our original image dividing by s0
-            norm_data = np.zeros(data.shape)
-            for i in range(data.shape[2]):
-                for j in range(data.shape[3]):
-                    norm_data[:, :, i, j] += data[:, :, i, j] / s0[:, :, i]
-
-            # get residuals: difference between real data and predicted data
-            residuals = norm_data - predicted_signal
-
-        R2_maps = []
-        print(f"\n{hmg.info}Generando mapas de R\u00b2.")
-
-        for d in range(n_dirs):
-            # compute R^2 maps
-            i_dir = n_basal + d * n_b_val
-            R2_map = R2MapGenerator().get_R2_map(
-                norm_data[:, :, :, i_dir : i_dir + n_b_val],
-                residuals[:, :, :, i_dir : i_dir + n_b_val],
-            )
-            R2_dir_path = self.study_path / f"Dir_{str(d + 1)}"
-            R2_dir_path.mkdir(parents=True)
-            save_nifti(R2_dir_path / "R2_map", R2_map.astype(np.float32), affine)
-            R2_maps.append(R2_map)
-
-        save_nifti(
-            self.study_path / "R2_map", np.moveaxis(np.array(R2_maps), 0, -1), affine
-        )
-
-        # ask if filtering is desired
-        apply_filter = ask_user("¿Quieres usar el filtro de ajuste?")
-
-        # select threshold and create R^2 maps
-        if apply_filter:
-            # get R2 maps and apply threshold to them to get the masks/filters
-            R2_map_paths = list(self.study_path.glob("Dir_*/*"))
-            f_R2_maps = []
-
-            th = R2MapGenerator().select_threshold()
-            for R2_map_path in R2_map_paths:
-                # f_R2_map shape: (x_dim, y_dim, n_slices)
-                f_R2_map = R2MapGenerator().get_filtered_R2(R2_map_path, "DTI", th)
-                f_R2_maps.append(
-                    f_R2_map
-                )  # filtered R2 maps for all gradient directions
-        else:
-            f_R2_maps = np.ones(np.shape(R2_maps))
-            f_R2_maps_slc = None
-
-        # save adc filtered heatmaps
-        f_ADC_maps = np.rollaxis(ADC_maps, axis=3) * np.array(f_R2_maps)
-        vmin, vmax, cmap = Heatmap().save_ADC_heatmap(f_ADC_maps, self.study_path)
-
-        # Getting a map per slice requires to have one R^2 map per slice
-        if apply_filter:
-            f_R2_maps_slc = np.multiply.reduce(f_R2_maps, axis=0)
-
-        self.f_R2_maps_slc = f_R2_maps_slc
-
-        if n_dirs <= 6:
-            # mean diffusivity
-            print(f"\n{hmg.info}Generando mapas de MD.")
-            MD_map = self.compute_map("MD")
-            md_saving_path = str(self.study_path / "MD")
-            os.makedirs(md_saving_path)
             save_nifti(
-                os.path.join(md_saving_path, "MD_map"),
-                MD_map.astype(np.float32),
+                str(self.study_path / "pred_signal"),
+                predicted_signal.astype(np.float32),
                 affine,
             )
-            Heatmap().save_heatmap(MD_map, "MD", md_saving_path, vmin, vmax, cmap)
 
-            # axial diffusivity
-            print(f"\n{hmg.info}Generando mapas de AD.")
-            AD_map = self.compute_map("AD")
-            AD_saving_path = str(self.study_path / "AD")
-            os.makedirs(AD_saving_path)
+            residuals = data - predicted_signal
+
+            R2_maps = []
+            print(f"\n{hmg.info}Generando mapas de R\u00b2.")
+
+            for d in range(n_dirs):
+                # compute R^2 maps
+                i_dir = n_basal + d * n_b_val
+                R2_map = R2MapGenerator().get_R2_map(
+                    data[:, :, :, i_dir : i_dir + n_b_val],
+                    residuals[:, :, :, i_dir : i_dir + n_b_val],
+                )
+                R2_map[mask == 0] = np.nan
+                R2_dir_path = self.study_path / f"Dir_{str(d + 1)}"
+                R2_dir_path.mkdir(parents=True)
+                save_nifti(R2_dir_path / "R2_map", R2_map.astype(np.float32), affine)
+                R2_maps.append(R2_map)
+
             save_nifti(
-                os.path.join(AD_saving_path, "AD_map"),
-                AD_map.astype(np.float32),
+                self.study_path / "R2_map",
+                np.moveaxis(np.array(R2_maps), 0, -1),
                 affine,
             )
-            Heatmap().save_heatmap(AD_map, "AD", AD_saving_path, vmin, vmax, cmap)
 
-            # radial diffusivity
-            print(f"\n{hmg.info}Generando mapas de RD.")
-            RD_map = self.compute_map("RD")
-            RD_saving_path = str(self.study_path / "RD")
-            os.makedirs(RD_saving_path)
-            save_nifti(
-                os.path.join(RD_saving_path, "RD_map"),
-                RD_map.astype(np.float32),
-                affine,
-            )
-            Heatmap().save_heatmap(RD_map, "RD", RD_saving_path, vmin, vmax, cmap)
+            # ask if filtering is desired
+            apply_filter = ask_user("¿Quieres usar el filtro de ajuste?")
 
-            # fractional anisotropy
-            # formula: https://dipy.org/documentation/1.0.0./examples_built/reconst_dti/
-            print(f"\n{hmg.info}Generando mapas de FA.")
-            FA_map = self.compute_map("FA")
-            FA_saving_path = str(self.study_path / "FA")
-            os.makedirs(FA_saving_path)
-            save_nifti(
-                os.path.join(FA_saving_path, "FA_map"),
-                FA_map.astype(np.float32),
-                affine,
-            )
-            Heatmap().save_heatmap(FA_map, "FA", FA_saving_path)
+            # select threshold and create R^2 maps
+            if apply_filter:
+                # get R2 maps and apply threshold to them to get the masks/filters
+                R2_map_paths = list(self.study_path.glob("Dir_*/*"))
+                f_R2_maps = []
+
+                th = R2MapGenerator().select_threshold()
+                for R2_map_path in R2_map_paths:
+                    # f_R2_map shape: (x_dim, y_dim, n_slices)
+                    f_R2_map = R2MapGenerator().get_filtered_R2(R2_map_path, "DTI", th)
+                    f_R2_maps.append(
+                        f_R2_map
+                    )  # filtered R2 maps for all gradient directions
+            else:
+                f_R2_maps = np.ones(np.shape(R2_maps))
+                f_R2_maps_slc = None
+
+            # save adc filtered heatmaps
+            f_ADC_maps = np.rollaxis(ADC_maps, axis=3) * np.array(f_R2_maps)
+            vmin, vmax, cmap = Heatmap().save_ADC_heatmap(f_ADC_maps, self.study_path)
+
+            # Getting a map per slice requires to have one R^2 map per slice
+            if apply_filter:
+                f_R2_maps_slc = np.multiply.reduce(f_R2_maps, axis=0)
+
+            self.f_R2_maps_slc = f_R2_maps_slc
+
+            if n_dirs >= 6:
+                # mean diffusivity
+                print(f"\n{hmg.info}Generando mapas de MD.")
+                MD_map = self.compute_map("MD")
+                md_saving_path = str(self.study_path / "MD")
+                os.makedirs(md_saving_path)
+                save_nifti(
+                    os.path.join(md_saving_path, "MD_map"),
+                    MD_map.astype(np.float32),
+                    affine,
+                )
+                Heatmap().save_heatmap(MD_map, "MD", md_saving_path, vmin, vmax, cmap)
+
+                # axial diffusivity
+                print(f"\n{hmg.info}Generando mapas de AD.")
+                AD_map = self.compute_map("AD")
+                AD_saving_path = str(self.study_path / "AD")
+                os.makedirs(AD_saving_path)
+                save_nifti(
+                    os.path.join(AD_saving_path, "AD_map"),
+                    AD_map.astype(np.float32),
+                    affine,
+                )
+                Heatmap().save_heatmap(AD_map, "AD", AD_saving_path, vmin, vmax, cmap)
+
+                # radial diffusivity
+                print(f"\n{hmg.info}Generando mapas de RD.")
+                RD_map = self.compute_map("RD")
+                RD_saving_path = str(self.study_path / "RD")
+                os.makedirs(RD_saving_path)
+                save_nifti(
+                    os.path.join(RD_saving_path, "RD_map"),
+                    RD_map.astype(np.float32),
+                    affine,
+                )
+                Heatmap().save_heatmap(RD_map, "RD", RD_saving_path, vmin, vmax, cmap)
+
+                # fractional anisotropy
+                # formula: https://dipy.org/documentation/1.0.0./examples_built/reconst_dti/
+                print(f"\n{hmg.info}Generando mapas de FA.")
+                FA_map = self.compute_map("FA")
+
+                FA_map[mask == 0] = np.nan
+
+                FA_saving_path = str(self.study_path / "FA")
+                os.makedirs(FA_saving_path)
+                save_nifti(
+                    os.path.join(FA_saving_path, "FA_map"),
+                    FA_map.astype(np.float32),
+                    affine,
+                )
+                Heatmap().save_heatmap(FA_map, "FA", FA_saving_path)
 
 
 ###############################################################################
@@ -841,7 +848,7 @@ class TimeCollector:
 
         file_path = self.root_path / subfolder / file_name
         with open(file_path, "w") as f:
-            f.write(" ".join([t for t in times]))
+            f.write(" ".join(list(times)))
 
         return file_path
 
@@ -849,12 +856,11 @@ class TimeCollector:
         """Read times (TR, TE, TEs) automatically from method.txt files
         located in T1, T2, T2* subfolders.
 
-        Returns
-        -------
-        times_paths: list
-            Contains TR in position 0, TE in position 1, and TEs in position 2.
-            It has to be in this way as other functions expect a varible with
-            times in this particular structure."""
+        Returns:
+            list: times_paths. Contains TR in position 0, TE in position 1, and TEs in
+            position 2. It has to be in this way as other functions expect a varible
+            with times in this particular structure.
+        """
 
         times_paths = {}  # empty dictionary that will store times
         for subfolder in self.studies_to_process:
@@ -1323,13 +1329,17 @@ class Heatmap:
     def save_ADC_heatmap(self, f_ADC_maps: np.array, study_path: str):
         """Save ADC heatmap. Opens a window to show the heatmaps per slice
         and allows to change color range and color map.
-        Parameters
-        ----------
-        f_ADC_maps : np.array
-            Includes filtered ADC directions.
-        study_path : Path
-            Path to study folder.
+
+        Args:
+            f_ADC_maps (np.array): Includes filtered ADC directions.
+            study_path (str): Path to study folder.
+
+        Returns:
+            float: vmin. Minimum value for the color scale.
+            float: vmax. Maximum value for the color scale.
+            str: cmap. Color scale name.
         """
+
         f_ADC_maps[f_ADC_maps == 0.0] = np.nan
 
         cmap = plt.cm.turbo  # select default cmap
