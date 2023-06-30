@@ -169,6 +169,17 @@ Before saving the maps, you will be asked if you want to use an [R{sup}`2` filte
 
 Proccesing of DTI maps is made thanks to the [DIPY](https://dipy.org/) library.
 
+#### ADC for acquisitions of less than 6 directions
+For DWI acquisitions with less than 6 directions available, the DTI model can't be calculated. In that case, the program will provide the option to use the monoexponential decay model, that means fitting the signal values for each pixel to the following curve equation: $S=S0*e^(-b*ADC)$
+
+There is also the option to do a line regression fitting to the linearized equation: $ln(S)=ln(S0)-b*ADC$
+
+The user will be given the option to choose between these two options, and then the model will be fitted. After that, the user will have the opportunity to examine the fitted curves for each pixel in an interactive graphic. Finally, the ADC map will be saved the same way as before.
+
+```{note}
+Fitting these models will only give the ADC map and the R{sup}`2` map as outputs. AD, RD and FA maps are exclusive of the DTI model. MD can be estimated as the mean of all the ADC directions.
+```
+
 (MT)=
 ### MT - Magnetisation Transfer
 In the case of MT images, no parameters need to be specified before the processing starts, but there might be several different images in the original study if we have modified the slope.  If so, the program will ask which folder or folders we want to process (normally, folder 1 will be the original adquisition and the following ones will be the images with the modified slope). If there is only one folder, it will be processed directly. The processing of these images is very fast, because it does not require fitting the data to a model.
