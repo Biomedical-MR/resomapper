@@ -176,7 +176,7 @@ def fit_volume(bvals, n_basal, n_bval, n_dirs, img, selected_model):
         range(n_slices),
         range(n_basal, img.shape[3]),
     ):
-        i_dir = round((i - n_basal) / n_bval)
+        i_dir = (i - n_basal) // n_bval
         if selected_model == "m":
             predicted_data[x, y, j, i - n_basal] = adcm_model(
                 adc_map[x, y, j, i_dir], s0_map[x, y, j, i_dir], bvals[i]
@@ -197,7 +197,9 @@ def fit_volume(bvals, n_basal, n_bval, n_dirs, img, selected_model):
 ###############################################################################
 
 
-def show_fitting_adc(adc_map, s0_map, data, bval, selected_model, n_basal, n_b_val):
+def show_fitting_adc(
+    adc_map, s0_map, data, bval, selected_model, n_basal, n_b_val, R2_maps
+):
     """Shows the resulting ADC map and the fitted curves for each pixel.
 
     To see the curves, click on a pixel and a graph will appear showing dots for the
@@ -213,11 +215,13 @@ def show_fitting_adc(adc_map, s0_map, data, bval, selected_model, n_basal, n_b_v
             "l" if the linearized model was used.
         n_basal (int): Number of basal images adquired.
         n_b_val (int): Number of b values per direction.
+        R2_maps (numpy.array): Map of R2 values for all slices and directions.
     """
     initial_slice = 0
     initial_dir = 0
     current_slice = adc_map[:, :, initial_slice, initial_dir]
     s0 = s0_map[:, :, initial_slice, initial_dir]
+    r2_slice = R2_maps[:, :, initial_slice, initial_dir]
     original_data = data
     bvalues = bval
 
@@ -262,9 +266,11 @@ def show_fitting_adc(adc_map, s0_map, data, bval, selected_model, n_basal, n_b_v
         """Update the image when the slider value changes."""
         nonlocal current_slice
         nonlocal s0
+        nonlocal r2_slice
 
         current_slice = adc_map[:, :, int(slice_slider.val), int(dir_slider.val)]
         s0 = s0_map[:, :, int(slice_slider.val), int(dir_slider.val)]
+        r2_slice = R2_maps[:, :, int(slice_slider.val), int(dir_slider.val)]
 
         ax[0].clear()
         ax[0].imshow(
@@ -312,6 +318,7 @@ def show_fitting_adc(adc_map, s0_map, data, bval, selected_model, n_basal, n_b_v
                 return
 
             s0_value = s0[x, y]
+            r2_value = r2_slice[x, y]
 
             x_data = np.append(
                 bvalues[:n_basal],
@@ -356,16 +363,27 @@ def show_fitting_adc(adc_map, s0_map, data, bval, selected_model, n_basal, n_b_v
                 ax[1].set_ylabel("S")
             else:
                 ax[1].set_ylabel("ln(S)")
-            ax[1].set_xlabel("b value")
+            ax[1].set_xlabel("b value (s/mm\u00b2)")
             ax[1].legend()
             ax[1].set_title(
-                f"ADC value: {adc_value:.6f}. Pixel: {x},{y}. S0 value: {s0_value:.2f}."
+                f"Pixel: [{x},{y}]. "
+                f"ADC value: {adc_value*1_000_000:.1f} (\u03BCm\u00b2/s). "
+                # f"S0 value: {s0_value:.2f}. "
+                f"R\u00b2 value: {r2_value:.4f}"
             )
 
             plt.show()
 
         except (IndexError, TypeError):
-            pass
+            ax[1].clear()
+            ax[1].text(
+                0.5,
+                0.5,
+                "Click on a pixel to show the curve fit.",
+                size=15,
+                ha="center",
+            )
+            plt.show()
 
     # Connect the onclick function to the figure
     cid = fig.canvas.mpl_connect("button_press_event", onclick)

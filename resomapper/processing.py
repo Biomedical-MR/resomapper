@@ -554,24 +554,23 @@ class DTIProcessor:
             adcm_map, s0_map, residuals, prediction = adcm.fit_volume(
                 bvals, n_basal, n_b_val, n_dirs, data, selected_model
             )
+            adcm_map_scaled = adcm_map * 1_000_000
             save_nifti(
-                str(self.study_path / "ADC_map"), adcm_map.astype(np.float32), affine
-            )
-            save_nifti(
-                str(self.study_path / "s0_map"), s0_map.astype(np.float32), affine
-            )
-            save_nifti(
-                str(self.study_path / "res_map"), residuals.astype(np.float32), affine
-            )
-            save_nifti(
-                str(self.study_path / "pred_signal"),
-                prediction.astype(np.float32),
+                str(self.study_path / "ADC_map"),
+                adcm_map_scaled.astype(np.float32),
                 affine,
             )
-
-            adcm.show_fitting_adc(
-                adcm_map, s0_map, data, bvals, selected_model, n_basal, n_b_val
-            )
+            # save_nifti(
+            #     str(self.study_path / "s0_map"), s0_map.astype(np.float32), affine
+            # )
+            # save_nifti(
+            #     str(self.study_path / "res_map"), residuals.astype(np.float32), affine
+            # )
+            # save_nifti(
+            #     str(self.study_path / "pred_signal"),
+            #     prediction.astype(np.float32),
+            #     affine,
+            # )
 
             R2_maps = []
             print(f"\n{hmg.info}Generando mapas de R\u00b2.")
@@ -588,11 +587,24 @@ class DTIProcessor:
                 save_nifti(R2_dir_path / "R2_map", R2_map.astype(np.float32), affine)
                 R2_maps.append(R2_map)
 
+            R2_maps_ordered = np.moveaxis(np.array(R2_maps), 0, -1)
             save_nifti(
                 self.study_path / "R2_map",
-                np.moveaxis(np.array(R2_maps), 0, -1),
+                R2_maps_ordered,
                 affine,
             )
+
+            if ask_user("¿Deseas ver los resultados de las curvas de ajuste?"):
+                adcm.show_fitting_adc(
+                    adcm_map,
+                    s0_map,
+                    data,
+                    bvals,
+                    selected_model,
+                    n_basal,
+                    n_b_val,
+                    R2_maps_ordered,
+                )
 
             # ask if filtering is desired
             apply_filter = ask_user("¿Quieres usar el filtro de ajuste?")
@@ -615,7 +627,7 @@ class DTIProcessor:
                 f_R2_maps_slc = None
 
             # save adc filtered heatmaps
-            f_ADC_maps = np.rollaxis(adcm_map, axis=3) * np.array(f_R2_maps)
+            f_ADC_maps = np.rollaxis(adcm_map_scaled, axis=3) * np.array(f_R2_maps)
             vmin, vmax, cmap = Heatmap().save_ADC_heatmap(f_ADC_maps, self.study_path)
 
         else:
@@ -685,11 +697,11 @@ class DTIProcessor:
 
             # get the signal predicted by the fitted DTI model
             predicted_signal = tensor_fit.predict(gtab)
-            save_nifti(
-                str(self.study_path / "pred_signal"),
-                predicted_signal.astype(np.float32),
-                affine,
-            )
+            # save_nifti(
+            #     str(self.study_path / "pred_signal"),
+            #     predicted_signal.astype(np.float32),
+            #     affine,
+            # )
 
             residuals = data - predicted_signal
 
