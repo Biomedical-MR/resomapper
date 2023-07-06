@@ -170,9 +170,11 @@ Before saving the maps, you will be asked if you want to use an [R{sup}`2` filte
 Proccesing of DTI maps is made thanks to the [DIPY](https://dipy.org/) library.
 
 #### ADC for acquisitions of less than 6 directions
-For DWI acquisitions with less than 6 directions available, the DTI model can't be calculated. In that case, the program will provide the option to use the monoexponential decay model, that means fitting the signal values for each pixel to the following curve equation: $S=S0*e^(-b*ADC)$
+For DWI acquisitions with less than 6 directions available, the DTI model can't be calculated. In that case, the program will provide the option to use the monoexponential decay model, that means fitting the signal values for each pixel to the following curve equation: 
+$S=S_0*e^{-b*ADC}$
 
-There is also the option to do a line regression fitting to the linearized equation: $ln(S)=ln(S0)-b*ADC$
+There is also the option to do a line regression fitting to the linearized equation: 
+$ln(S)=ln(S_0)-b*ADC$
 
 The user will be given the option to choose between these two options, and then the model will be fitted. After that, the user will have the opportunity to examine the fitted curves for each pixel in an interactive graphic. Finally, the ADC map will be saved the same way as before.
 
