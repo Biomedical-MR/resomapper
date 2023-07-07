@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.3.0 (06/07/2023)
+
+### Features
+
+- Added ADC model fitting for less than 6 grandient directions (monoexponential decay).
+
+### Fix
+
+- Fixed dependency requirements: Numpy version should be < 1.25.0 to avoid problems with Dipy 1.5.0.
+
 ## v0.2.1 (02/06/2023)
 
 ### Fix
