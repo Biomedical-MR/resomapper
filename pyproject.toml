@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "resomapper"
-version = "0.2.1"
+version = "0.3.0"
 description = "Pipeline for processing MR images and generating parametric maps."
 authors = ["Biomedical-MR"]
 license = "MIT"
