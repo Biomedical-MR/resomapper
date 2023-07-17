@@ -1,6 +1,7 @@
 import tkinter as tk
 import warnings
 from math import trunc
+import matplotlib
 
 import matplotlib.pyplot as plt
 import nibabel as nib
@@ -23,6 +24,7 @@ from resomapper.utils import Headermsg as hmg
 from resomapper.utils import ask_user, ask_user_options
 
 warnings.filterwarnings("ignore")
+matplotlib.use("TkAgg")
 
 
 ######################################### OLD ##########################################
@@ -102,9 +104,12 @@ def ask_user_parameters(parameter_dict):
     root = tk.Tk()
     root.title("resomapper")
 
+    values = {}
+
     def submit():
-        global values
-        values = {}
+        nonlocal values
+        # global values
+        # values = {}
         for parameter, info in parameter_dict.items():
             value = entry_boxes[parameter].get()
             predetermined_value = info[0]
@@ -118,7 +123,7 @@ def ask_user_parameters(parameter_dict):
                 error_label.config(text=f"Invalid input for {parameter}!")
                 return
         root.destroy()
-
+        root.quit()
         # return values  # Return parameter selection
 
     entry_boxes = {}
@@ -202,11 +207,13 @@ class Denoising:
                     )
 
                 if i == 0:
-                    self.show_denoised_output(original_image, denoised_image)
-                    process_again = ask_user(
-                        "¿Deseas cambiar los parámetros de filtrado?"
+                    process_again = self.show_denoised_output(
+                        original_image, denoised_image
                     )
-                    plt.close()
+                    # process_again = ask_user(
+                    #     "¿Deseas cambiar los parámetros de filtrado?"
+                    # )
+                    # plt.close()
 
                 if not process_again:
                     self.save_nii(study_nii, denoised_image)
@@ -270,19 +277,26 @@ class Denoising:
         ax.flat[2].set_title("Residuals")
         fig1.show()
 
+        process_again = ask_user("¿Deseas cambiar los parámetros de filtrado?")
+        plt.close(fig1)
+        return process_again
+
     ############################### Denoising methods ##################################
 
     def non_local_means_denoising(self, image, params):
-        print(f"\n{hmg.info}Has seleccionado el filtro non-local means.\n")
-        print(f"{hmg.ask}Selecciona los parámetros en la ventana emergente.")
-
         parameters_nlm = {
             "patch_size": [3, "Size of patches used for denoising."],
             "patch_distance": [7, "Maximal search distance (pixels)."],
             "h": [4.5, "Cut-off distance (in gray levels)."],
         }
 
-        selection = ask_user_parameters(parameters_nlm) if params is None else params
+        if params is None:
+            print(f"\n{hmg.info}Has seleccionado el filtro non-local means.\n")
+            print(f"{hmg.ask}Selecciona los parámetros en la ventana emergente.")
+            selection = ask_user_parameters(parameters_nlm)
+        else:
+            selection = params
+        # selection = ask_user_parameters(parameters_nlm) if params is None else params
 
         p_imas = []  # processed images
         p_serie = []
@@ -319,8 +333,8 @@ class Denoising:
         return r_imas, selection
 
     def non_local_means_2_denoising(self, image, params):
-        print(f"\n{hmg.info}Has seleccionado el filtro non-local means (version 2).\n")
-        print(f"{hmg.ask}Selecciona los parámetros en la ventana emergente.")
+        # print(f"\n{hmg.info}Has seleccionado el filtro non-local means (version 2).\n")
+        # print(f"{hmg.ask}Selecciona los parámetros en la ventana emergente.")
 
         parameters_nlm_2 = {
             "N_sigma": [0, ""],
@@ -328,7 +342,14 @@ class Denoising:
             "block_radius": [2, ""],
             "rician": [True, ""],
         }
-        selection = ask_user_parameters(parameters_nlm_2) if params is None else params
+
+        if params is None:
+            print(f"\n{hmg.info}Has seleccionado el filtro non-local means.\n")
+            print(f"{hmg.ask}Selecciona los parámetros en la ventana emergente.")
+            selection = ask_user_parameters(parameters_nlm_2)
+        else:
+            selection = params
+        # selection = ask_user_parameters(parameters_nlm_2) if params is None else params
 
         sigma = estimate_sigma(image, N=selection["N_sigma"])
         return (
@@ -340,12 +361,12 @@ class Denoising:
                 block_radius=selection["block_radius"],
                 rician=selection["rician"],
             ),
-            params,
+            selection,
         )
 
     def ascm_denoising(self, image, params):
-        print(f"\n{hmg.info}Has seleccionado el filtro ASCM.\n")
-        print(f"{hmg.ask}Selecciona los parámetros en la ventana emergente.")
+        # print(f"\n{hmg.info}Has seleccionado el filtro ASCM.\n")
+        # print(f"{hmg.ask}Selecciona los parámetros en la ventana emergente.")
 
         parameters_ascm = {
             "N_sigma": [0, ""],
@@ -354,7 +375,13 @@ class Denoising:
             "block_radius": [2, ""],
             "rician": [True, ""],
         }
-        selection = ask_user_parameters(parameters_ascm) if params is None else params
+        if params is None:
+            print(f"\n{hmg.info}Has seleccionado el filtro non-local means.\n")
+            print(f"{hmg.ask}Selecciona los parámetros en la ventana emergente.")
+            selection = ask_user_parameters(parameters_ascm)
+        else:
+            selection = params
+        # selection = ask_user_parameters(parameters_ascm) if params is None else params
 
         sigma = estimate_sigma(image, N=selection["N_sigma"])
 
@@ -377,7 +404,7 @@ class Denoising:
         )
 
         if len(image.shape) == 3:
-            return adaptive_soft_matching(image, den_small, den_large, sigma), params
+            return adaptive_soft_matching(image, den_small, den_large, sigma), selection
 
         denoised_image = []
         for i in range(image.shape[-1]):
@@ -390,11 +417,11 @@ class Denoising:
             denoised_image.append(denoised_vol)
 
         denoised_image = np.moveaxis(np.array(denoised_image), 0, -1)
-        return denoised_image, params
+        return denoised_image, selection
 
     def local_pca_denoising(self, image, gtab, params):
-        print(f"\n{hmg.info}Has seleccionado el filtro local PCA.\n")
-        print(f"{hmg.ask}Selecciona los parámetros en la ventana emergente.")
+        # print(f"\n{hmg.info}Has seleccionado el filtro local PCA.\n")
+        # print(f"{hmg.ask}Selecciona los parámetros en la ventana emergente.")
 
         parameters_lpca = {
             "correct_bias": [True, ""],
@@ -402,7 +429,13 @@ class Denoising:
             "tau_factor": [2.3, ""],
             "patch_radius": [2, ""],
         }
-        selection = ask_user_parameters(parameters_lpca) if params is None else params
+        if params is None:
+            print(f"\n{hmg.info}Has seleccionado el filtro non-local means.\n")
+            print(f"{hmg.ask}Selecciona los parámetros en la ventana emergente.")
+            selection = ask_user_parameters(parameters_lpca)
+        else:
+            selection = params
+        # selection = ask_user_parameters(parameters_lpca) if params is None else params
 
         sigma = pca_noise_estimate(
             image,
@@ -417,22 +450,28 @@ class Denoising:
                 tau_factor=selection["tau_factor"],
                 patch_radius=selection["patch_radius"],
             ),
-            params,
+            selection,
         )
 
     def mp_pca_denoising(self, image, params):
-        print(f"\n{hmg.info}Has seleccionado el filtro Marcenko-Pasteur PCA.\n")
-        print(f"{hmg.ask}Selecciona los parámetros en la ventana emergente.")
+        # print(f"\n{hmg.info}Has seleccionado el filtro Marcenko-Pasteur PCA.\n")
+        # print(f"{hmg.ask}Selecciona los parámetros en la ventana emergente.")
 
         parameters_mp_pca = {
             "patch_radius": [2, ""],
         }
-        selection = ask_user_parameters(parameters_mp_pca) if params is None else params
-        return mppca(image, patch_radius=selection["patch_radius"]), params
+        if params is None:
+            print(f"\n{hmg.info}Has seleccionado el filtro non-local means.\n")
+            print(f"{hmg.ask}Selecciona los parámetros en la ventana emergente.")
+            selection = ask_user_parameters(parameters_mp_pca)
+        else:
+            selection = params
+        # selection = ask_user_parameters(parameters_mp_pca) if params is None else params
+        return mppca(image, patch_radius=selection["patch_radius"]), selection
 
     def patch2self_denoising(self, image, bvals, params):
-        print(f"\n{hmg.info}Has seleccionado el filtro patch2self.\n")
-        print(f"{hmg.ask}Selecciona los parámetros en la ventana emergente.")
+        # print(f"\n{hmg.info}Has seleccionado el filtro patch2self.\n")
+        # print(f"{hmg.ask}Selecciona los parámetros en la ventana emergente.")
 
         parameters_p2s = {
             "model": ["ols", ""],
@@ -440,7 +479,13 @@ class Denoising:
             "clip_negative_vals": [False, ""],
             "b0_threshold": [50, ""],
         }
-        selection = ask_user_parameters(parameters_p2s) if params is None else params
+        if params is None:
+            print(f"\n{hmg.info}Has seleccionado el filtro non-local means.\n")
+            print(f"{hmg.ask}Selecciona los parámetros en la ventana emergente.")
+            selection = ask_user_parameters(parameters_p2s)
+        else:
+            selection = params
+        # selection = ask_user_parameters(parameters_p2s) if params is None else params
 
         return (
             patch2self(
@@ -451,7 +496,7 @@ class Denoising:
                 clip_negative_vals=selection["clip_negative_vals"],
                 b0_threshold=selection["b0_threshold"],
             ),
-            params,
+            selection,
         )
 
 
