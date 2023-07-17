@@ -148,7 +148,7 @@ class FileSystemBuilder:
 
         # init tkinter
         root = tk.Tk()
-        root.title("MyX")
+        root.title("resomapper")
 
         row = 1
         selected_modals = []
