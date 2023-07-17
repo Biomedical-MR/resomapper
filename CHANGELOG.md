@@ -2,6 +2,13 @@
 
 ## v0.4.0 (17/07/2023)
 
+### Fix
+
+- Fix to avoid denoising workflow to get stuck.
+- Updated dependencies.
+
+## v0.4.0 (17/07/2023)
+
 ### Features
 
 - Added new denoising filters (using dipy's API), and changed denoising preprocessing to the first place (before masking the brain). New filters:
