@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.4.0 (17/07/2023)
+
+### Features
+
+- Added new denoising filters (using dipy's API), and changed denoising preprocessing to the first place (before masking the brain). New filters:
+    - Non local means denoising (new version for testing, using dipy's function).
+    - Adaptive Soft Coefficient Matching (ASCM) denoising.
+    - Patch2self denoising (for DWI).
+    - Local PCA denoising (for DWI).
+    - Marcenko-Pastur PCA denoising (for DWI).
+
+
 ## v0.3.0 (07/07/2023)
 
 ### Features
