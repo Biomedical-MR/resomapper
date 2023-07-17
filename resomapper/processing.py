@@ -1388,7 +1388,7 @@ class Heatmap:
 
                 # create a frame
                 root = tk.Tk()
-                root.title("MyX")
+                root.title("resomapper")
 
                 # declaring string variable for storing values
                 color_min = tk.IntVar()
@@ -1543,7 +1543,7 @@ class Heatmap:
 
         # create a frame
         root = tk.Tk()
-        root.title("MyX")
+        root.title("resomapper")
 
         # declaring string variable for storing values
         color_min = tk.IntVar()

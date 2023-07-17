@@ -6,7 +6,7 @@ import warnings
 from colorama import just_fix_windows_console
 
 import resomapper.file_system_functions as fs
-from resomapper.preprocessing import Preprocessing
+from resomapper.preprocessing import Denoising
 from resomapper.processing import (
     DTIProcessor,
     MTProcessor,
@@ -89,6 +89,11 @@ def cli():
         current_modal = study_name.split("_")[0]
         print(f"\n\n{hmg.new_modal}Procesamiento del mapa de {current_modal}")
 
+        if ask_user(
+            "¿Deseas preprocesar este estudio con un filtro de reducción de ruido?"
+        ):
+            Denoising(study).denoise()
+
         # Mask specification and creation
         masker = Mask(study)
         mode = masker.select_mask_mode()
@@ -102,8 +107,6 @@ def cli():
                 mask_path = masker.create_mask(mode)
                 ok_mask = dti_map_pro.check_DTI_data()
 
-            if ask_user("¿Deseas realizar un preprocesado de este estudio?"):
-                Preprocessing([study]).preprocess()
             dti_map_pro.process_DTI()
 
         elif study_name.startswith("MT"):
@@ -114,8 +117,6 @@ def cli():
                 mask_path = masker.create_mask(mode)
                 ok_mask = mt_map_pro.check_MT_data()
 
-            if ask_user("¿Deseas realizar un preprocesado de este estudio?"):
-                Preprocessing([study]).preprocess()
             mt_map_pro.process_MT()
 
         else:
@@ -129,8 +130,6 @@ def cli():
                 mask_path = masker.create_mask(mode)
                 ok_mask = t_map_pro.check_T_data()
 
-            if ask_user("¿Deseas realizar un preprocesado de este estudio?"):
-                Preprocessing([study]).preprocess()
             t_map_pro.process_T_map(f_time_paths)
 
     print(f"\n{hmg.success}Procesamiento terminado.")
