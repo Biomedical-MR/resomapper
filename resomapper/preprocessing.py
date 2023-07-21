@@ -1,24 +1,18 @@
 import tkinter as tk
 import warnings
-from math import trunc
-import matplotlib
 
+import matplotlib
 import matplotlib.pyplot as plt
 import nibabel as nib
 import numpy as np
-
-# from scipy.ndimage import rotate
 from dipy.core.gradients import gradient_table
 from dipy.denoise.adaptive_soft_matching import adaptive_soft_matching
 from dipy.denoise.localpca import localpca, mppca
 from dipy.denoise.nlmeans import nlmeans
 from dipy.denoise.noise_estimate import estimate_sigma
-
-# from dipy.denoise.non_local_means import non_local_means
 from dipy.denoise.patch2self import patch2self
 from dipy.denoise.pca_noise_estimate import pca_noise_estimate
 from skimage.restoration import denoise_nl_means
-from skimage.transform import rotate
 
 from resomapper.utils import Headermsg as hmg
 from resomapper.utils import ask_user, ask_user_options
@@ -27,80 +21,18 @@ warnings.filterwarnings("ignore")
 matplotlib.use("TkAgg")
 
 
-######################################### OLD ##########################################
-def get_preprocessing_params():
-    """Show a window to select the parameters to perform non local means denoising.
+def ask_user_parameters(parameter_dict):
+    """Select values for different parameters in an emergent window. If a new value is
+    selected it has to be of the same class as the predetermined value.
+
+    Args:
+        parameter_dict (dict): Dictionary containing the name of the different
+            parameters as keys, along with a list containing the predetermined value for
+            each one and a brief description.
 
     Returns:
-        list: Filtering parameters list [search distance, window size, h value]
+        dict: Dictionary containing the selected values for each parameter name.
     """
-    print(f"\n{hmg.ask}Indica los parámetros de preprocesado en la ventana emergente.")
-
-    root = tk.Tk()
-    root.title("resomapper")
-
-    # declaring string variable for storing values
-    patch_s = tk.StringVar()
-    patch_d = tk.StringVar()
-    h = tk.StringVar()
-
-    # defining a function that will get the entries
-    def get_input():
-        global entries
-        try:
-            entry_a = int(patch_d_entry.get())
-            entry_b = int(patch_s_entry.get())
-            entry_c = float(h_entry.get())
-            entries = [entry_a, entry_b, entry_c]
-            root.destroy()
-            root.quit()
-        except ValueError:
-            print(
-                f"\n{hmg.error}Has introducido un valor no válido. Inténtalo de nuevo."
-            )
-
-    # creating a labels
-    patch_s_label = tk.Label(
-        root, text="Tamaño de la región: ", font=("calibre", 10, "bold")
-    )
-    patch_d_label = tk.Label(
-        root, text="Distancia de búsqueda: ", font=("calibre", 10, "bold")
-    )
-    h_label = tk.Label(root, text="Valor de H: ", font=("calibre", 10, "bold"))
-
-    # creating entries for inputs
-    patch_s_entry = tk.Entry(root, textvariable=patch_s, font=("calibre", 10, "normal"))
-    patch_d_entry = tk.Entry(root, textvariable=patch_d, font=("calibre", 10, "normal"))
-    h_entry = tk.Entry(root, textvariable=h, font=("calibre", 10, "normal"))
-
-    # setting default values
-    patch_s_entry.insert(0, "3")
-    patch_d_entry.insert(0, "7")
-    h_entry.insert(0, "4.5")
-
-    # creating a button
-    sub_btn = tk.Button(root, text="Aceptar", command=get_input)
-
-    # placing the label and entry in the required position using grid
-    patch_s_label.grid(row=0, column=0)
-    patch_s_entry.grid(row=0, column=1)
-    patch_d_label.grid(row=1, column=0)
-    patch_d_entry.grid(row=1, column=1)
-    h_label.grid(row=2, column=0)
-    h_entry.grid(row=2, column=1)
-    sub_btn.grid(row=3, column=0)
-
-    root.mainloop()
-    try:
-        return entries
-    except NameError:
-        return ""
-
-
-################################### ^^ OLD ^^ ##########################################
-
-
-def ask_user_parameters(parameter_dict):
     root = tk.Tk()
     root.title("resomapper")
 
@@ -108,23 +40,34 @@ def ask_user_parameters(parameter_dict):
 
     def submit():
         nonlocal values
-        # global values
-        # values = {}
+
         for parameter, info in parameter_dict.items():
             value = entry_boxes[parameter].get()
             predetermined_value = info[0]
             value_type = type(predetermined_value)
             try:
-                value = value_type(value)
+                if value_type == bool:
+                    # For boolean types, check if the input is 'True' or 'False'
+                    value = str(value).lower()
+                    if value in ["true", "1"]:
+                        value = True
+                    elif value in ["false", "0"]:
+                        value = False
+                    else:
+                        raise ValueError
+                else:
+                    value = value_type(value)
+
                 if value_type == str and not value:
                     raise ValueError
                 values[parameter] = value
+
             except (ValueError, TypeError):
                 error_label.config(text=f"Invalid input for {parameter}!")
                 return
+
         root.destroy()
         root.quit()
-        # return values  # Return parameter selection
 
     entry_boxes = {}
     for parameter, info in parameter_dict.items():
@@ -210,10 +153,6 @@ class Denoising:
                     process_again = self.show_denoised_output(
                         original_image, denoised_image
                     )
-                    # process_again = ask_user(
-                    #     "¿Deseas cambiar los parámetros de filtrado?"
-                    # )
-                    # plt.close()
 
                 if not process_again:
                     self.save_nii(study_nii, denoised_image)
@@ -234,7 +173,20 @@ class Denoising:
         return ask_user_options(question, options)
 
     def load_nii(self, study_path, scan=0):
-        """Returns data in size x_dim x y_dim x num slices x rep times"""
+        """Load a NIfTI image from the specified study path and return its data.
+
+        This function loads a NIfTI image file located in the given `study_path`.
+        If multiple NIfTI files are found  in the directory, the `scan` parameter can be
+        used to select a specific file based on its index.
+
+        Args:
+            study_path (Path): The path to the directory containing the NIfTI files.
+            scan (int, optional): Index of the NIfTI file to be loaded in case multiple
+                files are found. Defaults to 0.
+
+        Returns:
+            nib.nifti1.Nifti1Image: The loaded NIfTI image object.
+        """
 
         study_full_path = list(study_path.glob("*.nii.gz"))[scan]
 
@@ -243,13 +195,53 @@ class Denoising:
         return study
 
     def save_nii(self, study, array):
+        """Save a NIfTI image with the specified data using the study information.
+
+        The NIfTI image is saved in the same path as the loaded study with the same
+        filename.
+
+        Args:
+            study (nib.nifti1.Nifti1Image): The NIfTI image object from which to extract
+                the affine transformation and header information.
+            array (numpy.ndarray): The data to be stored in the new NIfTI image.
+        """
         nii_ima = nib.Nifti1Image(array, study.affine, study.header)
         nib.save(nii_ima, str(self.study_full_path))
 
-    def select_denoising_parameters(self):
-        pass
+    def info_and_ask_denoising_params(self, filter_name, params):
+        """Print a message indicating the selected filter and ask the user to input the
+        neccesary parameters.
+
+        Args:
+            filter_name (str): Name of the selected filter.
+            params (dict): Dictionary containing the parameter names along with a list
+                that contains the predetermined value and a brief description
+
+        Returns:
+            dict: Dictionary containing the selected values for each parameter name.
+        """
+
+        print(f"\n{hmg.info}Has seleccionado el filtro {filter_name} means.\n")
+        print(f"{hmg.ask}Selecciona los parámetros en la ventana emergente.")
+        return ask_user_parameters(params)
 
     def show_denoised_output(self, original_image, denoised_image):
+        """Display the denoised output and residuals of the denoising process.
+
+        This method takes the original image and its denoised counterpart and displays
+        them side by side along with the residual image obtained by computing
+        the element-wise squared difference between the original and denoised images.
+        A middle slice is shown.
+
+        Args:
+            original_image (numpy.ndarray): The original 3D or 4D image to be denoised.
+            denoised_image (numpy.ndarray): The denoised version of the original image.
+
+        Returns:
+            bool: A boolean value indicating whether the user wants to change the
+                denoising parameters.
+        """
+
         sli = original_image.shape[2] // 2
 
         if len(original_image.shape) == 3:
@@ -284,19 +276,30 @@ class Denoising:
     ############################### Denoising methods ##################################
 
     def non_local_means_denoising(self, image, params):
+        """Apply non local means denoising to an image using specified parameters.
+        This version uses the skimage library implementation of this filter.
+
+        Args:
+            image (numpy.ndarray): Input 3D/4D image array to be denoised.
+            params (dict or None): Dictionary containing the denoising parameters to be
+                used. If None, the user will be prompted to select the parameters.
+
+        Returns:
+            tuple: A tuple containing the denoised image and the selected denoising
+                parameters.
+        """
+
         parameters_nlm = {
             "patch_size": [3, "Size of patches used for denoising."],
             "patch_distance": [7, "Maximal search distance (pixels)."],
             "h": [4.5, "Cut-off distance (in gray levels)."],
         }
-
         if params is None:
-            print(f"\n{hmg.info}Has seleccionado el filtro non-local means.\n")
-            print(f"{hmg.ask}Selecciona los parámetros en la ventana emergente.")
-            selection = ask_user_parameters(parameters_nlm)
+            selection = self.info_and_ask_denoising_params(
+                "non-local means", parameters_nlm
+            )
         else:
             selection = params
-        # selection = ask_user_parameters(parameters_nlm) if params is None else params
 
         p_imas = []  # processed images
         p_serie = []
@@ -333,8 +336,18 @@ class Denoising:
         return r_imas, selection
 
     def non_local_means_2_denoising(self, image, params):
-        # print(f"\n{hmg.info}Has seleccionado el filtro non-local means (version 2).\n")
-        # print(f"{hmg.ask}Selecciona los parámetros en la ventana emergente.")
+        """Apply non local means denoising to an image using specified parameters.
+        This version uses Dipy's implementation of this filter.
+
+        Args:
+            image (numpy.ndarray): Input 3D/4D image array to be denoised.
+            params (dict or None): Dictionary containing the denoising parameters to be
+                used. If None, the user will be prompted to select the parameters.
+
+        Returns:
+            tuple: A tuple containing the denoised image and the selected denoising
+                parameters.
+        """
 
         parameters_nlm_2 = {
             "N_sigma": [0, ""],
@@ -342,14 +355,12 @@ class Denoising:
             "block_radius": [2, ""],
             "rician": [True, ""],
         }
-
         if params is None:
-            print(f"\n{hmg.info}Has seleccionado el filtro non-local means.\n")
-            print(f"{hmg.ask}Selecciona los parámetros en la ventana emergente.")
-            selection = ask_user_parameters(parameters_nlm_2)
+            selection = self.info_and_ask_denoising_params(
+                "non-local means (v2)", parameters_nlm_2
+            )
         else:
             selection = params
-        # selection = ask_user_parameters(parameters_nlm_2) if params is None else params
 
         sigma = estimate_sigma(image, N=selection["N_sigma"])
         return (
@@ -365,8 +376,18 @@ class Denoising:
         )
 
     def ascm_denoising(self, image, params):
-        # print(f"\n{hmg.info}Has seleccionado el filtro ASCM.\n")
-        # print(f"{hmg.ask}Selecciona los parámetros en la ventana emergente.")
+        """Apply Adapative Soft Coefficient Matching denoising to an image using
+        specified parameters.
+
+        Args:
+            image (numpy.ndarray): Input 3D/4D image array to be denoised.
+            params (dict or None): Dictionary containing the denoising parameters to be
+                used. If None, the user will be prompted to select the parameters.
+
+        Returns:
+            tuple: A tuple containing the denoised image and the selected denoising
+                parameters.
+        """
 
         parameters_ascm = {
             "N_sigma": [0, ""],
@@ -376,12 +397,9 @@ class Denoising:
             "rician": [True, ""],
         }
         if params is None:
-            print(f"\n{hmg.info}Has seleccionado el filtro non-local means.\n")
-            print(f"{hmg.ask}Selecciona los parámetros en la ventana emergente.")
-            selection = ask_user_parameters(parameters_ascm)
+            selection = self.info_and_ask_denoising_params("ASCM", parameters_ascm)
         else:
             selection = params
-        # selection = ask_user_parameters(parameters_ascm) if params is None else params
 
         sigma = estimate_sigma(image, N=selection["N_sigma"])
 
@@ -420,8 +438,19 @@ class Denoising:
         return denoised_image, selection
 
     def local_pca_denoising(self, image, gtab, params):
-        # print(f"\n{hmg.info}Has seleccionado el filtro local PCA.\n")
-        # print(f"{hmg.ask}Selecciona los parámetros en la ventana emergente.")
+        """Apply local PCA denoising to the given image using specified parameters.
+
+        Args:
+            image (numpy.ndarray): Input 3D/4D image array to be denoised.
+            gtab (numpy.ndarray): B-values and gradient directions associated with the
+                input image.
+            params (dict or None): Dictionary containing the denoising parameters to be
+                used. If None, the user will be prompted to select the parameters.
+
+        Returns:
+            tuple: A tuple containing the denoised image and the selected denoising
+                parameters.
+        """
 
         parameters_lpca = {
             "correct_bias": [True, ""],
@@ -430,12 +459,9 @@ class Denoising:
             "patch_radius": [2, ""],
         }
         if params is None:
-            print(f"\n{hmg.info}Has seleccionado el filtro non-local means.\n")
-            print(f"{hmg.ask}Selecciona los parámetros en la ventana emergente.")
-            selection = ask_user_parameters(parameters_lpca)
+            selection = self.info_and_ask_denoising_params("local PCA", parameters_lpca)
         else:
             selection = params
-        # selection = ask_user_parameters(parameters_lpca) if params is None else params
 
         sigma = pca_noise_estimate(
             image,
@@ -454,24 +480,43 @@ class Denoising:
         )
 
     def mp_pca_denoising(self, image, params):
-        # print(f"\n{hmg.info}Has seleccionado el filtro Marcenko-Pasteur PCA.\n")
-        # print(f"{hmg.ask}Selecciona los parámetros en la ventana emergente.")
+        """Apply Marcenko-Pastur PCA denoising to an image using specified parameters.
+
+        Args:
+            image (numpy.ndarray): Input 3D/4D image array to be denoised.
+            params (dict or None): Dictionary containing the denoising parameters to be
+                used. If None, the user will be prompted to select the parameters.
+
+        Returns:
+            tuple: A tuple containing the denoised image and the selected denoising
+                parameters.
+        """
 
         parameters_mp_pca = {
             "patch_radius": [2, ""],
         }
         if params is None:
-            print(f"\n{hmg.info}Has seleccionado el filtro non-local means.\n")
-            print(f"{hmg.ask}Selecciona los parámetros en la ventana emergente.")
-            selection = ask_user_parameters(parameters_mp_pca)
+            selection = self.info_and_ask_denoising_params(
+                "Marcenko-Pastur PCA", parameters_mp_pca
+            )
         else:
             selection = params
-        # selection = ask_user_parameters(parameters_mp_pca) if params is None else params
+
         return mppca(image, patch_radius=selection["patch_radius"]), selection
 
     def patch2self_denoising(self, image, bvals, params):
-        # print(f"\n{hmg.info}Has seleccionado el filtro patch2self.\n")
-        # print(f"{hmg.ask}Selecciona los parámetros en la ventana emergente.")
+        """Apply patch2self denoising to the given image using specified parameters.
+
+        Args:
+            image (numpy.ndarray): Input 3D/4D image array to be denoised.
+            bvals (numpy.ndarray): B-values associated with the input image.
+            params (dict or None): Dictionary containing the denoising parameters to be
+                used. If None, the user will be prompted to select the parameters.
+
+        Returns:
+            tuple: A tuple containing the denoised image and the selected denoising
+                parameters.
+        """
 
         parameters_p2s = {
             "model": ["ols", ""],
@@ -480,12 +525,9 @@ class Denoising:
             "b0_threshold": [50, ""],
         }
         if params is None:
-            print(f"\n{hmg.info}Has seleccionado el filtro non-local means.\n")
-            print(f"{hmg.ask}Selecciona los parámetros en la ventana emergente.")
-            selection = ask_user_parameters(parameters_p2s)
+            selection = self.info_and_ask_denoising_params("patch2self", parameters_p2s)
         else:
             selection = params
-        # selection = ask_user_parameters(parameters_p2s) if params is None else params
 
         return (
             patch2self(
@@ -498,119 +540,3 @@ class Denoising:
             ),
             selection,
         )
-
-
-######################################### OLD ##########################################
-class Preprocessing:
-    def __init__(self, studies_paths):
-        self.studies_paths = studies_paths
-
-    def load_nii(self, study_path, is_mt_study=False, scan=0):
-        """Returns data in size x_dim x y_dim x num slices x rep times"""
-
-        study_full_path = list(study_path.glob("*.nii.gz"))[scan]
-
-        study = nib.load(study_full_path)
-        self.study_full_path = study_full_path
-        return study
-
-    def denoise(self, image, patch_size=3, patch_distance=7, h=4.5):
-        return denoise_nl_means(
-            image, patch_size=patch_size, patch_distance=patch_distance, h=h
-        )
-
-    def save_nii(self, study, array):
-        nii_ima = nib.Nifti1Image(array, study.affine, study.header)
-        nib.save(nii_ima, str(self.study_full_path))
-
-    def preprocess(self):
-        preprocess_again = True
-
-        while preprocess_again:
-            denoise_params = get_preprocessing_params()
-            if denoise_params == "":
-                print(f"\n{hmg.error}No has seleccionado ningún parámetro.")
-                exit()
-
-            for study in self.studies_paths:
-                if study.parts[-1].split("_")[0] == "MT":
-                    n_scans = len(list(study.glob("*.nii.gz")))
-                    is_mt_study = True
-                else:
-                    n_scans = 1
-                    is_mt_study = False
-
-                for i in range(n_scans):
-                    p_imas = []  # processed images
-                    p_serie = []
-
-                    study_nii = self.load_nii(study, is_mt_study, i)
-                    study_data = study_nii.get_data()
-                    if len(study_data.shape) == 4:
-                        for serie in np.moveaxis(study_data, -1, 0):
-                            for ima in np.moveaxis(serie, -1, 0):
-                                # denoise using non local means
-                                d_ima = self.denoise(
-                                    ima,
-                                    denoise_params[0],
-                                    denoise_params[1],
-                                    denoise_params[2],
-                                )
-                                p_serie.append(d_ima)
-                            p_imas.append(p_serie)
-                            p_serie = []
-                        r_imas = np.moveaxis(np.array(p_imas), [0, 1], [-1, -2])
-                    elif len(study_data.shape) == 3:  # Caso de la MT - added by Raquel
-                        for ima in np.moveaxis(study_data, -1, 0):
-                            # denoise using non local means
-                            d_ima = self.denoise(
-                                ima,
-                                denoise_params[0],
-                                denoise_params[1],
-                                denoise_params[2],
-                            )
-                            p_imas.append(d_ima)
-                        r_imas = np.moveaxis(np.array(p_imas), 0, -1)
-                    else:
-                        print(
-                            f"{hmg.error}Dimensiones de archivo de imagen no esperadas."
-                        )
-                        exit()
-
-                    if (is_mt_study and (i == 0)) or not is_mt_study:
-                        fig, ax = plt.subplots(1, 2)
-                        n_slc = np.shape(study_data)[2]
-                        if len(study_data.shape) == 4:
-                            ax[0].imshow(
-                                rotate(study_data[:, :, trunc(n_slc / 2), 0], 270),
-                                cmap="gray",
-                            )
-                            ax[1].imshow(
-                                rotate(r_imas[:, :, trunc(n_slc / 2), 0], 270),
-                                cmap="gray",
-                            )
-                        else:
-                            ax[0].imshow(
-                                rotate(study_data[:, :, trunc(n_slc / 2)], 270),
-                                cmap="gray",
-                            )
-                            ax[1].imshow(
-                                rotate(r_imas[:, :, trunc(n_slc / 2)], 270), cmap="gray"
-                            )
-
-                        ax[0].set_title("Original")
-                        ax[1].set_title("Preprocesada")
-                        ax[0].axis("off")
-                        ax[1].axis("off")
-
-                        fig.show()
-
-                        preprocess_again = ask_user("¿Desea repetir el preprocesado?")
-
-                    if not preprocess_again:
-                        self.save_nii(study_nii, r_imas)
-
-        print(f"\n{hmg.info}Preprocesado completado. Va a comenzar el procesamiento.")
-
-
-################################### ^^ OLD ^^ ##########################################
