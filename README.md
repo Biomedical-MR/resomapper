@@ -12,6 +12,8 @@ Note that `resomapper` is a tool under active development, with new features and
 
 For more info, visit the [whole documentation](https://resomapper.readthedocs.io/en/latest).
 
+### DISCLAIMER: right now, this is a beta version of Resomapper. Soon, on summer 2025, the complete version with more functionalities will be available. Stay tuned!!!
+
 ## Installation
 
 To install **resomapper**, follow these steps:
