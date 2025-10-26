@@ -1,4 +1,4 @@
-![resomapper](docs/_static/logo_fixed_white.svg)
+![resomapper](docs/_static/resomapper_logo_color.svg)
 
 [![PyPI version](https://img.shields.io/pypi/v/resomapper?color=blue)](https://pypi.python.org/pypi/resomapper)
 [![Documentation Status](https://readthedocs.org/projects/resomapper/badge/?version=latest)](https://resomapper.readthedocs.io/en/latest/?badge=latest)
@@ -6,10 +6,7 @@
 
 Welcome to `resomapper`, a pipeline for processing MR images and generating parametric maps. 
 
-### DISCLAIMER: right now, this is a beta version of Resomapper. We are working on publicating this work, so the complete version with more functionalities will be available upon publication. Stay tuned!!!
-
-
-This tool is designed and developed by the *Biomedical Magnetic Resonance Lab* at the *Instituto de Investigaciones Biomédicas "Alberto Sols"* (CSIC-UAM). This project aims to collect a series of MR image processing tools written in Python under a friendly user interface for the lab needs. It is designed to streamline the processing of images, starting from raw adquisition files (we use Bruker study folders) to end up with parametric maps such as T1, T2 or T2* maps, as well as diffusion metric maps derived from DTI analysis.
+This tool is designed and developed by the *Preclinical neuroImaging Lab* at the *Instituto de Investigaciones Biomédicas Sols-Morreale* (CSIC-UAM), in Madrid. This project aims to collect a series of MR image processing tools written in Python under a friendly user interface for the lab needs. It is designed to streamline the processing of images, starting from raw adquisition files (we use Bruker study folders) to end up with parametric maps such as T1, T2 or T2* maps, as well as diffusion metric maps derived from DTI analysis.
 
 Note that `resomapper` is a tool under active development, with new features and improvements still on the way. It is used in-house for preclinical MRI data, mainly for mouse brain imaging, but can be used for different types of MRI data. Any suggestions are welcome!
 
@@ -58,5 +55,5 @@ Interested in contributing? Check out the contributing guidelines. Please note t
 
 ## License
 
-`resomapper` was created by Biomedical-MR. It is licensed under the terms of the MIT license.
+`resomapper` was created by the *Preclinical neuroImaging Lab* at the *Instituto de Investigaciones Biomédicas Sols-Morreale* (CSIC-UAM), in Madrid. It is licensed under the terms of the MIT license.
 
