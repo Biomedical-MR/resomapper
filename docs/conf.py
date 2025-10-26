@@ -45,7 +45,7 @@ myst_enable_extensions = [
 #
 html_theme = "sphinx_rtd_theme"
 html_static_path = ["_static"]
-html_logo = "_static/logo_fixed_white.svg"
+html_logo = "_static/resomapper_logo_white.svg"
 html_favicon = "_static/resomapper_favicon.ico"
 html_theme_options = {
     "logo_only": True,
