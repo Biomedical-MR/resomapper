@@ -179,12 +179,6 @@ These maps do not require any additional specification before processing begins.
 
 Processing of T maps is made thanks to the [MyRelax](https://github.com/fragrussu/MyRelax) library.
 
-(R2_filter)=
-### R{sup}`2` filter
-In the modalities that imply fitting the data to a model (DTI and T maps), you will be asked if you want to apply a R{sup}`2` filter. This filter will remove any pixels that have a R{sup}`2` value under a specified threshold, meaning that they adjust worse to the model. This filter is optional and usually is not needed.
-
-Regardless of your choice, a R{sup}`2` map will be saved for these modalities. This map consist on an image where each pixel value corresponds with the R{sup}`2` for that position. 
-
 (save_maps)=
 ## 7. Saving the maps
 Each time a map or a result is generated, in any of the modalities, a pop-up window will open showing the result. In addition, it will be possible to modify the color scale in which it is displayed, specifying the minimum and maximum value, as well as the name of the color palette.
@@ -198,9 +192,9 @@ align: center
 Map scaling windows.
 ```
 
-The different color palettes and their names can be found in the figure below (see ). The recommended ones are "turbo" (selected by default), and "jet". You can try different combinations and visualize them by pressing the {kbd}`Refresh` button. Once you are satisfied, click on {kbd}`Accept` to save the map.
+The different color palettes and their names come from the [Matplotlib](https://matplotlib.org/stable/users/explain/colors/colormaps.html) package. You can use any of those, but in the figure below we show some of the most comon ones. You can try different combinations and visualize them by pressing the {kbd}`Refresh` button. Once you are satisfied, click on {kbd}`Accept` to save the map.
 
-```{figure} _static/colorbars.png
+```{figure} _static/fig_colormaps.png
 ---
 width: 500px
 name: colorbars
@@ -209,4 +203,4 @@ align: center
 Different color palettes that can be used for map coloring.
 ```
 
-When all the maps of the selected modalities from all the studies included in the working directory have been processed and, the processing will be complete and the resomapper CLI will stop running.
+When all the maps of the selected modalities from all the studies included in the working directory have been processed and, the processing will be complete and the Resomapper CLI will stop running.
