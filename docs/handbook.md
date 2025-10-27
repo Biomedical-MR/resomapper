@@ -1,7 +1,7 @@
 (cli_run)=
-# Running the CLI
+# Running the interactive workflow (CLI)
 
-The main way to use **resomapper** is through a command-line interface (CLI), which allows users to easily follow the complete image processing pipeline. To use this CLI, after installing the package, simply open a terminal window, enter the `resomapper_cli` command. 
+The main way to use Resomapper is through a command-line interface (CLI), which allows users to easily follow the complete image processing pipeline. To use this CLI, after installing the package, simply open a terminal window and enter the `resomapper_cli` command. 
 
 ```
 > resomapper_cli
@@ -223,38 +223,3 @@ Different color palettes that can be used for map coloring.
 ```
 
 When all the maps of the selected modalities from all the studies included in the working directory have been processed and, the processing will be complete and the resomapper CLI will stop running.
-
----
-
-## Method details
-
-(noise-filter)=
-### Noise filtering with non-local means
-The preprocessing performed includes only a noise reduction in the image using the non-local means algorithm. This algorithm is based on replacing the intensity value of a pixel with the average value of the intensities of similar pixels. As these similar pixels do not necessarily have to be close to the target pixel, this algorithm searches the whole image (hence it is non-local).
-
-As searching the whole image is computationally expensive, we generally work by neighborhoods of pixels. For each target pixel (pixel whose intensity value is to be replaced) is taken:
-
-* A region size T around the target pixel.
-* A search area at a distance D in pixels defining a neighborhood around the target pixel.  In this neighborhood we will search for regions of size T with which to average. 
-* An intensity distance H that will allow averaging those pixels that have an intensity value similar to the target pixel. It serves as a tolerance value.
-
-The image below shows, in blue, the neighborhood defined by a distance D; in orange, the target pixel P; and in green, a region with a size T of 3x3 around P. The algorithm places a region of size T around each pixel Q that is within the neighborhood and that is in the range of values allowed by H. In the image, it is observed that Q1 and Q2 will serve to obtain the new value of P, but Q3 will not because it is outside the neighborhood. In the case of Q4, as the intensity values of its region are different from those of P, it will be a region that will also be discarded. To obtain the new value of P, a weighted sum of the average values of the pixels contained in each of the Q regions will be made, where each Q region will have a weight associated with a distance value (color distance, i.e. how similar the gray values are) between itself and the P region.
-
-```{figure} _static/filter_non_local_means.png
----
-width: 500px
-name: filter_non_local_means
-align: center
----
-Regions used by the non-local means filtering algorithm.
-```
-
-In the program, 3 parameters must be entered:
-
-* Size of the region, which refers to T. It must be an integer, because with this parameter regions of size TxT pixels are formed. For example, 3x3. 
-* Search distance, which refers to D. It must be an integer, because with this parameter regions of size DxD pixels are formed. For example, 7x7. 
-* Value of H. It can be integer or decimal. The higher it is, the more permissive it is to include regions with different intensities, so the image will be more blurred/blurred.
-
-It is advisable to test at the beginning to see which values are most suitable for each study and even for each modality. For example, if you are working with larger images, it will be convenient to increase the search distance or the region size.
-
-The article describing the method can be found [here](https://www.ipol.im/pub/art/2011/bcm_nlm/article.pdf). The code implementation of this algorithm has been implemented using the SciPy library. For more information see [here](https://scikit-image.org/docs/stable/auto_examples/filters/plot_nonlocal_means.html) and [here](https://scikit-image.org/docs/stable/api/skimage.restoration.html#skimage.restoration.denoise_nl_means).
