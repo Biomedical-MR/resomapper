@@ -12,35 +12,33 @@ This will start the processing workflow, and if you need to stop it at any point
 The program will follow several steps:
 
 1. [Choosing a working folder](start_cli)
-2. [Converting raw studies to NIfTI](convert_studies)
+2. [Converting studies to NIfTI](convert_studies)
 3. [Selection of modalities to process](modal_select)
-4. [Creating a mask](mask_creation)
-5. [Preprocessing the images](preprocessing)
+4. [Preprocessing the images](preprocessing)
+5. [Creating a mask](mask_creation)
 6. [Processing](processing)
     * {ref}`DTI`
     * {ref}`MT`
     * {ref}`Tmaps`
-7. [Saving the maps](save_maps)
+7. [Saving the output maps](save_maps)
 
 (start_cli)=
 ## 1. Choosing a working folder
-After displaying a welcome message in the terminal, a pop-up window will appear in which you'll have to choose your working folder and press {kbd}`Select folder`. This directory must contain all the studies we want to process, and it will also hold all the resulting files at the end (see {ref}`prepare_studies` for more details).
+After displaying a welcome message in the terminal, a pop-up window will appear in which you'll have to choose your working folder and press {kbd}`Select folder`. This directory must contain all the studies we want to process, and it will also hold all the resulting files at the end (see {ref}`prepare_studies` and {ref}`output_files`for more details).
 
 ```{attention}
-Make sure that you have selected the correct working folder.
+Make sure that you have selected the correct working directory. If you are selecting the folder of only one study, it won't be recognised. You should select the folder that contains that study (or more than one).
 ```
 
 (convert_studies)=
-## 2. Converting raw studies to NIfTI
-After choosing the working folder the conversion of studies from raw Bruker format to NIfTI will automatically start. In case that the studies have already been converted and stored before on the same folder the user will be asked if they can be reused or they need to be converted again.
-
-During this process the terminal will display some information prompts that can be ignored, and when completed, a message will be shown. Also, the folders containing the converted studies will be labeled with the modal they contain for an easier identification afterwards. They will be stored under the working directory, inside a folder named `convertidos` (see {ref}`converted_studies`).
+## 2. Converting studies to NIfTI
+If your input data is not already on NIfTI format, the conversion of studies will automatically start after choosing the working directory. In case that the studies have already been converted and stored before on the same folder the user will be asked if they can be reused or they need to be converted again. When completed, a message will be shown. Also, the folders containing the converted studies will be labeled according to the BIDS format with the modal they contain for an easier identification afterwards. They will be stored under the working directory, inside a folder named `resomapper_output` (see {ref}`converted_studies`).
 
 (modal_select)=
 ## 3. Selection of modalities to process
-The next step will be to select the modalities we want to process. Currently, in **resomapper**, we have implemented the posibility to generate T1, T2, T2*, MT and DTI parametric maps. A pop-up window will appear showing all these possibilities. We can check all we want and press {kbd}`OK` to start. For each study in the working directory, the selected modalities will be processed in case their adquisitions are present.
+The next step will be to select the modalities we want to process. Currently, in Resomapper, we have implemented the posibility to generate T1, T2, T2*, MTI and DTI parametric maps. A pop-up window will appear showing all these possibilities. You can check all the ones you want and press {kbd}`OK` to start. For each study in the working directory, the selected modalities will be processed in case their adquisitions are present.
 
-```{figure} _static/2_select_modal.png
+```{figure} _static/fig_select_modal.png
 ---
 width: 250px
 name: select_modal
@@ -49,16 +47,35 @@ align: center
 Modality selection window.
 ```
 
-When a modality of an study has already been processed and stored before, a message will be displayed in the terminal giving the option to process it again or not. 
+If any studies have already been processed and stored before, a message will be displayed in the terminal giving the option to process it again or not. 
 
 ```{attention}
-Take into account that processing it again means deleting any previous results for that modality (for the correspondig study). For that reason, make sure of copying them to another folder before continuing (you'll recieve a warning message to remind you anyway).
+Take into account that processing it again means deleting any previous results for that modality (for the correspondig study). For that reason, make sure of copying them to another folder before continuing if you need them (you'll recieve a warning message to remind you anyway).
 ```
 
-At this point, the processing of the several studies will start. A message will be shown in the terminal at the start of each study and for each modality inside of it.
+At this point, the processing workflow for the several studies will start. A message will be shown in the terminal at the start of each study and for each modality inside of it.
+
+(preprocessing)=
+## 4. Preprocessing the images
+Before starting the processing, you will have the option to preprocess the images before generating the parametric map. Currently, the available preprocessing options available include several denoising filters, Gibbs artifact suppression and bias field correction.
+
+For each of these, a question will be asked to determine if you want to use any of these, and if so, in the case of the denoising filters and bias field correction, a pop-up window will be shown asking for the filtering parameters. Usually, no changes should be done to these parameters, unless you get unwanted results and need to fine tune them. In that case, here are the references from the original packages where they come from, so you can check exactly what each parameter means:
+
+...
+
+After using any of the preprocessing options, a window will appear showing one of the slices of the original image and the corresponding preprocessed one. Also, in the case of the denoising filters or the Gibbs artifact correction, the residuals between both images (img1-img2)^2 will be shown. Ideally, in the case of denoising, these should be more or less randomly distributed, meaning that no structures of the original image have been over-smoothed. For Gibbs artifacts, you should see the removed rings in the residuals. In the case of the bias field correction, the calculated bias field will be shown. If you are not satisfied with the result, you can repeat the preprocessing as many times as you wish.
+
+```{figure} _static/fig_denoising.png
+---
+width: 500px
+name: denoising
+align: center
+---
+Filtered image pre-visualization.
+```
 
 (mask_creation)=
-## 4. Creating a mask
+## 5. Creating a mask
 The first step for each instance will be to create the masks or ROIs (Region Of Interest) where we want the processing to take place (in the case of neuroimaging, we need to extract the brain). To do so, the user will be asked between the following options:
 
 * **Selecting a file** that contains a binary mask, in NiFTI format.
@@ -67,10 +84,10 @@ The first step for each instance will be to create the masks or ROIs (Region Of 
 
 * **Manually creating a mask** by drawing it. In this case, pop-up windows will be shown for each slice where the mask can be manually created following the steps shown in the terminal (left-clicking to create lines and right-clicking to close the outline). 
 
-```{figure} _static/3_mask_creation.png
+```{figure} _static/fig_mask_creation.png
 ---
 width: 500px
-name: img_mask_creation
+name: mask_creation
 align: center
 ---
 Manual mask creation.
@@ -93,36 +110,6 @@ Make sure to **press {kbd}`enter`** when the mask pre-visualization window is op
 
 ```{note}
 After specifying a mask, the program will check if the images to be processed and the seleted mask match. If you have accidentally selected a mask file with more slices or different resolution, you will have the option to select the mask again.
-```
-
-(preprocessing)=
-## 5. Preprocessing the images
-Before starting the processing, we will have the option to preprocess the images before generating the parametric map. Currently, this preprocessing consist on a noise reduction filtering step (see {ref}`noise-filter` for more details). 
-
-In case you want to perform preprocessing, a pop-up window will be shown asking for the filtering parameters. The first and second ones must be integrers, while the last one can be either an integrer or a decimal number. In the {ref}`noise-filter` section you can see what these parameters mean.
-
-```{figure} _static/5_preprocessing_params.png
----
-width: 250px
-name: preprocessing_params
-align: center
----
-Parameter selection window.
-```
-
-Next, a window will appear showing the original image and the preprocessed image, while asking if everything is correct via the terminal. If you are not satisfied with the result, you can repeat the preprocessing as many times as you wish.
-
-```{figure} _static/6_filtered_result.png
----
-width: 500px
-name: filtered_result
-align: center
----
-Filtered image pre-visualization.
-```
-
-```{note}
-Take into account that the filtering algorithm currently implemented in resomapper is quite general and might need some parameter tweaking by hand to find a adequate number. We recommend to do only slight filterings. We are currently working on including more advanced denoising filters in resomapper that are better at avoiding loss of visual structures of interest.
 ```
 
 (processing)=
@@ -183,11 +170,11 @@ Fitting these models will only give the ADC map and the R{sup}`2` map as outputs
 ```
 
 (MT)=
-### MT - Magnetisation Transfer
+### MTI - Magnetisation Transfer Imaging
 In the case of MT images, no parameters need to be specified before the processing starts, but there might be several different images in the original study if we have modified the slope.  If so, the program will ask which folder or folders we want to process (normally, folder 1 will be the original adquisition and the following ones will be the images with the modified slope). If there is only one folder, it will be processed directly. The processing of these images is very fast, because it does not require fitting the data to a model.
 
 (Tmaps)=
-### T1, T2 and T2* maps
+### Relaxometry: T1, T2 and T2* maps
 These maps do not require any additional specification before processing begins. Once done, you will be asked if you want to use an [R{sup}`2` filter](R2_filter) and the maps can be saved.
 
 Processing of T maps is made thanks to the [MyRelax](https://github.com/fragrussu/MyRelax) library.
@@ -202,7 +189,7 @@ Regardless of your choice, a R{sup}`2` map will be saved for these modalities. T
 ## 7. Saving the maps
 Each time a map or a result is generated, in any of the modalities, a pop-up window will open showing the result. In addition, it will be possible to modify the color scale in which it is displayed, specifying the minimum and maximum value, as well as the name of the color palette.
 
-```{figure} _static/9_map_scale.png
+```{figure} _static/fig_map_saving.png
 ---
 width: 500px
 name: map_scale
