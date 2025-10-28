@@ -1,6 +1,10 @@
 # Required
 version: 2
 
+# Sphinx configuration file.
+sphinx:
+  configuration: docs/conf.py
+
 # Image to use
 build:
   image: testing
