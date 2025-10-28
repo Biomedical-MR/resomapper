@@ -1,35 +1,32 @@
-![resomapper](docs/_static/logo_fixed_white.svg)
+![resomapper](docs/_static/resomapper_logo_color.svg)
 
 [![PyPI version](https://img.shields.io/pypi/v/resomapper?color=blue)](https://pypi.python.org/pypi/resomapper)
 [![Documentation Status](https://readthedocs.org/projects/resomapper/badge/?version=latest)](https://resomapper.readthedocs.io/en/latest/?badge=latest)
 [![License: MIT](https://img.shields.io/badge/license-MIT-orange)](https://opensource.org/licenses/MIT)
 
-Welcome to `resomapper`, a pipeline for processing MR images and generating parametric maps. 
+Resomapper is an open-source, cross-platform Python tool designed to simplify quantitative MRI (qMRI) processing. It integrates established processing libraries into a unified and user-friendly workflow, supporting T1, T2, T2*, MTI, and DTI analyses, along with advanced preprocessing steps such as denoising, Gibbs artifact removal, and bias field correction. Users can run analyses interactively through an user-friendly interface, or through automated JSON-based configurations, ensuring compatibility by converting raw MRI data into the standardized NIfTI format within a BIDS-like structure. Resomapper promotes accessibility, reproducibility, and efficient data management in qMRI research and applications.
 
-### DISCLAIMER: right now, this is a beta version of Resomapper. We are working on publicating this work, so the complete version with more functionalities will be available upon publication. Stay tuned!!!
+This software was developed to address the specific needs our lab encountered when processing preclinical MRI data. We hope it will also be valuable to other researchers facing similar challenges by bringing together tools for multiple MRI modalities in a single, user-friendly platform. Designed especially for those without coding experience, Resomapper simplifies advanced qMRI processing through an intuitive workflow.
 
+Please note that Resomapper is an actively developed project, with ongoing improvements and new features being added regularly. It is currently used in-house for preclinical MRI studies—primarily mouse brain imaging—but is adaptable to various types of MRI data. We welcome feedback, suggestions, and contributions from the community to help make it even better.
 
-This tool is designed and developed by the *Biomedical Magnetic Resonance Lab* at the *Instituto de Investigaciones Biomédicas "Alberto Sols"* (CSIC-UAM). This project aims to collect a series of MR image processing tools written in Python under a friendly user interface for the lab needs. It is designed to streamline the processing of images, starting from raw adquisition files (we use Bruker study folders) to end up with parametric maps such as T1, T2 or T2* maps, as well as diffusion metric maps derived from DTI analysis.
-
-Note that `resomapper` is a tool under active development, with new features and improvements still on the way. It is used in-house for preclinical MRI data, mainly for mouse brain imaging, but can be used for different types of MRI data. Any suggestions are welcome!
-
-For more info, visit the [whole documentation](https://resomapper.readthedocs.io/en/latest).
+Here is a brief overview of Resomapper’s installation and usage, though we recommend visiting the [full documentation](https://resomapper.readthedocs.io/en/latest) for detailed instructions and additional information.
 
 ## Installation
 
-To install **resomapper**, follow these steps:
+To install Resomapper, follow these steps:
 
 1. Make sure that you have Python installed on your system. Versions supported are **3.8** and above. 
 
     * *Optional: create a virtual environment with conda or venv.*
 
-2. Install **resommaper** and all its dependencies running the following command from your terminal:
+2. Install Resommaper and all its dependencies running the following command from your terminal:
 
     ```
     pip install resomapper
     ```
 
-3. If you have already been using **resomapper** and there is any new version available, you can use the following command to update it:
+3. If you have already been using the software and there is any new version available, you can use the following command to update it:
 
     ```
     pip install resomapper --upgrade
@@ -37,9 +34,9 @@ To install **resomapper**, follow these steps:
 
 ## Usage
 
-Then, to start using **resomapper**, you'll need to follow these steps:
+Then, to start using Resomapper, you'll need to follow these steps:
 
-1. Prepare a working directory (an empty folder located wherever you want) and store inside the studies you want to process as folders in *Bruker* raw format.
+1. Prepare a working directory (an empty folder located wherever you want) and store inside the studies you want to process.
 
 2. Enter the command shown below to run the program's Command Line Interface. 
 
@@ -58,5 +55,5 @@ Interested in contributing? Check out the contributing guidelines. Please note t
 
 ## License
 
-`resomapper` was created by Biomedical-MR. It is licensed under the terms of the MIT license.
+Resomapper was created by the *Preclinical neuroImaging Lab* at the *Instituto de Investigaciones Biomédicas Sols-Morreale* (CSIC-UAM), in Madrid. It is licensed under the terms of the MIT license.
 
