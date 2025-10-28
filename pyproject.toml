@@ -23,6 +23,8 @@ matplotlib = "^3.10.7"
 colorama = "^0.4.6"
 seaborn = "^0.13.2"
 tqdm = "^4.67.1"
+scikit-image = "0.25.2"
+scikit-learn = "1.6.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.3.1"
