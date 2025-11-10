@@ -1,6 +1,10 @@
 # Changelog
 
-## v0.4.0 (17/07/2023)
+## v1.0.0 (10/11/2025)
+
+We are back! We had been upgrading Resomapper behind the scenes for some big changes! Check the documentation for the whole description of the new features. 
+
+## v0.4.1 (17/07/2023)
 
 ### Fix
 
