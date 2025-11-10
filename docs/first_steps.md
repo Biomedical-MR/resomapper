@@ -121,8 +121,8 @@ The working directory is a folder where all the studies you want to process must
 Currently, Resomapper supports several different input types:
 -	Bruker raw Paravision 6.1 format
 -	MRSolution scanners data
--	Nifti data
--	DICOM data
+-	Nifti data (in the structure used by Resomapper)
+-	DICOM data (for now, not directly included in the workflow, but via scripts using Resomapper's functions)
 
 Make sure that the studies are stored directly at the working directory, in separate folders. Each study corresponds to a patient (mouse, human...) and contains the folders of the different sequences adquired.
 

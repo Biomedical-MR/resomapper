@@ -36,3 +36,4 @@ build-backend = "poetry.core.masonry.api"
 [tool.poetry.scripts]
 resomapper_cli = "resomapper.cli:run_cli"
 resomapper_auto = "resomapper.auto:run_auto"
+resomapper_tools = "resomapper.standalonetools:run_tools"

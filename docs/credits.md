@@ -1,12 +1,12 @@
 # Credits
 
-**Resomapper** is a tool developed by the ***Biomedical Magnetic Resonance Lab*** at the [Instituto de Investigaciones Biomédicas *Alberto Sols*](https://www.iib.uam.es/portal/web/iibm/home). Here we want to acknowledge the packages used for the development of this program.
+**Resomapper** is a tool developed by the ***Preclinical neuroImaging Lab (PILab)*** at the [Instituto de Investigaciones Biomédicas Sols-Morreale](https://www.iib.uam.es/web/iibm). Here we want to acknowledge the packages used for the development of this program.
 
 * DTI processing and other additional tools: [**DIPY**](https://dipy.org/). 
 > Garyfallidis, E., Brett, M., Amirbekian, B., Rokem, A., van der Walt, S., Descoteaux, M., Nimmo-Smith, I.  & Dipy Contributors (2014). [DIPY, a library for the analysis of diffusion MRI data.](http://journal.frontiersin.org/Journal/10.3389/fninf.2014.00008/abstract) Frontiers in Neuroinformatics, vol.8, no.8.
 
 
-* T map processing: [**myrelax**](https://github.com/fragrussu/MyRelax).
+* Relaxometry map processing: [**myrelax**](https://github.com/fragrussu/MyRelax).
 > Grussu, F., Battiston, M., Veraart, J., Schneider, T., Cohen-Adad, J., Shepherd, T. M., Alexander, D. C., Fieremans, E., Novikov, D. S., & Gandini Wheeler-Kingshott, C. A. M. (2020). [Multi-parametric quantitative in vivo spinal cord MRI with unified signal readout and image denoising.](http://doi.org/10.1016/j.neuroimage.2020.116884) Neuroimage, 217, 116884.
 
 * Adquisition files conversion: [**bruker2nifti**](https://github.com/SebastianoF/bruker2nifti)

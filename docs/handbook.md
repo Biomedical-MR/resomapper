@@ -1,5 +1,5 @@
 (cli_run)=
-# Running the interactive workflow (CLI)
+# Running the interactive workflow
 
 The main way to use Resomapper is through a command-line interface (CLI), which allows users to easily follow the complete image processing pipeline. To use this CLI, after installing the package, simply open a terminal window and enter the `resomapper_cli` command. 
 
@@ -7,7 +7,7 @@ The main way to use Resomapper is through a command-line interface (CLI), which 
 > resomapper_cli
 ```
 
-This will start the processing workflow, and if you need to stop it at any point, just press {kbd}`Ctrl + C`. During this process, the user will be prompted to interact with the program via the terminal (writting a response and pressing {kbd}`Enter`) or pop-up windows (clicking on different options).
+This will start the processing workflow, and if you need to stop it at any point, just press {kbd}`Ctrl` + {kbd}`C`. During this process, the user will be prompted to interact with the program via the terminal (writting a response and pressing {kbd}`Enter`) or pop-up windows (clicking on different options).
 
 The program will follow several steps:
 
@@ -59,9 +59,11 @@ At this point, the processing workflow for the several studies will start. A mes
 ## 4. Preprocessing the images
 Before starting the processing, you will have the option to preprocess the images before generating the parametric map. Currently, the available preprocessing options available include several denoising filters, Gibbs artifact suppression and bias field correction.
 
-For each of these, a question will be asked to determine if you want to use any of these, and if so, in the case of the denoising filters and bias field correction, a pop-up window will be shown asking for the filtering parameters. Usually, no changes should be done to these parameters, unless you get unwanted results and need to fine tune them. In that case, here are the references from the original packages where they come from, so you can check exactly what each parameter means:
+For each of these, a question will be asked to determine if you want to use any of these, and if so, in the case of the denoising filters and bias field correction, a pop-up window will be shown asking for the filtering parameters. Usually, no changes should be done to these parameters, unless you get unwanted results and need to fine tune them. 
 
-...
+<!-- In that case, here are the references from the original packages where they come from, so you can check exactly what each parameter means:
+
+... -->
 
 After using any of the preprocessing options, a window will appear showing one of the slices of the original image and the corresponding preprocessed one. Also, in the case of the denoising filters or the Gibbs artifact correction, the residuals between both images (img1-img2)^2 will be shown. Ideally, in the case of denoising, these should be more or less randomly distributed, meaning that no structures of the original image have been over-smoothed. For Gibbs artifacts, you should see the removed rings in the residuals. In the case of the bias field correction, the calculated bias field will be shown. If you are not satisfied with the result, you can repeat the preprocessing as many times as you wish.
 
@@ -93,7 +95,7 @@ align: center
 Manual mask creation.
 ```
 
-After creating the masks for all slices, a pop-up window will appear with a preview of all of them. Once viewed, press {kbd}`enter` (do it while the window is on focus, you can click on it first to make sure), and the terminal will ask if it is correct. If you are not satisfied with the masks created, you can repeat the process as many times as necessary.
+After creating the masks for all slices, a pop-up window will appear with a preview of all of them. Once viewed the terminal will ask if it is correct. If you are not satisfied with the masks created, you can repeat the process as many times as necessary.
 
 ```{figure} _static/4_mask_visualization.png
 ---
@@ -104,13 +106,10 @@ align: center
 Mask pre-visualization window.
 ```
 
-```{warning}
-Make sure to **press {kbd}`enter`** when the mask pre-visualization window is open to continue the process, and not close it with the {kbd}`X` tab. It can be easy to lose these window between other ones we may have opened before.
-```
-
+<!-- 
 ```{note}
 After specifying a mask, the program will check if the images to be processed and the seleted mask match. If you have accidentally selected a mask file with more slices or different resolution, you will have the option to select the mask again.
-```
+``` -->
 
 (processing)=
 ## 6. Processing
@@ -124,16 +123,19 @@ This step is taken to help the user keep track of the adquisiton information. Th
 
 However, in the case of the number of gradient directions, it may be the case that you want to remove some of the directions from the image because they were not acquired correctly. For this reason, if a number smaller than the real was specified, the user will be asked if that's the number of directions desired instead. Anyways, if the correct number was introduced, the user will also be asked if any directions need to be removed, just in case. In both scenarios, after confirming the number of directions to be deleted, the index of those will be asked, as shown below.
 
-```{figure} _static/7_DWI_parameters.png
+<!-- ```{figure} _static/7_DWI_parameters.png
 ---
 width: 600px
 name: DWI_parmeters
 align: center
 ---
 Diffusion imaging parameter specification.
-```
+``` -->
 
-Once we have confirmed all these adquisition parameters, the vector of effective b values and the directions matrix will be shown in the terminal. See the image below to learn how this vector and matrix are structured.
+Once we have confirmed all these adquisition parameters, the vector of effective b values and the directions matrix will be shown in the terminal. 
+
+
+<!-- See the image below to learn how this vector and matrix are structured.
 
 ```{figure} _static/8_vector_matrix.png
 ---
@@ -142,9 +144,9 @@ name: vector_matrix
 align: center
 ---
 B values vector and gradient directions matrix.
-```
+``` -->
 
-Finally, the DTI model will be adjusted to the data, the ADC map will be computed and then the tensor will be solved to compute the remaining maps. In total, the maps produced for this modality are:
+Finally, the DTI model will be adjusted to the data. In total, the maps produced for this modality are:
 
 * **ADC -** Apparent Diffusion Coeficient
 * **AD -** Axial Diffusivity
@@ -152,7 +154,8 @@ Finally, the DTI model will be adjusted to the data, the ADC map will be compute
 * **MD -** Mean Diffusivity
 * **FA -** Fractional Anisotropy
 
-Before saving the maps, you will be asked if you want to use an [R{sup}`2` filter](R2_filter) and you will be able to adjust the color scale of each map (see {ref}`save_maps`).
+<!-- 
+Before saving the maps, you will be asked if you want to use an [R{sup}`2` filter](R2_filter) and you will be able to adjust the color scale of each map (see {ref}`save_maps`). -->
 
 Proccesing of DTI maps is made thanks to the [DIPY](https://dipy.org/) library.
 
@@ -175,7 +178,9 @@ In the case of MT images, no parameters need to be specified before the processi
 
 (Tmaps)=
 ### Relaxometry: T1, T2 and T2* maps
-These maps do not require any additional specification before processing begins. Once done, you will be asked if you want to use an [R{sup}`2` filter](R2_filter) and the maps can be saved.
+These maps do not require any additional specification before processing begins.
+
+<!-- Once done, you will be asked if you want to use an [R{sup}`2` filter](R2_filter) and the maps can be saved. -->
 
 Processing of T maps is made thanks to the [MyRelax](https://github.com/fragrussu/MyRelax) library.
 
