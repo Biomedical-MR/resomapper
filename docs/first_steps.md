@@ -70,7 +70,7 @@ Either way, to create a virtual environment with conda, you'll need to enter the
 You can also specify the Python version you want to use for the virtual environment (if not specified, as before, it will use the default Python version of your conda installation):
 
 ```
-> conda create --name resomapper python=3.8
+> conda create --name resomapper python=3.11
 ```
 
 In either case, answer yes when conda asks you to proceed. After creating the environment, whenever you want to use it, you will have to enter the comand:
