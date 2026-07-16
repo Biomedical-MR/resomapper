@@ -3,7 +3,7 @@
 [![PyPI version](https://img.shields.io/pypi/v/resomapper?color=blue)](https://pypi.python.org/pypi/resomapper)
 [![Documentation Status](https://readthedocs.org/projects/resomapper/badge/?version=latest)](https://resomapper.readthedocs.io/en/latest/?badge=latest)
 [![License: MIT](https://img.shields.io/badge/license-MIT-orange)](https://opensource.org/licenses/MIT)
-[![DOI](https://zenodo.org/badge/636663671.svg)](https://doi.org/10.5281/zenodo.21397794)
+[![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.21397795-blue.svg)](https://doi.org/10.5281/zenodo.21397794)
 
 Resomapper is an open-source, cross-platform Python tool designed to simplify quantitative MRI (qMRI) processing. It integrates established processing libraries into a unified and user-friendly workflow, supporting T1, T2, T2*, MTI, and DTI analyses, along with advanced preprocessing steps such as denoising, Gibbs artifact removal, and bias field correction. Users can run analyses interactively through an user-friendly interface, or through automated JSON-based configurations, ensuring compatibility by converting raw MRI data into the standardized NIfTI format within a BIDS-like structure. Resomapper promotes accessibility, reproducibility, and efficient data management in qMRI research and applications.
 
